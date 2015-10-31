@@ -40,3 +40,4 @@ out
 archive
 .nfs*
 .#-emacs*
+.DS_Store

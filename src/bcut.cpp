@@ -4,6 +4,8 @@
 using namespace std;
 
 void bcut::parseCuts(TString cuts){
+  vcuts_.clear(); // Starting the parsing every time
+  cuts.ReplaceAll(" ", "");
   TString cut;
   int pos;
   do{
@@ -19,6 +21,15 @@ bool bcut::pass(baby_base *baby){
   for(size_t ind(0); ind < vcuts_.size(); ind++)
     if(!vcuts_[ind].pass(baby)) return false;
   return true;
+}
+
+void bcut::operator+=(TString &cut){
+  if(cut!="") cuts_ += ("&&"+cut);
+  parseCuts(cuts_);
+}
+
+bcut bcut::operator+(bcut &ibcut){
+  return bcut(cuts_+"&&"+ibcut.cuts_);
 }
 
 bcut::bcut(TString cuts):
@@ -128,8 +139,7 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="pass"){
     cutType_ = kBool;
     bb_ = &baby_base::pass;
-  }
-  if(var.Contains("[")){
+  } else if(var.Contains("[")){ // if var is a vector element
     TString index_s(var);
     var.Remove(var.Index("["), var.Length());
     index_s.Remove(0, index_s.Index("[")+1);
@@ -138,8 +148,14 @@ void onecut::assignBranch(TString var, TString val){
     if(var=="trig"){
       cutType_ = kvBool;
       bvb_ = &baby_base::trig;
+    } else {
+      cout<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl;
+      cutType_ = kAlwaysFalse;
     }
-  } // if var is a vector element
+  }else {
+    cout<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl;
+    cutType_ = kAlwaysFalse;
+  } 
 
   if(cutType_ == kFloat) cutf_ = val.Atof();
   if(cutType_ == kInt) cuti_ = val.Atoi();

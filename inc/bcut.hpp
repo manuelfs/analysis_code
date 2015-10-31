@@ -56,6 +56,8 @@ public:
 
   void parseCuts(TString cuts);
   bool pass(baby_base *baby);
+  void operator+=(TString &cut);
+  bcut operator+(bcut &ibcut);
   bcut(TString cuts="");
   ~bcut();
 
