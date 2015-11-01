@@ -1,0 +1,484 @@
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <ctime>
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <getopt.h>
+
+#include "TMath.h"
+#include "TChain.h"
+#include "TH1D.h"
+#include "TCanvas.h"
+#include "TLegend.h"
+#include "TLine.h"
+#include "TString.h"
+#include "TLatex.h"
+#include "TArrow.h"
+#include "TGraphAsymmErrors.h"
+#include "TError.h" // Controls error level reporting
+
+#include "bcut.hpp"
+#include "styles.hpp"
+#include "baby_basic.hpp"
+#include "utilities.hpp"
+#include "utilities_macros.hpp"
+
+#define NSAM 2
+
+using namespace std;
+
+namespace{
+  bool do_data(false);
+  bool only_tt(false);
+  TString baseht("500");   
+  TString lowmj("250");    
+  TString highmj("400");   
+  TString lowmet("200");
+  TString highmet("400");
+  TString basenj("4"); //only 4 implemeted so far...
+  TString lownj("6"); // 6 or 7 lowest to go into kappa (only 6 yields validated)
+  TString highnj("9"); // 8 or 9 (only 9 yields validated)
+  double lumi(3.);
+}
+
+void getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts, 
+               vector<double> &yields, vector<double> &w2, bool do_trig=false);
+void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin);
+void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<unsigned> > &m3_njbin_ind, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin);
+
+int main(){ 
+  gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
+
+  time_t begtime, endtime;
+  time(&begtime);
+  TString folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
+  TString folderdata="/cms2r0/babymaker/babies/2015_10_25/data/singlelep/combined/skim_1lht500met200/";
+
+  ////// Creating babies
+  baby_basic data(folderdata+"*root");
+  baby_basic bkg(folder+"*TTJets*Lept*");
+  bkg.Add(folder+"*TTJets*HT*");
+  if(!only_tt){
+    bkg.Add(folder+"*_WJetsToLNu*");
+    bkg.Add(folder+"*_TTWJets*");
+    bkg.Add(folder+"*_TTZTo*");
+    bkg.Add(folder+"*_ST_*");
+    bkg.Add(folder+"*DYJetsToLL*");
+    bkg.Add(folder+"*_QCD_HT*");
+    bkg.Add(folder+"*ttHJetTobb*");
+    bkg.Add(folder+"*_WWTo*");
+    bkg.Add(folder+"*ggZH_HToBB*");
+  }
+
+  ////// Defining cuts
+  bcut baseline("nleps==1&&mj>"+lowmj+"&&njets>="+basenj+"&&nbm>=1");
+  
+  map<TString, vector<bcut> > cutmap;
+  //RmT and kappa calculation depend on mt cuts ordering, assumed 0 = low, 1 = high
+  cutmap["mt"].push_back(bcut("mt<=140"));
+  cutmap["mt"].push_back(bcut("mt>140"));
+  
+  //kappa calculation depends on MJ cut ordering, assumed 0 = low, 1 = high
+  cutmap["mj"].push_back(bcut("mj<="+highmj));
+  cutmap["mj"].push_back(bcut("mj>"+highmj));
+
+  cutmap["nb"].push_back(bcut("nbm==1"));
+  cutmap["nb"].push_back(bcut("nbm==2")); //high met kappa will integrate over nb=2 and nb>=3
+  cutmap["nb"].push_back(bcut("nbm>=3"));
+
+  cutmap["met"].push_back(bcut("met<="+highmet));
+  cutmap["met"].push_back(bcut("met>"+highmet));
+
+  vector<vector<unsigned> > m3_njbin_ind;
+  m3_njbin_ind.push_back(vector<unsigned>()); // push indices of yields to be integrated for low nj
+  m3_njbin_ind.push_back(vector<unsigned>()); // push indices of yields to be integrated for high nj
+  cutmap["nj"].push_back(bcut("njets==4"));
+  cutmap["nj"].push_back(bcut("njets==5")); 
+  cutmap["nj"].push_back(bcut("njets==6")); 
+  if (atoi(lownj)==6) m3_njbin_ind[0].push_back(cutmap["nj"].size()-1);
+  cutmap["nj"].push_back(bcut("njets==7")); 
+  if (atoi(lownj)<=7) m3_njbin_ind[0].push_back(cutmap["nj"].size()-1);
+  cutmap["nj"].push_back(bcut("njets==8")); 
+  if (atoi(highnj)==8) m3_njbin_ind[1].push_back(cutmap["nj"].size()-1);
+  else m3_njbin_ind[0].push_back(cutmap["nj"].size()-1);
+  cutmap["nj"].push_back(bcut("njets>=9")); 
+  m3_njbin_ind[1].push_back(cutmap["nj"].size()-1);
+
+  ////// Combining cuts
+  vector<bcut > bincuts;
+  for(size_t imet(0); imet<cutmap["met"].size(); imet++){
+    for(size_t imj(0); imj<cutmap["mj"].size(); imj++){
+      for(size_t inb(0); inb<cutmap["nb"].size(); inb++){
+        for(size_t inj(0); inj<cutmap["nj"].size(); inj++){
+          for(size_t imt(0); imt<cutmap["mt"].size(); imt++){ // This is the loop over powersk as well
+            bincuts.push_back(cutmap["nj"][inj]+cutmap["mt"][imt]+cutmap["mj"][imj]+cutmap["nb"][inb]+cutmap["met"][imet]);
+          } // Loop over mt and k observables
+        } // Loop over nj
+      } // Loop over nb
+    } // Loop over mj
+  }
+
+  ////// Finding yields 
+  vector<double> yield[NSAM], w2[NSAM];
+  size_t ini, fin;
+  //cutmap["mj"].resize(1);
+  if(do_data){
+    cutmap["nb"].resize(1);
+    cutmap["nb"].push_back(bcut("nbm>=2"));
+    getYields(data, baseline, bincuts, yield[1], w2[1], true);
+    ini = 1; fin = 1;
+  } else {
+    getYields(bkg, baseline, bincuts, yield[0], w2[0]);
+    ini = 0; fin = 0;
+  }
+
+  rmt(baseline.cuts_, cutmap, yield, w2, ini, fin);
+  if (!do_data) kappa(baseline.cuts_, cutmap, m3_njbin_ind, yield, w2, ini, fin);
+  else cout<<"Kappa is blinded in data"<<endl;
+
+  time(&endtime); 
+  cout<<"Plots took "<<difftime(endtime, begtime)<<" seconds"<<endl;  
+  
+}
+
+void getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts, 
+               vector<double> &yield, vector<double> &w2, bool do_trig){
+  yield = vector<double>(bincuts.size(), 0);
+  w2 = yield;
+  long nentries(baby.GetEntries());
+  //nentries = 30000;
+  for(long entry(0); entry < nentries; entry++){
+    baby.GetEntry(entry);
+    if(do_trig){
+      if(!baby.pass()) continue;
+      if(!baby.trig()[4] && !baby.trig()[8]) continue;
+    }
+    // cout<<"nleps "<<baby.nleps()<<", pass "<<baseline.pass(&baby)<<", cut "<<baseline.cuts_<<endl;
+    if(!baseline.pass(&baby)) continue;
+    for(size_t ind(0); ind<bincuts.size(); ind++){ 
+      // cout<<"nj "<<baby.njets()<<", nb "<<baby.nbm()<<", mj "<<baby.mj()<<", mt "<<baby.mt()
+      //          <<", pass "<<bincuts[ind].pass(&baby)<<", cut "<<bincuts[ind].cuts_<<" \t ncuts "<<bincuts[ind].vcuts_.size()<<endl;
+      // for(size_t icut(0); icut < bincuts[ind].vcuts_.size(); icut++)
+      //        cout<<bincuts[ind].vcuts_[icut].cut_<<" pass "<<bincuts[ind].vcuts_[icut].pass(&baby)<<endl;
+      if(bincuts[ind].pass(&baby)) {
+        yield[ind] += baby.weight()*lumi;
+        w2[ind] += baby.weight()*baby.weight()*lumi*lumi;
+      }
+    }
+  } // Loop over entries
+
+}
+
+void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<unsigned> > &m3_njbin_ind, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin){
+
+  vector<float> powersk;
+  powersk.push_back(1);  //  mt<=140  mj<=400   R1
+  powersk.push_back(-1); //  mt<=140  mj>400    R2
+  powersk.push_back(-1); //  mt>140   mj<=400   R3
+  powersk.push_back(1);  //  mt>140   mj>400    R4
+
+  float mSigma, pSigma;
+  float minh(0), maxh(cutmap["mj"].size()*cutmap["nj"].size()), wtot(maxh-minh);
+  float wnj(wtot/static_cast<float>(m3_njbin_ind.size()));
+  float wmet(wnj/static_cast<float>(cutmap["met"].size()));
+  float wnb(wmet/static_cast<float>(cutmap["nb"].size()+3));
+  // These vectors have indices vx[4][nbsize][njsize*metsize]
+  vector<vector<vector<double> > > vx, vy, vexl, vexh, veyl, veyh;
+  for(unsigned idata(0); idata<NSAM; idata++){
+    vx.push_back (vector<vector<double> >());  vexl.push_back(vector<vector<double> >());  vexh.push_back(vector<vector<double> >());
+    vy.push_back (vector<vector<double> >());  veyl.push_back(vector<vector<double> >());  veyh.push_back(vector<vector<double> >());
+    for(unsigned inb(0); inb<cutmap["nb"].size()+1; inb++){ // add an extra row for nb>=2, which needs a separate graph
+      vx[idata].push_back (vector<double>());  vexl[idata].push_back(vector<double>());  vexh[idata].push_back(vector<double>());
+      vy[idata].push_back (vector<double>());  veyl[idata].push_back(vector<double>());  veyh[idata].push_back(vector<double>());
+    }
+  }
+  
+  TString totcut("");
+  for(unsigned imet(0); imet<cutmap["met"].size(); imet++){
+    for(unsigned inb(0); inb<cutmap["nb"].size(); inb++){
+      for(unsigned inj(0); inj<m3_njbin_ind.size(); inj++){ //loop over the meta njet bins, instead of the fine bins of cutmap["nj"]
+        for(size_t idata(ini); idata<=fin; idata++){
+          if(imet==1 && inb==2) continue;
+          vector<vector<float> > entries;
+          vector<vector<float> > weights;
+          for(unsigned obs(0); obs < powersk.size(); obs++) {
+            size_t imt(obs/2), imj(obs%2);
+            entries.push_back(vector<float>());
+            weights.push_back(vector<float>());
+            vector<size_t> ind;
+            if (imj%2==0){ //if low MJ, i.e. region 1 or 3, integrate over njets and nb
+              for (unsigned iinj(0); iinj<m3_njbin_ind.size(); iinj++){ //for r1 and r3 we loop over also the meta njet bins
+                for (unsigned iiinj(0); iiinj<m3_njbin_ind[iinj].size(); iiinj++){ //and then over the individual njets within
+                  for (unsigned iinb(0); iinb<cutmap["nb"].size(); iinb++){
+                    ind.push_back(imt + m3_njbin_ind[iinj][iiinj]*cutmap["mt"].size() + iinb*cutmap["mt"].size()*cutmap["nj"].size()
+                              + imj*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size()
+                              + imet*cutmap["mj"].size()*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size());
+                  }
+                }
+              }
+            } else {
+              if(imet==1 && inb==1) { //if high MET, high MJ, merge nb=3 into nb=2
+                for (unsigned iinj(0); iinj<m3_njbin_ind[inj].size(); iinj++){ //merge the individual njets counts within this njet meta bin
+                  for (unsigned iinb(1); iinb<3; iinb++){
+                    ind.push_back(imt + m3_njbin_ind[inj][iinj]*cutmap["mt"].size() + iinb*cutmap["mt"].size()*cutmap["nj"].size()
+                                + imj*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size()
+                                + imet*cutmap["mj"].size()*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size());
+                  }
+                }
+              } else {
+                for (unsigned iinj(0); iinj<m3_njbin_ind[inj].size(); iinj++){ //and then over the individual njets within
+                  ind.push_back(imt + m3_njbin_ind[inj][iinj]*cutmap["mt"].size() + inb*cutmap["mt"].size()*cutmap["nj"].size()
+                                + imj*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size()
+                                + imet*cutmap["mj"].size()*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size());
+                }
+              }
+            }
+            double totw2(0.);
+            double totyield(0.);
+            for (size_t ibin(0); ibin<ind.size(); ibin++){
+              totw2 += w2[idata][ind[ibin]];
+              totyield += yield[idata][ind[ibin]]; 
+            }
+            //print values
+            if (imj%2==0){ 
+              if (inj==0 && inb==0 && obs==0)
+                cout<<"r"<<obs+1<<"_"<<(imet==0 ? "lowmet":"highmet")<<"_allnj_allnb = "<<totyield<<endl;
+            } else {
+              cout<<"r"<<obs+1<<"_"<<(imet==0 ? "lowmet":"highmet")<<"_"<<(inj==0 ? "lownj":"highnj")<<"_nb"<<inb+1<<" = "<<totyield<<endl;
+            }
+            entries[obs].push_back(pow(totyield,2)/totw2);
+            weights[obs].push_back(totw2/totyield);
+            // cout<<"Total yield for inj "<<inj<<", imet "<<imet<<", inb "<<inb<<", obs "<<obs<<" = "<<entries[obs].back()<<endl;
+          } // Loop over number of observables going into kappa
+   
+          double kappa(0);
+          kappa = calcKappa(entries, weights, powersk, mSigma, pSigma, (idata%2)==1, false);   
+          //collapse information into the vectors that will be fed into the 4 graphs nb==1, nb==2, nb>=3 and nb>=2
+          unsigned iinb(inb);
+          float xpoint = inj*wnj+imet*wmet+(iinb+2)*wnb;
+          if (imet==1 && inb==1) {
+            iinb = 3; 
+            xpoint = inj*wnj+imet*wmet+(iinb)*wnb;
+          }
+          vx[idata][iinb].push_back(xpoint);   vexl[idata][iinb].push_back(0);        vexh[idata][iinb].push_back(0);
+          vy[idata][iinb].push_back(kappa);    veyl[idata][iinb].push_back(mSigma);   veyh[idata][iinb].push_back(pSigma);
+          if (iinb==3) { // fill this with 0, since otherwise it can segfault
+            vx[idata][1].push_back(-999);   vexl[idata][1].push_back(0);   vexh[idata][1].push_back(0);
+            vy[idata][1].push_back(-999);   veyl[idata][1].push_back(0);   veyh[idata][1].push_back(0);
+            vx[idata][2].push_back(-999);   vexl[idata][2].push_back(0);   vexh[idata][2].push_back(0);
+            vy[idata][2].push_back(-999);   veyl[idata][2].push_back(0);   veyh[idata][2].push_back(0);
+          }
+        } // Loop over MC and data
+      } // Loop over nb cuts
+    } // Loop over met cuts
+  } // Loop over nj cuts
+
+  TH1D histo("histo",cuts2title(basecut+"&&ht>"+baseht+"&&met>"+lowmet),m3_njbin_ind.size()*cutmap["met"].size(), minh, maxh);
+  for(unsigned inj(0); inj<m3_njbin_ind.size(); inj++)
+    for(unsigned imet(0); imet<cutmap["met"].size(); imet++)
+      histo.GetXaxis()->SetBinLabel(1+imet+inj*cutmap["met"].size(), cuts2title(cutmap["met"][imet].cuts_));
+
+  for(unsigned idata(ini); idata<=fin; idata++){
+    bool is_data((idata%2)==1);
+    TString stylename = "RA4";
+    styles style(stylename);
+    style.setDefaultStyle();
+    float max_axis(3.2), max_kappa(0.);
+    unsigned nbsize(vx[idata].size());
+    for(unsigned inb(0); inb<nbsize; inb++){
+      for(unsigned ik(0); ik<vy[idata].size(); ik++){
+        if(vy[idata][inb][ik] > max_kappa) max_kappa = vy[idata][inb][ik];
+        if(vy[idata][inb][ik] > max_axis && vy[idata][inb][ik]-veyl[idata][inb][ik] < max_axis) {
+          veyl[idata][inb][ik] = max_axis-(vy[idata][inb][ik]-veyl[idata][inb][ik]);
+          vy[idata][inb][ik] = max_axis;
+        }
+      }
+    }
+    TCanvas can;
+    TLine line; line.SetLineColor(28); line.SetLineWidth(4); line.SetLineStyle(2);
+    histo.Draw();
+    TString ytitle("#kappa^{MC}"); 
+    if(is_data) ytitle += " (data uncert.)";
+    else ytitle += " (MC uncert.)";
+    histo.SetYTitle(ytitle);
+    histo.SetMaximum(max_axis);
+    style.moveYAxisLabel(&histo, max_axis, false);
+    line.SetLineColor(1); line.SetLineWidth(2); 
+    line.DrawLine(minh+wtot/2., 0, minh+wtot/2, max_axis);
+
+    double legX(style.PadLeftMargin+0.03), legY(0.902), legSingle = 0.052;
+    double legW = 0.29, legH = legSingle*nbsize;
+    legH = legSingle*((nbsize+1)/2);
+    TLegend leg(legX, legY-legH, legX+legW, legY);
+    leg.SetTextSize(style.LegendSize); leg.SetFillColor(0); 
+    leg.SetFillStyle(0); leg.SetBorderSize(0);
+    leg.SetTextFont(style.nFont); 
+    leg.SetNColumns(2);
+    TGraphAsymmErrors graph[20];
+    int colors[] = {2,4,kMagenta+2, kGreen+3}, styles[] = {20, 21, 22, 23};
+    for(unsigned inb(0); inb<nbsize; inb++){
+      graph[inb] = TGraphAsymmErrors(vx[idata][inb].size(), &(vx[idata][inb][0]), &(vy[idata][inb][0]), 
+                                     &(vexl[idata][inb][0]), &(vexh[idata][inb][0]), &(veyl[idata][inb][0]), &(veyh[idata][inb][0]));
+      graph[inb].SetMarkerStyle(styles[inb]); graph[inb].SetMarkerSize(1.4); 
+      graph[inb].SetMarkerColor(colors[inb]); graph[inb].SetLineColor(colors[inb]);
+      graph[inb].Draw("p same");   
+      cutmap["nb"][inb].cuts_.ReplaceAll("nbm","n_{b}");
+      cutmap["nb"][inb].cuts_.ReplaceAll("=="," = ");
+      cutmap["nb"][inb].cuts_.ReplaceAll(">="," #geq ");
+      if (inb==3) leg.AddEntry(&graph[inb], "n_{b} #geq", "p");
+      else leg.AddEntry(&graph[inb], cutmap["nb"][inb].cuts_, "p");
+    }
+
+    leg.Draw();
+    TLatex label; label.SetNDC(kTRUE);label.SetTextAlign(22);
+    TString m3_low_nj = cutmap["nj"][m3_njbin_ind[0][0]].cuts_;
+    m3_low_nj = m3_low_nj[m3_low_nj.Length()-1];
+    label.DrawLatex(0.37,0.03,m3_low_nj+" #leq n_{j} #leq "+TString::Format("%i",atoi(highnj)-1));
+    label.DrawLatex(0.73,0.03,"n_{j} #geq "+highnj);
+
+    TString pname = "plots/kappa_mj"+lowmj+"x"+highmj+"_met"+lowmet+"x"+highmet+"_nj"+lownj+"x"+highnj;
+    if(is_data) pname += "_data";
+    else {
+      if(only_tt) pname += "_tt";
+      else  pname += "_allmc";
+    }
+    pname += ".pdf";
+    can.SaveAs(pname);
+    cout<<"Saved "<<pname<<endl;
+
+  }
+ 
+}
+
+void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin){
+
+  vector<float> powersk;
+  //assuming that mt cuts are ordered as mt<=140, mt>140
+  powersk.push_back(-1); 
+  powersk.push_back(1); 
+
+  // size_t nmet(cutmap["mj"].size()*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size());
+  for (size_t imet(0); imet<cutmap["met"].size(); imet++) {
+    ////// Finding kappas
+    float mSigma, pSigma;
+    float minh(0), maxh(cutmap["mj"].size()*cutmap["nj"].size()), wtot(maxh-minh);
+    float wmj(wtot/static_cast<float>(cutmap["mj"].size()));
+    float wnj(wmj/static_cast<float>(cutmap["nj"].size()));
+    float wnb(wnj/static_cast<float>(cutmap["nb"].size()+4));
+    vector<vector<vector<double> > > vx, vy, vexl, vexh, veyl, veyh;
+    for(size_t idata(0); idata<NSAM; idata++){
+      vx.push_back (vector<vector<double> >());  vexl.push_back(vector<vector<double> >());  vexh.push_back(vector<vector<double> >());
+      vy.push_back (vector<vector<double> >());  veyl.push_back(vector<vector<double> >());  veyh.push_back(vector<vector<double> >());    
+      for(size_t inb(0); inb<cutmap["nb"].size(); inb++){
+        vx[idata].push_back (vector<double>());  vexl[idata].push_back(vector<double>());  vexh[idata].push_back(vector<double>());
+        vy[idata].push_back (vector<double>());  veyl[idata].push_back(vector<double>());  veyh[idata].push_back(vector<double>());
+      }
+    }
+
+    for(size_t imj(0); imj<cutmap["mj"].size(); imj++){
+      for(size_t inb(0); inb<cutmap["nb"].size(); inb++){
+        for(size_t inj(0); inj<cutmap["nj"].size(); inj++){
+          vector<vector<float> > entries;
+          vector<vector<float> > weights;
+          for(size_t idata(ini); idata<=fin; idata++){
+            for(size_t imt(0); imt<cutmap["mt"].size(); imt++){ // This is the loop over powersk as well
+              entries.push_back(vector<float>());
+              weights.push_back(vector<float>());
+              size_t ind(imt + inj*cutmap["mt"].size() + inb*cutmap["mt"].size()*cutmap["nj"].size()
+                         + imj*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size()
+                         + imet*cutmap["mj"].size()*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size());
+              double sigma(sqrt(w2[idata][ind]));
+              double totyield(yield[idata][ind]);
+              entries[imt].push_back(pow(totyield,2)/pow(sigma,2));
+              weights[imt].push_back(pow(sigma,2)/totyield);
+            } // Loop over mt and k observables
+            double kappa(0);
+            kappa = calcKappa(entries, weights, powersk, mSigma, pSigma, idata==1, false);  
+            if(imj>=1 && idata==1) { // Blinding data at high MJ
+              kappa = 1;
+              pSigma = 0; mSigma = 0;
+            }
+            float xpoint = inj*wnj+imj*wmj+(inb+2)*wnb;
+            vx[idata][inb].push_back(xpoint);    vexl[idata][inb].push_back(0);         vexh[idata][inb].push_back(0);
+            vy[idata][inb].push_back(kappa);     veyl[idata][inb].push_back(mSigma);    veyh[idata][inb].push_back(pSigma);
+          } // Loop over is data  
+        } // Loop over nj
+      } // Loop over nb
+    } // Loop over mj
+
+    // Set up histo for axes of RmT plot
+    TH1D histo("histo",cuts2title(basecut+"&&ht>"+baseht+"&&met>"+lowmet+"&&"+cutmap["met"][imet].cuts_),cutmap["nj"].size()*cutmap["mj"].size(), minh, maxh);
+    for(size_t imj(0); imj<cutmap["mj"].size(); imj++)
+      for(size_t inj(0); inj<cutmap["nj"].size(); inj++)
+        histo.GetXaxis()->SetBinLabel(1+inj+imj*cutmap["nj"].size(), cuts2title(cutmap["nj"][inj].cuts_));
+
+    // find max kappa to set up axis range
+    styles style("RA4long"); //style.LabelSize = 0.05;
+    style.setDefaultStyle();
+    float max_axis(0.35);
+    size_t nbsize(vx[ini].size());
+    TCanvas can;
+    TLine line; line.SetLineColor(28); line.SetLineWidth(4); line.SetLineStyle(3);
+    histo.Draw();
+    TString ytitle("R_{m_{T}}"); 
+    histo.SetYTitle(ytitle);
+    histo.SetMaximum(max_axis);
+    style.moveYAxisLabel(&histo, 1000, false);
+    line.DrawLine(minh, 1, maxh, 1);
+    line.SetLineColor(1); line.SetLineWidth(2); 
+    line.DrawLine(minh+wtot/2., 0, minh+wtot/2, max_axis);
+
+    //--- Green arrows indicating baseline
+    int acolor(kGreen+3);
+    float alength((maxh-minh)/8.), yarrow(max_axis/15.), llength(max_axis/1.5);
+    TArrow arrow; arrow.SetLineColor(acolor); arrow.SetLineWidth(1); arrow.SetArrowSize(0.02);
+    TLatex label; label.SetNDC(kFALSE);label.SetTextAlign(11); label.SetTextColor(acolor);
+    float binw(histo.GetBinWidth(1));
+    line.SetLineColor(acolor); line.SetLineWidth(1); line.SetLineStyle(2);
+    float xarrow(minh+binw*2);
+    line.DrawLine(xarrow, 0, xarrow, llength);
+    arrow.DrawArrow(xarrow, yarrow, xarrow+alength, yarrow);
+    label.DrawLatex(xarrow+0.1, yarrow+max_axis/80., "Baseline");
+    xarrow = minh+wtot/2+binw*2;
+    line.DrawLine(xarrow, 0, xarrow, llength);
+    arrow.DrawArrow(xarrow, yarrow, xarrow+alength, yarrow);
+    label.DrawLatex(xarrow+0.1, yarrow+max_axis/80., "Baseline");
+
+    //--- draw RmT plot
+    double legX(style.PadLeftMargin+0.0), legY(0.88), legSingle = 0.052;
+    double legW = 0.29, legH = legSingle*nbsize;
+    if(nbsize>3) legH = legSingle*((nbsize+1)/2);
+    TLegend leg(legX, legY-legH, legX+legW, legY);
+    leg.SetTextSize(style.LegendSize); leg.SetFillColor(0); 
+    leg.SetFillStyle(0); leg.SetBorderSize(0);
+    leg.SetTextFont(style.nFont); 
+    if(nbsize>3) leg.SetNColumns(2);
+    TGraphAsymmErrors graph[20];
+    int colors[] = {2,4,kMagenta+2, kGreen+3}, styles[] = {20, 21, 22, 23};
+    for(size_t inb(0); inb<nbsize; inb++){
+      graph[inb] = TGraphAsymmErrors(vx[ini][inb].size(), &(vx[ini][inb][0]), &(vy[ini][inb][0]), 
+                                     &(vexl[ini][inb][0]), &(vexh[ini][inb][0]), &(veyl[ini][inb][0]), &(veyh[ini][inb][0]));
+      graph[inb].SetMarkerStyle(styles[inb]); graph[inb].SetMarkerSize(1.4); 
+      graph[inb].SetMarkerColor(colors[inb]); graph[inb].SetLineColor(colors[inb]);
+      graph[inb].Draw("p same");   
+      leg.AddEntry(&graph[inb], cuts2title(cutmap["nb"][inb].cuts_), "p");
+    }
+    leg.Draw();
+    label.SetNDC(kTRUE); label.SetTextAlign(22); label.SetTextColor(1);
+    TString cutname;
+    label.DrawLatex(0.37,0.03,"M_{J} #leq 400");
+    label.DrawLatex(0.73,0.03,"M_{J} > 400");
+
+
+    TString pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+(imet==0 ? lowmet:highmet)+"_lownj"+basenj+"_data.pdf"; 
+
+    if(!do_data) {
+      if(only_tt) pname.ReplaceAll("data","tt");
+      else pname.ReplaceAll("data","allmc");
+    }
+    can.SaveAs(pname);
+    cout<<"Saved "<<pname<<endl;
+  }
+}

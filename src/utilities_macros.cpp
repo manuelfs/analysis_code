@@ -522,6 +522,8 @@ void plot_2D_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString 
 
 TString cuts2title(TString title){
   if(title=="1") title = "";
+  if (title.Contains("met>200") && title.Contains("met>400")) title.ReplaceAll("met>200&&",""); 
+  if (title.Contains("met>200") && title.Contains("met<=400")) {title.ReplaceAll("met>200&&",""); title.ReplaceAll("met<=400","200<met<=400");} 
   title.ReplaceAll("1==1", "Full Sample");
   title.ReplaceAll("el_tks_chg*lep_charge<0", "OS");title.ReplaceAll("mu_tks_chg*lep_charge<0", "OS");title.ReplaceAll("had_tks_chg*lep_charge<0", "OS");
   title.ReplaceAll("Sum$(abs(mc_id)==11)","n^{true}_{e}");
@@ -566,7 +568,7 @@ TString cuts2title(TString title){
   title.ReplaceAll("(fjets_pt*cosh(fjets_eta))","p_{fatjet}"); title.ReplaceAll("fjets_pt","p^{fatjet}_{T}"); title.ReplaceAll("jets_pt","p^{jet}_{T}");
   title.ReplaceAll("mus_reliso","RelIso"); title.ReplaceAll("els_reliso","RelIso");
   title.ReplaceAll("mus_miniso_tr15","MiniIso"); title.ReplaceAll("els_miniso_tr15","MiniIso");
-  title.ReplaceAll("njets","n_{jets}");title.ReplaceAll("abs(lep_id)==13&&","");
+  title.ReplaceAll("njets","n_{j}");title.ReplaceAll("abs(lep_id)==13&&","");
   title.ReplaceAll(">=", " #geq "); title.ReplaceAll(">", " > "); 
   title.ReplaceAll("<=", " #leq "); title.ReplaceAll("<", " < "); 
   title.ReplaceAll("&&", ", "); title.ReplaceAll("==", " = "); 
