@@ -32,6 +32,7 @@ using namespace std;
 namespace{
   bool do_data(false);
   bool only_tt(false);
+  bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
   TString highmj("400");   
@@ -189,7 +190,9 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
   for(unsigned idata(0); idata<NSAM; idata++){
     vx.push_back (vector<vector<double> >());  vexl.push_back(vector<vector<double> >());  vexh.push_back(vector<vector<double> >());
     vy.push_back (vector<vector<double> >());  veyl.push_back(vector<vector<double> >());  veyh.push_back(vector<vector<double> >());
-    for(unsigned inb(0); inb<cutmap["nb"].size()+1; inb++){ // add an extra row for nb>=2, which needs a separate graph
+    unsigned nbmax = cutmap["nb"].size();
+    if (fatbins) nbmax += 1; // add an extra row for nb>=2, which needs a separate graph
+    for(unsigned inb(0); inb<nbmax; inb++){ 
       vx[idata].push_back (vector<double>());  vexl[idata].push_back(vector<double>());  vexh[idata].push_back(vector<double>());
       vy[idata].push_back (vector<double>());  veyl[idata].push_back(vector<double>());  veyh[idata].push_back(vector<double>());
     }
@@ -200,7 +203,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     for(unsigned inb(0); inb<cutmap["nb"].size(); inb++){
       for(unsigned inj(0); inj<m3_njbin_ind.size(); inj++){ //loop over the meta njet bins, instead of the fine bins of cutmap["nj"]
         for(size_t idata(ini); idata<=fin; idata++){
-          if(imet==1 && inb==2) continue;
+          if(imet==1 && inb==2 && fatbins) continue;
           vector<vector<float> > entries;
           vector<vector<float> > weights;
           for(unsigned obs(0); obs < powersk.size(); obs++) {
@@ -208,7 +211,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
             entries.push_back(vector<float>());
             weights.push_back(vector<float>());
             vector<size_t> ind;
-            if (imj%2==0){ //if low MJ, i.e. region 1 or 3, integrate over njets and nb
+            if (imj%2==0 && fatbins){ //if low MJ, i.e. region 1 or 3, integrate over njets and nb
               for (unsigned iinj(0); iinj<m3_njbin_ind.size(); iinj++){ //for r1 and r3 we loop over also the meta njet bins
                 for (unsigned iiinj(0); iiinj<m3_njbin_ind[iinj].size(); iiinj++){ //and then over the individual njets within
                   for (unsigned iinb(0); iinb<cutmap["nb"].size(); iinb++){
@@ -219,7 +222,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
                 }
               }
             } else {
-              if(imet==1 && inb==1) { //if high MET, high MJ, merge nb=3 into nb=2
+              if(imet==1 && inb==1 && fatbins) { //if high MET, high MJ, merge nb=3 into nb=2
                 for (unsigned iinj(0); iinj<m3_njbin_ind[inj].size(); iinj++){ //merge the individual njets counts within this njet meta bin
                   for (unsigned iinb(1); iinb<3; iinb++){
                     ind.push_back(imt + m3_njbin_ind[inj][iinj]*cutmap["mt"].size() + iinb*cutmap["mt"].size()*cutmap["nj"].size()
@@ -242,7 +245,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
               totyield += yield[idata][ind[ibin]]; 
             }
             //print values
-            if (imj%2==0){ 
+            if (imj%2==0 && fatbins){ 
               if (inj==0 && inb==0 && obs==0)
                 cout<<"r"<<obs+1<<"_"<<(imet==0 ? "lowmet":"highmet")<<"_allnj_allnb = "<<totyield<<endl;
             } else {
@@ -258,13 +261,14 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
           //collapse information into the vectors that will be fed into the 4 graphs nb==1, nb==2, nb>=3 and nb>=2
           unsigned iinb(inb);
           float xpoint = inj*wnj+imet*wmet+(iinb+2)*wnb;
-          if (imet==1 && inb==1) {
+          // if (!fatbins) xpoint = inj*wnj+imet*wmet+(iinb)*wnb;
+          if (imet==1 && inb==1 && fatbins) {
             iinb = 3; 
             xpoint = inj*wnj+imet*wmet+(iinb)*wnb;
           }
           vx[idata][iinb].push_back(xpoint);   vexl[idata][iinb].push_back(0);        vexh[idata][iinb].push_back(0);
           vy[idata][iinb].push_back(kappa);    veyl[idata][iinb].push_back(mSigma);   veyh[idata][iinb].push_back(pSigma);
-          if (iinb==3) { // fill this with 0, since otherwise it can segfault
+          if (iinb==3 && fatbins) { // fill this with 0, since otherwise it can segfault
             vx[idata][1].push_back(-999);   vexl[idata][1].push_back(0);   vexh[idata][1].push_back(0);
             vy[idata][1].push_back(-999);   veyl[idata][1].push_back(0);   veyh[idata][1].push_back(0);
             vx[idata][2].push_back(-999);   vexl[idata][2].push_back(0);   vexh[idata][2].push_back(0);
@@ -327,7 +331,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
       cutmap["nb"][inb].cuts_.ReplaceAll("nbm","n_{b}");
       cutmap["nb"][inb].cuts_.ReplaceAll("=="," = ");
       cutmap["nb"][inb].cuts_.ReplaceAll(">="," #geq ");
-      if (inb==3) leg.AddEntry(&graph[inb], "n_{b} #geq", "p");
+      if (inb==3) leg.AddEntry(&graph[inb], "n_{b} #geq 2", "p");
       else leg.AddEntry(&graph[inb], cutmap["nb"][inb].cuts_, "p");
     }
 
@@ -338,7 +342,12 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     label.DrawLatex(0.37,0.03,m3_low_nj+" #leq n_{j} #leq "+TString::Format("%i",atoi(highnj)-1));
     label.DrawLatex(0.73,0.03,"n_{j} #geq "+highnj);
 
+    // draw a line at 1
+    line.SetLineColor(28); line.SetLineWidth(4); line.SetLineStyle(3);
+    line.DrawLine(minh, 1, maxh, 1);
+
     TString pname = "plots/kappa_mj"+lowmj+"x"+highmj+"_met"+lowmet+"x"+highmet+"_nj"+lownj+"x"+highnj;
+    if (!fatbins) pname.ReplaceAll("kappa_","kappa_method1_");
     if(is_data) pname += "_data";
     else {
       if(only_tt) pname += "_tt";
@@ -346,7 +355,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     }
     pname += ".pdf";
     can.SaveAs(pname);
-    cout<<"Saved "<<pname<<endl;
+    cout<<"open "<<pname<<endl;
 
   }
  
@@ -479,6 +488,6 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       else pname.ReplaceAll("data","allmc");
     }
     can.SaveAs(pname);
-    cout<<"Saved "<<pname<<endl;
+    cout<<"open "<<pname<<endl;
   }
 }
