@@ -44,8 +44,6 @@ namespace{
   double lumi(3.);
 }
 
-void getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts, 
-               vector<double> &yields, vector<double> &w2, bool do_trig=false);
 void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin);
 void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<unsigned> > &m3_njbin_ind, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin);
 
@@ -128,10 +126,10 @@ int main(){
   if(do_data){
     cutmap["nb"].resize(1);
     cutmap["nb"].push_back(bcut("nbm>=2"));
-    getYields(data, baseline, bincuts, yield[1], w2[1], true);
+    getYields(data, baseline, bincuts, yield[1], w2[1], 1., true);
     ini = 1; fin = 1;
   } else {
-    getYields(bkg, baseline, bincuts, yield[0], w2[0]);
+    getYields(bkg, baseline, bincuts, yield[0], w2[0], lumi);
     ini = 0; fin = 0;
   }
 
@@ -142,34 +140,6 @@ int main(){
   time(&endtime); 
   cout<<"Plots took "<<difftime(endtime, begtime)<<" seconds"<<endl;  
   
-}
-
-void getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts, 
-               vector<double> &yield, vector<double> &w2, bool do_trig){
-  yield = vector<double>(bincuts.size(), 0);
-  w2 = yield;
-  long nentries(baby.GetEntries());
-  //nentries = 30000;
-  for(long entry(0); entry < nentries; entry++){
-    baby.GetEntry(entry);
-    if(do_trig){
-      if(!baby.pass()) continue;
-      if(!baby.trig()[4] && !baby.trig()[8]) continue;
-    }
-    // cout<<"nleps "<<baby.nleps()<<", pass "<<baseline.pass(&baby)<<", cut "<<baseline.cuts_<<endl;
-    if(!baseline.pass(&baby)) continue;
-    for(size_t ind(0); ind<bincuts.size(); ind++){ 
-      // cout<<"nj "<<baby.njets()<<", nb "<<baby.nbm()<<", mj "<<baby.mj()<<", mt "<<baby.mt()
-      //          <<", pass "<<bincuts[ind].pass(&baby)<<", cut "<<bincuts[ind].cuts_<<" \t ncuts "<<bincuts[ind].vcuts_.size()<<endl;
-      // for(size_t icut(0); icut < bincuts[ind].vcuts_.size(); icut++)
-      //        cout<<bincuts[ind].vcuts_[icut].cut_<<" pass "<<bincuts[ind].vcuts_[icut].pass(&baby)<<endl;
-      if(bincuts[ind].pass(&baby)) {
-        yield[ind] += baby.weight()*lumi;
-        w2[ind] += baby.weight()*baby.weight()*lumi*lumi;
-      }
-    }
-  } // Loop over entries
-
 }
 
 void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<unsigned> > &m3_njbin_ind, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin){
@@ -246,10 +216,14 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
             }
             //print values
             if (imj%2==0 && fatbins){ 
-              if (inj==0 && inb==0 && obs==0)
-                cout<<"r"<<obs+1<<"_"<<(imet==0 ? "lowmet":"highmet")<<"_allnj_allnb = "<<totyield<<endl;
+              if (inj==0 && inb==0 && obs==0){
+		if(obs==0) cout<<endl;
+                cout<<"r"<<obs+1<<"_"<<(imet==0 ? "lowmet":"highmet")<<"_allnj_allnb \t= "<<setw(7)<<RoundNumber(totyield,2)<<endl;
+	      }
             } else {
-              cout<<"r"<<obs+1<<"_"<<(imet==0 ? "lowmet":"highmet")<<"_"<<(inj==0 ? "lownj":"highnj")<<"_nb"<<inb+1<<" = "<<totyield<<endl;
+	      if(obs==0) cout<<endl;
+              cout<<"r"<<obs+1<<"_"<<(imet==0 ? "lowmet":"highmet")<<"_"<<(inj==0 ? "lownj":"highnj")
+		  <<"_nb"<<inb+1<<" \t= "<<setw(7)<<RoundNumber(totyield,2)<<endl;
             }
             entries[obs].push_back(pow(totyield,2)/totw2);
             weights[obs].push_back(totw2/totyield);
@@ -355,7 +329,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     }
     pname += ".pdf";
     can.SaveAs(pname);
-    cout<<"open "<<pname<<endl;
+    cout<<endl<<" open "<<pname<<endl<<endl;
 
   }
  

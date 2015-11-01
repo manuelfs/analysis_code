@@ -12,6 +12,9 @@
 #include "TRandom3.h"
 #include "TChain.h"
 
+#include "bcut.hpp"
+#include "baby_basic.hpp"
+
 namespace ra4{
   // Had to define the TColor objects in the cpp
   enum {
@@ -80,6 +83,14 @@ public:
   
 };
 
+class tfeats {
+public:
+  tfeats(TString icuts, TString itag);
+  void add(TString texname, TString tcut, TString option="");
+  TString cuts, tag;
+  std::vector<TString> texnames, tcuts, options;
+};
+
 class sfeats {
 public:
   sfeats(std::vector<TString> ifile, TString ilabel, int icolor=1, int istyle=1, TString icut="1",
@@ -109,11 +120,14 @@ void calc_chi2_diff(TH1D *histo1, TH1D *histo2, float &chi2, int &ndof, float &p
 void calc_chi2(TH1D *histo, float &chi2, int &ndof, float &pvalue, float &average);
 long getYieldErr(TChain& tree, TString cut, double& yield, double& uncertainty);
 
+void getYields(baby_basic &baby, bcut baseline, std::vector<bcut> bincuts, std::vector<double> &yields, std::vector<double> &w2,
+	       double lumi=1., bool do_trig=false);
 void plot_distributions(std::vector<sfeats> Samples, std::vector<hfeats> vars, TString luminosity="10", 
 			TString filetype=".eps", TString namestyle="LargeLabels", TString dir = "1d", bool doRatio=false);
 void plot_2D_distributions(std::vector<sfeats> Samples, std::vector<hfeats> vars, TString luminosity,
                            TString filetype, TString namestyle, TString dir);
 TString cuts2title(TString title);
+TString cuts2tex(TString cuts);
 TString invertcut(TString cut);
 TString format_tag(TString tag);
 double gsl_ran_gamma (const double a, const double b, TRandom3 &rand);

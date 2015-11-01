@@ -130,6 +130,9 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="nleps"){
     cutType_ = kInt;
     bi_ = &baby_base::nleps;
+  }else if(var=="ntruleps"){
+    cutType_ = kInt;
+    bi_ = &baby_base::ntruleps;
   }else if(var=="njets"){
     cutType_ = kInt;
     bi_ = &baby_base::njets;

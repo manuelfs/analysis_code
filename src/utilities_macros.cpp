@@ -520,10 +520,31 @@ void plot_2D_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString 
   }
 }
 
+TString cuts2tex(TString cuts){
+  if(cuts.Contains("met>200")){
+    if(cuts.Contains("met<=400")) {
+      cuts.ReplaceAll("met<=400", "");
+      cuts.ReplaceAll("met>200", "200<met<=400");
+    }
+    if(cuts.Contains("met>400")) {
+      cuts.ReplaceAll("met>400", "");
+      cuts.ReplaceAll("met>200", "met>400");
+    }
+  }
+  cuts.ReplaceAll("&&&&", "&&");  cuts.ReplaceAll("&&", ", ");  
+  cuts.ReplaceAll("ht", "H_T"); cuts.ReplaceAll("mj", "M_J"); cuts.ReplaceAll("met", "\\mathrm{MET}");  
+  cuts.ReplaceAll("njets", "n_j");  cuts.ReplaceAll("nbm", "n_b");  cuts.ReplaceAll("nleps", "n_{\\ell}"); 
+  cuts.ReplaceAll(">=", "\\geq ");  cuts.ReplaceAll("<=", " \\leq "); cuts.ReplaceAll("==", " = ");
+
+  cuts = "$"+cuts+"$";
+  return cuts;
+}
+
 TString cuts2title(TString title){
   if(title=="1") title = "";
   if (title.Contains("met>200") && title.Contains("met>400")) title.ReplaceAll("met>200&&",""); 
-  if (title.Contains("met>200") && title.Contains("met<=400")) {title.ReplaceAll("met>200&&",""); title.ReplaceAll("met<=400","200<met<=400");} 
+  if (title.Contains("met>200") && title.Contains("met<=400")) {title.ReplaceAll("met>200&&",""); 
+    title.ReplaceAll("met<=400","200<met<=400");} 
   title.ReplaceAll("1==1", "Full Sample");
   title.ReplaceAll("el_tks_chg*lep_charge<0", "OS");title.ReplaceAll("mu_tks_chg*lep_charge<0", "OS");title.ReplaceAll("had_tks_chg*lep_charge<0", "OS");
   title.ReplaceAll("Sum$(abs(mc_id)==11)","n^{true}_{e}");
@@ -750,6 +771,16 @@ TString format_tag(TString tag){
   return tag;
 }
 
+tfeats::tfeats(TString icuts, TString itag):
+  cuts(icuts),
+  tag(itag){
+  }
+void tfeats::add(TString texname, TString tcut, TString option){
+  texnames.push_back(texname);
+  tcuts.push_back(tcut);
+  options.push_back(option);
+}
+
 sfeats::sfeats(vector<TString> ifile, TString ilabel, int icolor, int istyle, TString icut, 
                TString isamVariable){
   file = ifile; label = ilabel; cut = icut;
@@ -842,6 +873,31 @@ void calc_chi2_diff(TH1D *histo1, TH1D *histo2, float &chi2, int &ndof, float &p
     chi2 += pow((vals[0][0][ival]-vals[1][0][ival]*Raver)/error,2);
   }
   pvalue = TMath::Prob(chi2,ndof);
+}
+
+void getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts, 
+               vector<double> &yield, vector<double> &w2, double lumi, bool do_trig){
+  yield = vector<double>(bincuts.size(), 0);
+  w2 = yield;
+  long nentries(baby.GetEntries());
+  for(long entry(0); entry < nentries; entry++){
+    baby.GetEntry(entry);
+    if(do_trig){
+      if(!baby.pass()) continue;
+      if(!baby.trig()[4] && !baby.trig()[8]) continue;
+    }
+    if(!baseline.pass(&baby)) continue;
+    for(size_t ind(0); ind<bincuts.size(); ind++){ 
+      if(bincuts[ind].pass(&baby)) {
+        yield[ind] += baby.weight();
+        w2[ind] += baby.weight()*baby.weight();
+      }
+    }
+  } // Loop over entries
+  for(size_t ind(0); ind<bincuts.size(); ind++){ 
+     yield[ind] *= lumi;
+     w2[ind] *= pow(lumi, 2);
+  }
 }
 
 long getYieldErr(TChain& tree, TString cut, double& yield, double& uncertainty){
