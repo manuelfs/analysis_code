@@ -51,6 +51,7 @@ onecut::~onecut(){
 bool onecut::pass(baby_base *baby){
   int vali; float valf;
   switch(cutType_){
+  default:
   case kAlwaysTrue:
     return true;
   case kAlwaysFalse:
