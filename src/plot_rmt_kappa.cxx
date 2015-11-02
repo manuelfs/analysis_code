@@ -32,7 +32,8 @@ using namespace std;
 namespace{
   bool do_data(false);
   bool only_tt(false);
-  bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
+  bool do_metbins(true);
+  bool fatbins(false); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
   TString highmj("400");   
@@ -87,8 +88,12 @@ int main(){
   cutmap["nb"].push_back(bcut("nbm==2")); //high met kappa will integrate over nb=2 and nb>=3
   cutmap["nb"].push_back(bcut("nbm>=3"));
 
-  cutmap["met"].push_back(bcut("met<="+highmet));
-  cutmap["met"].push_back(bcut("met>"+highmet));
+  if (do_metbins){
+    cutmap["met"].push_back(bcut("met<="+highmet));
+    cutmap["met"].push_back(bcut("met>"+highmet));
+  } else {
+    cutmap["met"].push_back(bcut("met>"+lowmet));
+  }
 
   vector<vector<unsigned> > m3_njbin_ind;
   m3_njbin_ind.push_back(vector<unsigned>()); // push indices of yields to be integrated for low nj
@@ -134,7 +139,7 @@ int main(){
   }
 
   rmt(baseline.cuts_, cutmap, yield, w2, ini, fin);
-  if (!do_data) kappa(baseline.cuts_, cutmap, m3_njbin_ind, yield, w2, ini, fin);
+  if (!do_data && do_metbins) kappa(baseline.cuts_, cutmap, m3_njbin_ind, yield, w2, ini, fin);
   else cout<<"Kappa is blinded in data"<<endl;
 
   time(&endtime); 
@@ -392,7 +397,9 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     } // Loop over mj
 
     // Set up histo for axes of RmT plot
-    TH1D histo("histo",cuts2title(basecut+"&&ht>"+baseht+"&&met>"+lowmet+"&&"+cutmap["met"][imet].cuts_),cutmap["nj"].size()*cutmap["mj"].size(), minh, maxh);
+    TString hist_ttl = basecut+"&&ht>"+baseht+"&&met>"+lowmet+"&&"+cutmap["met"][imet].cuts_;
+    if (!do_metbins) hist_ttl = basecut+"&&ht>"+baseht+"&&"+cutmap["met"][imet].cuts_;
+    TH1D histo("histo",cuts2title(hist_ttl),cutmap["nj"].size()*cutmap["mj"].size(), minh, maxh);
     for(size_t imj(0); imj<cutmap["mj"].size(); imj++)
       for(size_t inj(0); inj<cutmap["nj"].size(); inj++)
         histo.GetXaxis()->SetBinLabel(1+inj+imj*cutmap["nj"].size(), cuts2title(cutmap["nj"][inj].cuts_));
@@ -455,7 +462,8 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     label.DrawLatex(0.73,0.03,"M_{J} > 400");
 
 
-    TString pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+(imet==0 ? lowmet:highmet)+"_lownj"+basenj+"_data.pdf"; 
+    TString pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+(imet==0 ? (lowmet+"x"+highmet):highmet)+"_lownj"+basenj+"_data.pdf"; 
+    if (!do_metbins) pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+lowmet+"_lownj"+basenj+"_data.pdf"; 
 
     if(!do_data) {
       if(only_tt) pname.ReplaceAll("data","tt");
