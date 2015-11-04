@@ -34,12 +34,13 @@ namespace{
   bool do_data(false);
   bool only_tt(false);
   bool do_metbins(true);
-  bool fatbins(false); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
+  bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
   TString highmj("400");   
   TString lowmet("200");
   TString highmet("400");
+  TString mtcut("140");
   TString basenj("4"); //only 4 implemeted so far...
   TString lownj("6"); // 6 or 7 lowest to go into kappa (only 6 yields validated)
   TString highnj("9"); // 8 or 9 (only 9 yields validated)
@@ -78,8 +79,8 @@ int main(){
   
   map<TString, vector<bcut> > cutmap;
   //RmT and kappa calculation depend on mt cuts ordering, assumed 0 = low, 1 = high
-  cutmap["mt"].push_back(bcut("mt<=140"));
-  cutmap["mt"].push_back(bcut("mt>140"));
+  cutmap["mt"].push_back(bcut("mt<="+mtcut));
+  cutmap["mt"].push_back(bcut("mt>"+mtcut));
   
   //kappa calculation depends on MJ cut ordering, assumed 0 = low, 1 = high
   cutmap["mj"].push_back(bcut("mj<="+highmj));
@@ -141,7 +142,7 @@ int main(){
 
   rmt(baseline.cuts_, cutmap, yield, w2, ini, fin);
   if (!do_data && do_metbins) kappa(baseline.cuts_, cutmap, m3_njbin_ind, yield, w2, ini, fin);
-  else cout<<"Kappa is blinded in data"<<endl;
+  else cout<<"Kappa is blinded in data, or needs the MET bins"<<endl;
 
   time(&endtime); 
   cout<<"Plots took "<<difftime(endtime, begtime)<<" seconds"<<endl;  
@@ -333,7 +334,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
       if(only_tt) pname += "_tt";
       else  pname += "_allmc";
     }
-    pname += ".pdf";
+    pname += "_mt"+mtcut+".pdf";
     can.SaveAs(pname);
     cout<<endl<<" open "<<pname<<endl<<endl;
 
@@ -463,8 +464,8 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     label.DrawLatex(0.73,0.03,"M_{J} > 400");
 
 
-    TString pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+(imet==0 ? (lowmet+"x"+highmet):highmet)+"_lownj"+basenj+"_data.pdf"; 
-    if (!do_metbins) pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+lowmet+"_lownj"+basenj+"_data.pdf"; 
+    TString pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+(imet==0 ? (lowmet+"x"+highmet):highmet)+"_lownj"+basenj+"_mt"+mtcut+"_data.pdf"; 
+    if (!do_metbins) pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+lowmet+"_lownj"+basenj+"_mt"+mtcut+"_data.pdf"; 
 
     if(!do_data) {
       if(only_tt) pname.ReplaceAll("data","tt");
