@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
   int line_width = 4;
   TArrow arrow; arrow.SetLineColor(kGray+2); arrow.SetFillColor(0);
   arrow.SetArrowSize(0.05); arrow.SetLineWidth(3);
-  TLine l_mj(500.,0.,500.,mt_max);
+  TLine l_mj(400.,0.,400.,mt_max);
   TLine l_mt(250.,140.,mj_max,140.);
   l_mj.SetLineWidth(line_width);
   l_mt.SetLineWidth(line_width);
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]){
   h_data.SetMarkerStyle(20);
   h_data.Draw("scat same");
 
-  l_mt.DrawLine(500.,0.,500.,mt_max);
+  l_mt.DrawLine(400.,0.,400.,mt_max);
   l_mt.DrawLine(250.,140.,mj_max,140.);
   l_mj.DrawLine(250.,0.,250.,mt_max);
   //  arrow.DrawArrow(150,30,325,30);
