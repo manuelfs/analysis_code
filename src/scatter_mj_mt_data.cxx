@@ -78,7 +78,7 @@ int main(int argc, char *argv[]){
   baby_basic st_data(folder_data+"*Single*");
 
   double mj_max = 1000.;
-  double mt_max = 400.;
+  double mt_max = 500.;
 
   TH2D h_sig("h_sig", ";M_{J} [GeV];m_{T} [GeV]", 20, 0., mj_max, 20, 0., mt_max);
   TH2D h_bkg("h_bkg", ";M_{J} [GeV];m_{T} [GeV]", 20, 0., mj_max, 20, 0., mt_max);
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
   int line_width = 4;
   TArrow arrow; arrow.SetLineColor(kGray+2); arrow.SetFillColor(0);
   arrow.SetArrowSize(0.05); arrow.SetLineWidth(3);
-  TLine l_mj(400.,0.,400.,mt_max);
+  TLine l_mj(500.,0.,500.,mt_max);
   TLine l_mt(250.,140.,mj_max,140.);
   l_mj.SetLineWidth(line_width);
   l_mt.SetLineWidth(line_width);
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]){
   set<size_t> indices_bkg = GetRandomIndices(st_bkg, ttbar_norm, rand3);
   set<size_t> indices_data = GetRandomIndices(st_data, 1, rand3);
 
-  Process(st_sig, g_sig, g_sig_full, h_sig, 2, 20, 1, indices_sig, 0, true);
+  Process(st_sig, g_sig, g_sig_full, h_sig, 2, 20, 1, indices_sig, 0, false);
   if(merge_ttbar){
     Process(st_bkg, g_bkg, g_bkg_full, h_bkg, 1006, 21, 1, indices_bkg, 0, false);
   }else{
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]){
   h_data.SetMarkerStyle(20);
   h_data.Draw("scat same");
 
-  l_mt.DrawLine(400.,0.,400.,mt_max);
+  l_mt.DrawLine(500.,0.,500.,mt_max);
   l_mt.DrawLine(250.,140.,mj_max,140.);
   l_mj.DrawLine(250.,0.,250.,mt_max);
   //  arrow.DrawArrow(150,30,325,30);
@@ -286,7 +286,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
     if(isData && !((st.trig()[4] ||st.trig()[8]) && st.pass())) continue; 
 
     double mj = std::min(999.9f, st.mj());
-    double mt = std::min(399.9f, st.mt());
+    double mt = std::min(499.9f, st.mt());
 
     if(isData) { 
         AddPoint(g_full, mj, mt); 
