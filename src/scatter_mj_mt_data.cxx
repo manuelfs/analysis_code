@@ -77,8 +77,8 @@ int main(int argc, char *argv[]){
   st_bkg.Add(folder+"*ttHJetTobb*");
   baby_basic st_data(folder_data+"*Single*");
 
-  double mj_max = 1000.;
-  double mt_max = 500.;
+  double mj_max = 1200.;
+  double mt_max = 600.;
 
   TH2D h_sig("h_sig", ";M_{J} [GeV];m_{T} [GeV]", 20, 0., mj_max, 20, 0., mt_max);
   TH2D h_bkg("h_bkg", ";M_{J} [GeV];m_{T} [GeV]", 20, 0., mj_max, 20, 0., mt_max);
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]){
   
   
   const Int_t NRGBs = 5;
-  const Int_t NCont = 255;
+  const Int_t NCont = /*255*/999;
 
   Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
   Double_t red[NRGBs] = { 0.00, 0.00, 0.87, 1.00, 0.51 };
@@ -202,6 +202,7 @@ int main(int argc, char *argv[]){
   TCanvas c;
   c.SetRightMargin(0.1);
   h_bkg.Scale(h_data.Integral()/h_bkg.Integral());
+  h_bkg.SetMinimum(-0.001); 
   h_bkg.Draw("colz"); 
   /*
   if(merge_ttbar){
@@ -272,8 +273,9 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
 
     if(false
        //|| (st.mt()>140 && st.mj()>400) // for blinding
-       //|| st.nbm()<2
-       || st.nbm()!=1
+       //|| st.nbm()<2 //nb>=2
+       //|| st.nbm()!=1 //nb==1
+       || st.nbm()<1 //nb==1
        || st.njets()<njets_min
        || (njets_max > 0 && st.njets()>njets_max)
        || st.met()<=met_min
@@ -285,8 +287,8 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
     
     if(isData && !((st.trig()[4] ||st.trig()[8]) && st.pass())) continue; 
 
-    double mj = std::min(999.9f, st.mj());
-    double mt = std::min(499.9f, st.mt());
+    double mj = std::min(1199.9f, st.mj());
+    double mt = std::min(599.9f, st.mt());
 
     if(isData) { 
         AddPoint(g_full, mj, mt); 
