@@ -62,8 +62,8 @@ bool onecut::pass(baby_base *baby){
     return (baby->*bvb_)()[ivector_];
   case kFloat:
   case kvFloat:
-    if(kFloat) valf = (baby->*bf_)();
-    if(kvFloat) valf = (baby->*bvf_)()[ivector_];
+    if(cutType_ == kFloat) valf = (baby->*bf_)();
+    if(cutType_ == kvFloat) valf = (baby->*bvf_)()[ivector_];
     switch(compType_){
     case kNotEqual:     return valf != cutf_;
     case kLess:         return valf <  cutf_;
@@ -75,8 +75,8 @@ bool onecut::pass(baby_base *baby){
     }
   case kInt:
   case kvInt:
-    if(kInt) vali = (baby->*bi_)();
-    if(kvInt) vali = (baby->*bvi_)()[ivector_];
+    if(cutType_ == kInt) vali = (baby->*bi_)();
+    if(cutType_ == kvInt) vali = (baby->*bvi_)()[ivector_];
     switch(compType_){
     case kNotEqual:     return vali != cuti_;
     case kLess:         return vali <  cuti_;
