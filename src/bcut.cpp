@@ -61,7 +61,9 @@ bool onecut::pass(baby_base *baby){
   case kvBool:
     return (baby->*bvb_)()[ivector_];
   case kFloat:
-    valf = (baby->*bf_)();
+  case kvFloat:
+    if(kFloat) valf = (baby->*bf_)();
+    if(kvFloat) valf = (baby->*bvf_)()[ivector_];
     switch(compType_){
     case kNotEqual:     return valf != cutf_;
     case kLess:         return valf <  cutf_;
@@ -72,7 +74,9 @@ bool onecut::pass(baby_base *baby){
     case kGreater:      return valf >  cutf_;
     }
   case kInt:
-    vali = (baby->*bi_)();
+  case kvInt:
+    if(kInt) vali = (baby->*bi_)();
+    if(kvInt) vali = (baby->*bvi_)()[ivector_];
     switch(compType_){
     case kNotEqual:     return vali != cuti_;
     case kLess:         return vali <  cuti_;
@@ -170,7 +174,10 @@ void onecut::assignBranch(TString var, TString val){
     if(var=="trig"){
       cutType_ = kvBool;
       bvb_ = &baby_base::trig;
-    } else {
+    }else if(var=="sys_ht"){ 
+      cutType_ = kvFloat;
+      bvf_ = &baby_base::sys_ht;
+    }else {
       cout<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl;
       cutType_ = kAlwaysFalse;
     }
@@ -179,6 +186,6 @@ void onecut::assignBranch(TString var, TString val){
     cutType_ = kAlwaysFalse;
   } 
 
-  if(cutType_ == kFloat) cutf_ = val.Atof();
-  if(cutType_ == kInt) cuti_ = val.Atoi();
+  if(cutType_ == kFloat || cutType_ == kvFloat) cutf_ = val.Atof();
+  if(cutType_ == kInt || cutType_ == kvInt)     cuti_ = val.Atoi();
 }

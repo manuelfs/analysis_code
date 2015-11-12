@@ -34,6 +34,18 @@ int main(){
   time_t begtime, endtime;
   time(&begtime);
 
+  float mSigma, pSigma;
+  vector<vector<float> > entries = {{0},{16}};
+  vector<vector<float> > weights = {{1},{1}};
+
+  vector<float> powersk;
+  powersk.push_back(1);  //  mt<=140  mj<=400   R1
+  powersk.push_back(-1); //  mt<=140  mj>400    R2
+
+  double k = calcKappa(entries, weights, powersk, mSigma, pSigma);
+  cout<<entries[0][0]<<" over "<<entries[1][0]<<" is "<<k<<" +"<<pSigma<<" -"<<mSigma<<endl;
+  
+  return 0;
 
   //// Defining samples, i.e. columns in the table
   TString folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";

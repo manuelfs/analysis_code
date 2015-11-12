@@ -13,6 +13,8 @@ typedef float& (baby_base::*baby_float)();
 typedef bool& (baby_base::*baby_bool)();
 typedef int& (baby_base::*baby_int)();
 typedef std::vector<bool>& (baby_base::*baby_vbool)();
+typedef std::vector<int>& (baby_base::*baby_vint)();
+typedef std::vector<float>& (baby_base::*baby_vfloat)();
 
 class onecut {
 public:
@@ -26,7 +28,7 @@ public:
     kGreaterEqual = 2
   };
 
-  enum cutType{kFloat, kInt, kBool, kvBool, kAlwaysTrue, kAlwaysFalse};
+  enum cutType{kFloat, kvFloat, kInt, kvInt, kBool, kvBool, kAlwaysTrue, kAlwaysFalse};
   cutType cutType_;
   comparisonType compType_;
   TString cut_;
@@ -38,8 +40,10 @@ public:
   // Floats
   baby_float bf_;
   float cutf_;
+  baby_vfloat bvf_;
   // Ints
   baby_int bi_;
+  baby_vint bvi_;
   int cuti_;
 
   bool pass(baby_base *baby);

@@ -22,7 +22,15 @@ float mt
 float mt_nohf
 float mt_tru
 float mt_tru_nuw
+float mt_rebal
 float dphi_wlep
+bool jetmismeas
+
+################### Systematic weights #######
+float weight_muRup
+float weight_muRdown
+float weight_muFup
+float weight_muFdown
 
 ###################   MET   ##################
 float met
@@ -39,6 +47,7 @@ float met_tru
 float met_tru_phi
 float met_tru_nuw
 float met_tru_nuw_phi
+float met_rebal
 
 ###################   Jets   ##################
 int njets
@@ -65,10 +74,11 @@ std::vector<float> jets_eta
 std::vector<float> jets_phi
 std::vector<float> jets_m
 std::vector<float> jets_csv
-std::vector<float> jets_dpt
+std::vector<float> jets_pt_res
 std::vector<bool>  jets_islep
 std::vector<int>   jets_fjet_index
 std::vector<int>   jets_fjet08_index
+std::vector<int>   jets_hadronFlavour
 
 ##################   Leptons   ################
 int nleps
@@ -229,6 +239,7 @@ std::vector<float> mc_eta
 std::vector<float> mc_phi
 std::vector<int>   mc_id
 std::vector<int>   mc_mom
+bool fromGS
 int ntruleps
 int ntrumus
 int ntruels
@@ -237,3 +248,15 @@ int ntrutausl
 float isr_tru_pt
 float isr_tru_eta
 float isr_tru_phi
+int mgluino
+int mlsp
+
+################  Systematic variations   ##################
+std::vector<float> sys_ht
+std::vector<int>   sys_njets
+std::vector<int>   sys_nbm
+std::vector<bool>  sys_pass
+std::vector<float> sys_mj
+std::vector<float> sys_met
+std::vector<float> sys_mt
+
