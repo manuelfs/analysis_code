@@ -174,9 +174,27 @@ void onecut::assignBranch(TString var, TString val){
     if(var=="trig"){
       cutType_ = kvBool;
       bvb_ = &baby_base::trig;
+    }else if(var=="sys_pass"){
+      cutType_ = kvBool;
+      bvb_ = &baby_base::sys_pass;
     }else if(var=="sys_ht"){ 
       cutType_ = kvFloat;
       bvf_ = &baby_base::sys_ht;
+    }else if(var=="sys_met"){ 
+      cutType_ = kvFloat;
+      bvf_ = &baby_base::sys_met;
+    }else if(var=="sys_njets"){ 
+      cutType_ = kvInt;
+      bvi_ = &baby_base::sys_njets;
+    }else if(var=="sys_nbm"){ 
+      cutType_ = kvInt;
+      bvi_ = &baby_base::sys_nbm;
+    }else if(var=="sys_mj"){ 
+      cutType_ = kvFloat;
+      bvf_ = &baby_base::sys_mj;
+    }else if(var=="sys_mt"){ 
+      cutType_ = kvFloat;
+      bvf_ = &baby_base::sys_mt;
     }else {
       cout<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl;
       cutType_ = kAlwaysFalse;
