@@ -91,6 +91,17 @@ public:
   std::vector<TString> texnames, tcuts, options;
 };
 
+class trigfeats {
+public:
+  trigfeats(TString icuts, TString itag);
+  void add(TString texname, baby_basic *baby, TString num, TString den);
+  void setYields(size_t index, double num, double den);
+  TString cuts, tag;
+  std::vector<TString> texnames, nums, dens;
+  std::vector<baby_basic*> babies;
+  std::vector<double> effi, errup, errdown;
+};
+
 class sfeats {
 public:
   sfeats(std::vector<TString> ifile, TString ilabel, int icolor=1, int istyle=1, TString icut="1",
@@ -138,6 +149,6 @@ double intGaus(double mean, double sigma, double minX, double maxX);
 double calcKappa(std::vector<std::vector<float> > &entries, std::vector<std::vector<float> > &weights,
 		 std::vector<float> &powers, float &mSigma, float &pSigma, bool do_data=false, 
 		 bool verbose=false, bool do_plot=false, int nrep=100000);
-float Efficiency(float den, float num, float &errup, float &errdown);
+float Efficiency(double den, double num, double &errup, double &errdown);
 
 #endif

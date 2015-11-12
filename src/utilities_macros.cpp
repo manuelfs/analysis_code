@@ -531,9 +531,14 @@ TString cuts2tex(TString cuts){
       cuts.ReplaceAll("met>200", "met>400");
     }
   }
+  cuts.ReplaceAll("1&&", ""); cuts.ReplaceAll("&&1", "");
+  cuts.ReplaceAll("trig[0]", "\\text{HT350\\_MET100}");
+  cuts.ReplaceAll("trig[4]", "\\text{Mu15\\_VVVL}"); cuts.ReplaceAll("trig[8]", "\\text{Ele15\\_VVVL}");   
   cuts.ReplaceAll("&&&&", "&&");  cuts.ReplaceAll("&&", ", ");  
-  cuts.ReplaceAll("ht", "H_T"); cuts.ReplaceAll("mj", "M_J"); cuts.ReplaceAll("met", "\\mathrm{MET}");  
+  cuts.ReplaceAll("ht_ra2", "H_T"); cuts.ReplaceAll("ht", "H_T"); 
+  cuts.ReplaceAll("mj", "M_J"); cuts.ReplaceAll("met", "\\mathrm{MET}");  
   cuts.ReplaceAll("njets", "n_j");  cuts.ReplaceAll("nbm", "n_b");  cuts.ReplaceAll("nleps", "n_{\\ell}"); 
+  cuts.ReplaceAll("nvels", "n_e");  
   cuts.ReplaceAll(">=", "\\geq ");  cuts.ReplaceAll("<=", " \\leq "); cuts.ReplaceAll("==", " = ");
 
   cuts = "$"+cuts+"$";
@@ -771,6 +776,7 @@ TString format_tag(TString tag){
   return tag;
 }
 
+////////// TFEATS: Table features
 tfeats::tfeats(TString icuts, TString itag):
   cuts(icuts),
   tag(itag){
@@ -781,6 +787,31 @@ void tfeats::add(TString texname, TString tcut, TString option){
   options.push_back(option);
 }
 
+////////// TRIGFEATS: Trigger features
+trigfeats::trigfeats(TString icuts, TString itag):
+  cuts(icuts),
+  tag(itag){
+  }
+void trigfeats::add(TString texname, baby_basic *baby, TString num, TString den){
+  texnames.push_back(texname);
+  babies.push_back(baby);
+  nums.push_back(num);
+  dens.push_back(den);
+  effi.push_back(-1.);	  // Will be filled in setYields
+  errup.push_back(-1.);	  // Will be filled in setYields
+  errdown.push_back(-1.); // Will be filled in setYields
+}
+void trigfeats::setYields(size_t index, double num, double den){
+  if(den<=0){
+    cout<<"Bad denominator: "<<den<<". Exiting "<<endl;
+    return;
+  }
+  effi[index] = 100*Efficiency(num, den, errup[index], errdown[index]);
+  errup[index] *= 100.;
+  errdown[index] *= 100.;
+}
+
+////////// SFEATS: Sample features
 sfeats::sfeats(vector<TString> ifile, TString ilabel, int icolor, int istyle, TString icut, 
                TString isamVariable){
   file = ifile; label = ilabel; cut = icut;
@@ -1095,7 +1126,7 @@ double calcKappa(vector<vector<float> > &entries, vector<vector<float> > &weight
   return stdval;
 }
 
-float Efficiency(float num, float den, float &errup, float &errdown){
+float Efficiency(double num, double den, double &errup, double &errdown){
   if(den<=0){cout<<"Denominator is "<<den<<". Exiting"<<endl; return -1.;}
 
   TH1D hnum("hnum","",1,0,1);
