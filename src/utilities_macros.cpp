@@ -1024,7 +1024,7 @@ double gsl_ran_gamma(const double a, const double b, TRandom3 &rand){
 // powers[Nobs] defines kappa = Product_obs{ Sum_sam{yields[sam][obs]*weights[sam][obs]}^powers[obs] }
 double calcKappa(vector<vector<float> > &entries, vector<vector<float> > &weights,
                  vector<float> &powers, float &mSigma, float &pSigma, bool do_data,
-                 bool verbose, bool do_plot, int nrep){
+                 bool verbose, double syst, bool do_plot, int nrep){
   TRandom3 rand(1234);
   styles style("RA4"); style.setDefaultStyle();
   int nbadk(0);
@@ -1048,6 +1048,11 @@ double calcKappa(vector<vector<float> > &entries, vector<vector<float> > &weight
       if(observed <= 0 && powers[obs] < 0) Denom_is0 = true;
       else fKappas[irep] *= pow(observed, powers[obs]);
     } // Loop over number of observables going into kappa
+
+    if(syst>=0){
+      double factor = exp(rand.Gaus(0,syst));
+      fKappas[irep] *= factor;
+    }
     if(Denom_is0 && fKappas[irep]==0) {
       fKappas.pop_back();
       nbadk++;
