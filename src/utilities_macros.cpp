@@ -1050,7 +1050,7 @@ double calcKappa(vector<vector<float> > &entries, vector<vector<float> > &weight
     } // Loop over number of observables going into kappa
 
     if(syst>=0){
-      double factor = exp(rand.Gaus(0,syst));
+      double factor = exp(rand.Gaus(0,log(1+syst)));
       fKappas[irep] *= factor;
     }
     if(Denom_is0 && fKappas[irep]==0) {

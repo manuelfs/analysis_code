@@ -19,6 +19,8 @@ using namespace std;
 
 namespace{
   double lumi(1.264);
+  bool do_other(false);
+  float syst = 1.;
 }
 
 int main(){ 
@@ -31,17 +33,29 @@ int main(){
 
   ////// Creating babies
   baby_basic data(folderdata+"*root");
-  baby_basic bkg(folder+"*TTJets*Lept*");
-  bkg.Add(folder+"*TTJets*HT*");
-  bkg.Add(folder+"*_WJetsToLNu*");
-  bkg.Add(folder+"*_TTWJets*");
-  bkg.Add(folder+"*_TTZTo*");
-  bkg.Add(folder+"*_ST_*");
-  bkg.Add(folder+"*DYJetsToLL*");
-  bkg.Add(folder+"*_QCD_HT*");
-  bkg.Add(folder+"*ttHJetTobb*");
-  bkg.Add(folder+"*_WWTo*");
-  bkg.Add(folder+"*ggZH_HToBB*");
+  baby_basic tt(folder+"*TTJets*Lept*");
+  tt.Add(folder+"*TTJets*HT*");
+  baby_basic other(folder+"*_WJetsToLNu*");
+  if(do_other){
+    other.Add(folder+"*_TTWJets*");
+    other.Add(folder+"*_TTZTo*");
+    other.Add(folder+"*_ST_*");
+    other.Add(folder+"*DYJetsToLL*");
+    other.Add(folder+"*_QCD_HT*");
+    other.Add(folder+"*ttHJetTobb*");
+    other.Add(folder+"*_WWTo*");
+    other.Add(folder+"*ggZH_HToBB*");
+  } else {
+    tt.Add(folder+"*_WJetsToLNu*");
+    tt.Add(folder+"*_TTWJets*");
+    tt.Add(folder+"*_TTZTo*");
+    tt.Add(folder+"*_ST_*");
+    tt.Add(folder+"*DYJetsToLL*");
+    tt.Add(folder+"*_QCD_HT*");
+    tt.Add(folder+"*ttHJetTobb*");
+    tt.Add(folder+"*_WWTo*");
+    tt.Add(folder+"*ggZH_HToBB*");
+  }
 
   ////// Defining cuts
   bcut baseline("nleps==1&&mj>250&&njets>=6&&nbm>=1");
@@ -68,8 +82,9 @@ int main(){
   } // Loop over signal bins
     
   ////// Finding yields 
-  vector<double> mcyield, mcw2, datayield, dataw2;
-  getYields(bkg, baseline, bincuts, mcyield, mcw2, lumi);
+  vector<double> mcyield, mcw2, datayield, dataw2, otheryield, otherw2;
+  getYields(tt, baseline, bincuts, mcyield, mcw2, lumi);
+  if(do_other) getYields(other, baseline, bincuts, otheryield, otherw2, lumi);
   getYields(data, baseline, bincuts, datayield, dataw2, 1., true);
 
   // for(size_t ind(0); ind<datayield.size(); ind++)
@@ -90,7 +105,7 @@ int main(){
 
   float mSigma, pSigma, pred, pred_sys, mSigma_sys, pSigma_sys;
   size_t nabcd(abcdcuts.size()), digits(1);
-  vector<vector<float> > preds;
+  vector<vector<float> > preds, kappas, fractions;
   for(size_t ind(0); ind<njbcuts.size(); ind++){
     bool lowjets(ind%2==0);
     vector<vector<float> > entries;
@@ -104,31 +119,51 @@ int main(){
     } // Loop over observables for data
     //pred = calcKappa(entries, weights, pow_pred, mSigma, pSigma);
 
-    double k(1.);
+    float k(1.), kup(1.), kdown(1.);    
+    fractions.push_back(vector<float>());
     for(size_t obs(0); obs < abcdcuts.size(); obs++){
       size_t index(nabcd*ind+obs);
-      k *= pow(mcyield[index], pow_tot[3+obs]);
-      entries.push_back(vector<float>());
-      weights.push_back(vector<float>());
-      entries.back().push_back(pow(mcyield[index],2)/mcw2[index]);
-      weights.back().push_back(mcw2[index]/mcyield[index]);
+      if(!do_other){
+	k *= pow(mcyield[index], pow_tot[3+obs]);
+	entries.push_back(vector<float>());
+	weights.push_back(vector<float>());
+	entries.back().push_back(pow(mcyield[index],2)/mcw2[index]);
+	weights.back().push_back(mcw2[index]/mcyield[index]);
+      } else {
+	k *= pow(mcyield[index]+otheryield[index], pow_tot[3+obs]);
+	float f(otheryield[index]/(mcyield[index]+otheryield[index]));
+	fractions.back().push_back(f*100);
+
+	kup *= pow(mcyield[index]+exp(log(1+syst))*otheryield[index], pow_tot[3+obs]);
+	kdown *= pow(mcyield[index]+exp(-log(1+syst))*otheryield[index], pow_tot[3+obs]);
+      }
     } // Loop over observables for MC
+    if(do_other){
+      kup = (kup-k)/k*100;
+      kdown = (kdown-k)/k*100;
+      kappas.push_back(vector<float>({k, kup, kdown}));
+      cout<<"k = "<<RoundNumber(k,2)<<", up "<<setw(5)<<RoundNumber(kup,1)<<"%, down "<<setw(5)
+	  <<RoundNumber(kdown,1)<<"%, other fractions ";
+      for(size_t oth(0); oth<fractions[ind].size(); oth++) cout <<setw(4)<<RoundNumber(fractions[ind][oth],1)<<"% ";
+      cout<<" => cuts "<<bincuts[4*ind+3].cuts_<<endl;
+    }
 
-    //pred *= k; mSigma *= k; mSigma *= k;
-
-    // Calculating predictions without systematics
-    pred = calcKappa(entries, weights, pow_tot, mSigma, pSigma);
-    if(mSigma<0) mSigma = 0;
-
-    // Calculating predictions with systematics
-    float totsys = (lowjets?0.51:1.07);
-    pred_sys = calcKappa(entries, weights, pow_tot, mSigma_sys, pSigma_sys, false, false, totsys);
-    if(mSigma_sys < 0) mSigma_sys = 0;
-    preds.push_back(vector<float>({pred, pSigma, mSigma, pred_sys, pSigma_sys, mSigma_sys}));
+    if(!do_other){
+      // Calculating predictions without systematics
+      pred = calcKappa(entries, weights, pow_tot, mSigma, pSigma);
+      if(mSigma<0) mSigma = 0;
+      
+      // Calculating predictions with systematics
+      float totsys = (lowjets?0.51:1.07);
+      pred_sys = calcKappa(entries, weights, pow_tot, mSigma_sys, pSigma_sys, false, false, totsys);
+      if(mSigma_sys < 0) mSigma_sys = 0;
+      preds.push_back(vector<float>({pred, pSigma, mSigma, pred_sys, pSigma_sys, mSigma_sys}));
+    }
   } // Loop over signal bins
 
   ///// Printing table
   TString outname = "txt/table_predictions.tex";
+  if(do_other) outname.ReplaceAll("predictions", "other_sys");
   ofstream out(outname);
 
   out << fixed << setprecision(digits);
@@ -140,59 +175,76 @@ int main(){
   out << "\\begin{table}\n";
   out << "\\centering\n";
   out << "\\resizebox{\\textwidth}{!}{\n";
-  out << "\n\\begin{tabular}[tbp!]{ l rrrr}\\hline\\hline\n";
-  out << "& & Bkg.~Pred. &Bkg.~Pred.   \\\\ \n";
-  out << "Bin & MC & toys (stat) & toys (stat+sys) & Obs. \\\\ \\hline\\hline\n";
-  out << " \\multicolumn{5}{c}{$200<\\text{MET}\\leq 400$}  \\\\ \\hline\n";
-  out << "R1: all $n_j,n_b$ & "<<mcyield[0] <<" & $"<<datayield[0] 
-      << " \\pm " << sqrt(datayield[0]) <<"$ & $"<<datayield[0] 
-      << " \\pm " << sqrt(datayield[0]) <<"$ & "
-      << setprecision(0) <<datayield[0]<<setprecision(digits)<<" \\\\"<<endl;
-  for(size_t ind(0); ind<ilowmet; ind++){
-    size_t index(nabcd*ind+1);
-    out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<datayield[index] 
-       << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
-       << " \\pm " << sqrt(datayield[index]) <<"$ & "
-       << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
-  }
-  out << "R3: all $n_j,n_b$ & "<<mcyield[2] <<" & $"<<datayield[2] 
-      << " \\pm " << sqrt(datayield[2]) <<"$ & $"<<datayield[2] 
-      << " \\pm " << sqrt(datayield[2]) <<"$ & "
-      << setprecision(0) << datayield[2] << setprecision(digits)<<" \\\\"<<endl;
-  out << "\\hline"<<endl;
-  for(size_t ind(0); ind<ilowmet; ind++){
-    size_t index(nabcd*ind+3);
-    out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
-       << "^{+" << preds[ind][1] <<"}_{-" << preds[ind][2] 
-       <<"}$ & $"<<preds[ind][3] << "^{+" << preds[ind][4] 
-       <<"}_{-" << preds[ind][5] <<"}$ & "
-       << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
-  }
-  out << "\\hline\\hline\n \\multicolumn{5}{c}{$\\text{MET}> 400$}  \\\\ \\hline\n";
-  out << "R1: all $n_j,n_b$ & "<<mcyield[nabcd*ilowmet] <<" & $"<<datayield[nabcd*ilowmet] 
-      << " \\pm " << sqrt(datayield[nabcd*ilowmet]) <<"$ & $"<<datayield[nabcd*ilowmet] 
-      << " \\pm " << sqrt(datayield[nabcd*ilowmet]) <<"$ & "
-      << setprecision(0) <<datayield[nabcd*ilowmet]<<setprecision(digits)<<" \\\\"<<endl;
-  for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
-    size_t index(nabcd*ind+1);
-    out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<datayield[index] 
-       << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
-       << " \\pm " << sqrt(datayield[index]) <<"$ & "
-       << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
-  }
-  out << "R3: all $n_j,n_b$ & "<<mcyield[nabcd*ilowmet+2] <<" & $"<<datayield[nabcd*ilowmet+2] 
-      << " \\pm " << sqrt(datayield[nabcd*ilowmet+2]) <<"$ & $"<<datayield[nabcd*ilowmet+2] 
-      << " \\pm " << sqrt(datayield[nabcd*ilowmet+2]) <<"$ & "
-      << setprecision(0) <<datayield[nabcd*ilowmet+2]<<setprecision(digits)<<" \\\\"<<endl;
-  out << "\\hline"<<endl;
-  for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
-    size_t index(nabcd*ind+3);
-    out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
-       << "^{+" << preds[ind][1] <<"}_{-" << preds[ind][2] 
-       <<"}$ & $"<<preds[ind][3] << "^{+" << preds[ind][4] 
-       <<"}_{-" << preds[ind][5] <<"}$ & "<<datayield[index]
-       << setprecision(0) <<setprecision(digits)<<" \\\\"<<endl;
-  }
+  if(!do_other){
+    out << "\n\\begin{tabular}[tbp!]{ l rrrr}\\hline\\hline\n";
+    out << "& & Bkg.~Pred. &Bkg.~Pred.   \\\\ \n";
+    out << "Bin & MC & toys (stat) & toys (stat+sys) & Obs. \\\\ \\hline\\hline\n";
+    out << " \\multicolumn{5}{c}{$200<\\text{MET}\\leq 400$}  \\\\ \\hline\n";
+    out << "R1: all $n_j,n_b$ & "<<mcyield[0] <<" & $"<<datayield[0] 
+	<< " \\pm " << sqrt(datayield[0]) <<"$ & $"<<datayield[0] 
+	<< " \\pm " << sqrt(datayield[0]) <<"$ & "
+	<< setprecision(0) <<datayield[0]<<setprecision(digits)<<" \\\\"<<endl;
+    for(size_t ind(0); ind<ilowmet; ind++){
+      size_t index(nabcd*ind+1);
+      out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<datayield[index] 
+	 << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
+	 << " \\pm " << sqrt(datayield[index]) <<"$ & "
+	 << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
+    }
+    out << "R3: all $n_j,n_b$ & "<<mcyield[2] <<" & $"<<datayield[2] 
+	<< " \\pm " << sqrt(datayield[2]) <<"$ & $"<<datayield[2] 
+	<< " \\pm " << sqrt(datayield[2]) <<"$ & "
+	<< setprecision(0) << datayield[2] << setprecision(digits)<<" \\\\"<<endl;
+    out << "\\hline"<<endl;
+    for(size_t ind(0); ind<ilowmet; ind++){
+      size_t index(nabcd*ind+3);
+      out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
+	 << "^{+" << preds[ind][1] <<"}_{-" << preds[ind][2] 
+	 <<"}$ & $"<<preds[ind][3] << "^{+" << preds[ind][4] 
+	 <<"}_{-" << preds[ind][5] <<"}$ & "
+	 << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
+    }
+    out << "\\hline\\hline\n \\multicolumn{5}{c}{$\\text{MET}> 400$}  \\\\ \\hline\n";
+    out << "R1: all $n_j,n_b$ & "<<mcyield[nabcd*ilowmet] <<" & $"<<datayield[nabcd*ilowmet] 
+	<< " \\pm " << sqrt(datayield[nabcd*ilowmet]) <<"$ & $"<<datayield[nabcd*ilowmet] 
+	<< " \\pm " << sqrt(datayield[nabcd*ilowmet]) <<"$ & "
+	<< setprecision(0) <<datayield[nabcd*ilowmet]<<setprecision(digits)<<" \\\\"<<endl;
+    for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
+      size_t index(nabcd*ind+1);
+      out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<datayield[index] 
+	 << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
+	 << " \\pm " << sqrt(datayield[index]) <<"$ & "
+	 << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
+    }
+    out << "R3: all $n_j,n_b$ & "<<mcyield[nabcd*ilowmet+2] <<" & $"<<datayield[nabcd*ilowmet+2] 
+	<< " \\pm " << sqrt(datayield[nabcd*ilowmet+2]) <<"$ & $"<<datayield[nabcd*ilowmet+2] 
+	<< " \\pm " << sqrt(datayield[nabcd*ilowmet+2]) <<"$ & "
+	<< setprecision(0) <<datayield[nabcd*ilowmet+2]<<setprecision(digits)<<" \\\\"<<endl;
+    out << "\\hline"<<endl;
+    for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
+      size_t index(nabcd*ind+3);
+      out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
+	 << "^{+" << preds[ind][1] <<"}_{-" << preds[ind][2] 
+	 <<"}$ & $"<<preds[ind][3] << "^{+" << preds[ind][4] 
+	 <<"}_{-" << preds[ind][5] <<"}$ & "<<datayield[index]
+	 << setprecision(0) <<setprecision(digits)<<" \\\\"<<endl;
+    }
+  } else {
+    out << "\n\\begin{tabular}[tbp!]{ l rrr |";
+    for(size_t obs(0); obs < abcdcuts.size(); obs++) out<<"r";
+    out << "}\\hline\\hline\n";
+    out << " &  & non-$t\\bar{t}\\times"<<RoundNumber(1+syst,1)<<"$ & non-$t\\bar{t}\\times"
+	<<RoundNumber(exp(-log(1+syst)),1)<<"$ & \\multicolumn{4}{c}{Fraction of non-$t\\bar{t}$ bkg.} \\\\ \n";
+    out << "Bin & $\\kappa$ & $\\Delta\\kappa$ [\\%] & $\\Delta\\kappa$ [\\%]";
+    for(size_t obs(0); obs < abcdcuts.size(); obs++) out<<" & $f_{\\text{R"<<obs+1<<"}}$ [\\%]";
+    out << " \\\\ \\hline\\hline\n";
+    for(size_t ind(0); ind<njbcuts.size(); ind++){
+      out<<cuts2tex(njbcuts[ind])<<" & "<<RoundNumber(kappas[ind][0],2) <<" & "<<kappas[ind][1] <<" & "<<kappas[ind][2];
+      for(size_t obs(0); obs < abcdcuts.size(); obs++) out<<" & "<<fractions[ind][obs];
+      out<<" \\\\"<<endl;
+      if(ind==ilowmet-1) out<<"\\hline"<<endl;
+    }
+  } // if(!do_other)
 
   out<< "\\hline\\hline\n\\end{tabular}"<<endl<<endl;
   out << "}\n";
