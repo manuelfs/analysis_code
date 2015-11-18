@@ -8,33 +8,18 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include "TMath.h"
-#include "TChain.h"
-#include "TH1D.h"
-#include "TCanvas.h"
-#include "TLegend.h"
-#include "TLine.h"
-#include "TString.h"
-#include "TLatex.h"
-#include "TArrow.h"
-#include "TGraphAsymmErrors.h"
 #include "TError.h" // Controls error level reporting
 
 #include "bcut.hpp"
-#include "styles.hpp"
 #include "baby_basic.hpp"
 #include "utilities.hpp"
 #include "utilities_macros.hpp"
-
-#define NSAM 2
 
 using namespace std;
 
 namespace{
   double lumi(1.264);
 }
-
-void kappa(map<TString, vector<bcut> > &cutmap, vector<vector<unsigned> > &m3_njbin_ind, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin);
 
 int main(){ 
   gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
@@ -139,9 +124,6 @@ int main(){
     float totsys = (lowjets?0.51:1.07);
     pred_sys = calcKappa(entries, weights, pow_tot, mSigma_sys, pSigma_sys, false, false, totsys);
     if(mSigma_sys < 0) mSigma_sys = 0;
-    // cout<<setw(5)<<RoundNumber(pred,digits)<<" +"<<RoundNumber(pSigma,digits)<<" -"<<RoundNumber(mSigma,digits)
-    // 	<<" with pred "<<RoundNumber(pred,digits,k)<<" and k "<<RoundNumber(k,digits)
-    // 	<<". CUTS: "<<bincuts[nabcd*ind+3].cuts_<<endl;
     preds.push_back(vector<float>({pred, pSigma, mSigma, pred_sys, pSigma_sys, mSigma_sys}));
   } // Loop over signal bins
 
@@ -149,9 +131,9 @@ int main(){
   TString outname = "txt/table_predictions.tex";
   ofstream out(outname);
 
+  out << fixed << setprecision(digits);
   out << "\\documentclass{article}\n";
-  out << "\\usepackage{amsmath,graphicx,rotating}\n";
-  //out << "\\usepackage[landscape]{geometry}\n";
+  out << "\\usepackage{amsmath,graphicx,rotating,geometry}\n";
   out << "\\renewcommand{\\arraystretch}{1.3}\n";
   out << "\\thispagestyle{empty}\n";
   out << "\\begin{document}\n";
@@ -160,48 +142,56 @@ int main(){
   out << "\\resizebox{\\textwidth}{!}{\n";
   out << "\n\\begin{tabular}[tbp!]{ l rrrr}\\hline\\hline\n";
   out << "& & Bkg.~Pred. &Bkg.~Pred.   \\\\ \n";
-  out << "Bin & MC & $\\Gamma$ (stat) & $\\Gamma$ (stat+sys) & Obs. \\\\ \\hline\\hline\n";
+  out << "Bin & MC & toys (stat) & toys (stat+sys) & Obs. \\\\ \\hline\\hline\n";
   out << " \\multicolumn{5}{c}{$200<\\text{MET}\\leq 400$}  \\\\ \\hline\n";
-  out << "R1: all $n_j,n_b$ & "<<RoundNumber(mcyield[0], digits)<<" & $"<<RoundNumber(datayield[0], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[0]), digits)<<"$ & $"<<RoundNumber(datayield[0], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[0]), digits)<<"$ & "<<RoundNumber(datayield[0], 0)<<" \\\\"<<endl;
+  out << "R1: all $n_j,n_b$ & "<<mcyield[0] <<" & $"<<datayield[0] 
+      << " \\pm " << sqrt(datayield[0]) <<"$ & $"<<datayield[0] 
+      << " \\pm " << sqrt(datayield[0]) <<"$ & "
+      << setprecision(0) <<datayield[0]<<setprecision(digits)<<" \\\\"<<endl;
   for(size_t ind(0); ind<ilowmet; ind++){
     size_t index(nabcd*ind+1);
-    out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & "<<RoundNumber(mcyield[index], digits)<<" & $"<<RoundNumber(datayield[index], digits)
-       << " \\pm " << RoundNumber(sqrt(datayield[index]), digits)<<"$ & $"<<RoundNumber(datayield[index], digits)
-       << " \\pm " << RoundNumber(sqrt(datayield[index]), digits)<<"$ & "<<RoundNumber(datayield[index], 0)<<" \\\\"<<endl;
+    out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<datayield[index] 
+       << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
+       << " \\pm " << sqrt(datayield[index]) <<"$ & "
+       << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
   }
-  out << "R3: all $n_j,n_b$ & "<<RoundNumber(mcyield[2], digits)<<" & $"<<RoundNumber(datayield[2], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[2]), digits)<<"$ & $"<<RoundNumber(datayield[2], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[2]), digits)<<"$ & "<<RoundNumber(datayield[2], 0)<<" \\\\"<<endl;
+  out << "R3: all $n_j,n_b$ & "<<mcyield[2] <<" & $"<<datayield[2] 
+      << " \\pm " << sqrt(datayield[2]) <<"$ & $"<<datayield[2] 
+      << " \\pm " << sqrt(datayield[2]) <<"$ & "
+      << setprecision(0) << datayield[2] << setprecision(digits)<<" \\\\"<<endl;
   out << "\\hline"<<endl;
   for(size_t ind(0); ind<ilowmet; ind++){
     size_t index(nabcd*ind+3);
-    out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<RoundNumber(mcyield[index], digits)<<" & $"<<RoundNumber(preds[ind][0], digits)
-       << "^{+" << RoundNumber(preds[ind][1], digits)<<"}_{-" << RoundNumber(preds[ind][2], digits)
-       <<"}$ & $"<<RoundNumber(preds[ind][3], digits)<< "^{+" << RoundNumber(preds[ind][4], digits)
-       <<"}_{-" << RoundNumber(preds[ind][5], digits)<<"}$ & "<<RoundNumber(datayield[index], 0)<<" \\\\"<<endl;
+    out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
+       << "^{+" << preds[ind][1] <<"}_{-" << preds[ind][2] 
+       <<"}$ & $"<<preds[ind][3] << "^{+" << preds[ind][4] 
+       <<"}_{-" << preds[ind][5] <<"}$ & "
+       << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
   }
   out << "\\hline\\hline\n \\multicolumn{5}{c}{$\\text{MET}> 400$}  \\\\ \\hline\n";
-  out << "R1: all $n_j,n_b$ & "<<RoundNumber(mcyield[nabcd*ilowmet], digits)<<" & $"<<RoundNumber(datayield[nabcd*ilowmet], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[nabcd*ilowmet]), digits)<<"$ & $"<<RoundNumber(datayield[nabcd*ilowmet], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[nabcd*ilowmet]), digits)<<"$ & "<<RoundNumber(datayield[nabcd*ilowmet], 0)<<" \\\\"<<endl;
+  out << "R1: all $n_j,n_b$ & "<<mcyield[nabcd*ilowmet] <<" & $"<<datayield[nabcd*ilowmet] 
+      << " \\pm " << sqrt(datayield[nabcd*ilowmet]) <<"$ & $"<<datayield[nabcd*ilowmet] 
+      << " \\pm " << sqrt(datayield[nabcd*ilowmet]) <<"$ & "
+      << setprecision(0) <<datayield[nabcd*ilowmet]<<setprecision(digits)<<" \\\\"<<endl;
   for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
     size_t index(nabcd*ind+1);
-    out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & "<<RoundNumber(mcyield[index], digits)<<" & $"<<RoundNumber(datayield[index], digits)
-       << " \\pm " << RoundNumber(sqrt(datayield[index]), digits)<<"$ & $"<<RoundNumber(datayield[index], digits)
-       << " \\pm " << RoundNumber(sqrt(datayield[index]), digits)<<"$ & "<<RoundNumber(datayield[index], 0)<<" \\\\"<<endl;
+    out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<datayield[index] 
+       << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
+       << " \\pm " << sqrt(datayield[index]) <<"$ & "
+       << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
   }
-  out << "R3: all $n_j,n_b$ & "<<RoundNumber(mcyield[nabcd*ilowmet+2], digits)<<" & $"<<RoundNumber(datayield[nabcd*ilowmet+2], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[nabcd*ilowmet+2]), digits)<<"$ & $"<<RoundNumber(datayield[nabcd*ilowmet+2], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[nabcd*ilowmet+2]), digits)<<"$ & "<<RoundNumber(datayield[nabcd*ilowmet+2], 0)<<" \\\\"<<endl;
+  out << "R3: all $n_j,n_b$ & "<<mcyield[nabcd*ilowmet+2] <<" & $"<<datayield[nabcd*ilowmet+2] 
+      << " \\pm " << sqrt(datayield[nabcd*ilowmet+2]) <<"$ & $"<<datayield[nabcd*ilowmet+2] 
+      << " \\pm " << sqrt(datayield[nabcd*ilowmet+2]) <<"$ & "
+      << setprecision(0) <<datayield[nabcd*ilowmet+2]<<setprecision(digits)<<" \\\\"<<endl;
   out << "\\hline"<<endl;
   for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
     size_t index(nabcd*ind+3);
-    out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<RoundNumber(mcyield[index], digits)<<" & $"<<RoundNumber(preds[ind][0], digits)
-       << "^{+" << RoundNumber(preds[ind][1], digits)<<"}_{-" << RoundNumber(preds[ind][2], digits)
-       <<"}$ & $"<<RoundNumber(preds[ind][3], digits)<< "^{+" << RoundNumber(preds[ind][4], digits)
-       <<"}_{-" << RoundNumber(preds[ind][5], digits)<<"}$ & "<<RoundNumber(datayield[index], 0)<<" \\\\"<<endl;
+    out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
+       << "^{+" << preds[ind][1] <<"}_{-" << preds[ind][2] 
+       <<"}$ & $"<<preds[ind][3] << "^{+" << preds[ind][4] 
+       <<"}_{-" << preds[ind][5] <<"}$ & "<<datayield[index]
+       << setprecision(0) <<setprecision(digits)<<" \\\\"<<endl;
   }
 
   out<< "\\hline\\hline\n\\end{tabular}"<<endl<<endl;
