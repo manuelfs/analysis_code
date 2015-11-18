@@ -107,7 +107,7 @@ int main(){
   size_t nabcd(abcdcuts.size()), digits(1);
   vector<vector<float> > preds;
   for(size_t ind(0); ind<njbcuts.size(); ind++){
-    bool lowmet(ind<ilowmet);
+    bool lowjets(ind%2==0);
     vector<vector<float> > entries;
     vector<vector<float> > weights;
     for(size_t obs(0); obs < pow_pred.size(); obs++) {
@@ -136,7 +136,7 @@ int main(){
     if(mSigma<0) mSigma = 0;
 
     // Calculating predictions with systematics
-    float totsys = (lowmet?0.51:1.07);
+    float totsys = (lowjets?0.51:1.07);
     pred_sys = calcKappa(entries, weights, pow_tot, mSigma_sys, pSigma_sys, false, false, totsys);
     if(mSigma_sys < 0) mSigma_sys = 0;
     // cout<<setw(5)<<RoundNumber(pred,digits)<<" +"<<RoundNumber(pSigma,digits)<<" -"<<RoundNumber(mSigma,digits)
@@ -173,7 +173,8 @@ int main(){
   }
   out << "R3: all $n_j,n_b$ & "<<RoundNumber(mcyield[2], digits)<<" & $"<<RoundNumber(datayield[2], digits)
       << " \\pm " << RoundNumber(sqrt(datayield[2]), digits)<<"$ & $"<<RoundNumber(datayield[2], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[2]), digits)<<"$ & "<<RoundNumber(datayield[2], 0)<<" \\\\\\hline"<<endl;
+      << " \\pm " << RoundNumber(sqrt(datayield[2]), digits)<<"$ & "<<RoundNumber(datayield[2], 0)<<" \\\\"<<endl;
+  out << "\\hline"<<endl;
   for(size_t ind(0); ind<ilowmet; ind++){
     size_t index(nabcd*ind+3);
     out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<RoundNumber(mcyield[index], digits)<<" & $"<<RoundNumber(preds[ind][0], digits)
@@ -181,7 +182,7 @@ int main(){
        <<"}$ & $"<<RoundNumber(preds[ind][3], digits)<< "^{+" << RoundNumber(preds[ind][4], digits)
        <<"}_{-" << RoundNumber(preds[ind][5], digits)<<"}$ & "<<RoundNumber(datayield[index], 0)<<" \\\\"<<endl;
   }
-  out << "\\hline\\hline \\multicolumn{5}{c}{$\\text{MET}> 400$}  \\\\ \\hline\n";
+  out << "\\hline\\hline\n \\multicolumn{5}{c}{$\\text{MET}> 400$}  \\\\ \\hline\n";
   out << "R1: all $n_j,n_b$ & "<<RoundNumber(mcyield[nabcd*ilowmet], digits)<<" & $"<<RoundNumber(datayield[nabcd*ilowmet], digits)
       << " \\pm " << RoundNumber(sqrt(datayield[nabcd*ilowmet]), digits)<<"$ & $"<<RoundNumber(datayield[nabcd*ilowmet], digits)
       << " \\pm " << RoundNumber(sqrt(datayield[nabcd*ilowmet]), digits)<<"$ & "<<RoundNumber(datayield[nabcd*ilowmet], 0)<<" \\\\"<<endl;
@@ -193,7 +194,8 @@ int main(){
   }
   out << "R3: all $n_j,n_b$ & "<<RoundNumber(mcyield[nabcd*ilowmet+2], digits)<<" & $"<<RoundNumber(datayield[nabcd*ilowmet+2], digits)
       << " \\pm " << RoundNumber(sqrt(datayield[nabcd*ilowmet+2]), digits)<<"$ & $"<<RoundNumber(datayield[nabcd*ilowmet+2], digits)
-      << " \\pm " << RoundNumber(sqrt(datayield[nabcd*ilowmet+2]), digits)<<"$ & "<<RoundNumber(datayield[nabcd*ilowmet+2], 0)<<" \\\\\\hline"<<endl;
+      << " \\pm " << RoundNumber(sqrt(datayield[nabcd*ilowmet+2]), digits)<<"$ & "<<RoundNumber(datayield[nabcd*ilowmet+2], 0)<<" \\\\"<<endl;
+  out << "\\hline"<<endl;
   for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
     size_t index(nabcd*ind+3);
     out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<RoundNumber(mcyield[index], digits)<<" & $"<<RoundNumber(preds[ind][0], digits)
