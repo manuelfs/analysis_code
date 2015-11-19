@@ -28,7 +28,7 @@ namespace {
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
-		size_t ini);
+		vector<vector<double> > entries, size_t ini);
 
 int main(){
   gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
@@ -37,7 +37,7 @@ int main(){
 
 
   //// Defining samples, i.e. columns in the table
-  TString folder="/net/cms2/cms2r0/babymaker/babies/2015_10_19/mc/";
+  TString folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
   vector<TString> s_tt;
   s_tt.push_back(folder+"*_TTJets*Lept*");
   s_tt.push_back(folder+"*_TTJets_HT*");
@@ -86,7 +86,7 @@ int main(){
   tables.back().add("MET$>200$ GeV", "met>200&&ht>500&&nleps==1");
   tables.back().add("$N_{\\rm jets}\\geq6$", "njets>=6&&met>200&&ht>500&&nleps==1");
   tables.back().add("$N_{\\rm b}\\geq1$", "nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$M_J>250$ GeV", "mj>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1","-");
+  tables.back().add("$M_J>250$ GeV", "mj>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1","=");
   tables.back().add("$N_{\\rm b}\\geq2$", "mj>250&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
   tables.back().add("$m_T>140$ GeV", "mt>140&&mj>250&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
   tables.back().add("$M_J>400$ GeV", "mt>140&&mj>400&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
@@ -106,7 +106,7 @@ int main(){
     tables[itab].cuts = "ht>500&&met>200&&"+baseline_s + "&&" + tables[itab].cuts;
   }
   //// Calculating yields per sample, all bins from all tables at a time
-  vector<vector<double> > yields, w2;
+  vector<vector<double> > yields, w2, entries;
   vector<int> repeat_sam(Samples.size(), -1); // used when the same sample appears multiple times in Samples
   for(size_t sam(0); sam < Samples.size(); sam++){
     vector<bcut> samcuts;
@@ -131,13 +131,15 @@ int main(){
       time(&endtime); 
       cout<<setw(3)<<difftime(endtime, begtime)<<" seconds passed. Finding yields for \""<<Samples[sam].label
 	  <<"\" with "<<baby.GetEntries()<<" entries"<<endl;
-      getYields(baby, baseline, samcuts, yields.back(), w2.back(), luminosity.Atof());
+      entries.push_back(getYields(baby, baseline, samcuts, yields.back(), w2.back(), luminosity.Atof()));
     } else {
       //// If the yields were calculated earlier, put them in the correct vector and erase them from the previous sample
       size_t ncuts(bincuts.size());
+      entries.push_back(vector<double>(&entries[repeat_sam[sam]][ncuts], &entries[repeat_sam[sam]][2*ncuts+1]));
+      entries[repeat_sam[sam]].erase(entries[repeat_sam[sam]].begin()+ncuts, entries[repeat_sam[sam]].begin()+ncuts*2);
       yields.push_back(vector<double>(&yields[repeat_sam[sam]][ncuts], &yields[repeat_sam[sam]][2*ncuts+1]));
-      w2.push_back(vector<double>(&w2[repeat_sam[sam]][ncuts], &w2[repeat_sam[sam]][2*ncuts+1]));
       yields[repeat_sam[sam]].erase(yields[repeat_sam[sam]].begin()+ncuts, yields[repeat_sam[sam]].begin()+ncuts*2);
+      w2.push_back(vector<double>(&w2[repeat_sam[sam]][ncuts], &w2[repeat_sam[sam]][2*ncuts+1]));
       w2[repeat_sam[sam]].erase(w2[repeat_sam[sam]].begin()+ncuts, w2[repeat_sam[sam]].begin()+ncuts*2);
     }
   } // Loop over samples
@@ -145,7 +147,7 @@ int main(){
   //// Printing each table. ini keeps track of the index in yields where the specific table begins
   size_t ini(0);
   for(size_t itab(0); itab < tables.size(); itab++) {
-    printTable(Samples, tables[itab], yields, w2, ini);
+    printTable(Samples, tables[itab], yields, w2, entries, ini);
     ini +=  tables[itab].tcuts.size();
   }
   time(&endtime); 
@@ -153,9 +155,12 @@ int main(){
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
-		size_t ini) {
+		vector<vector<double> > entries, size_t ini) {
   int nsig(0), digits(1);
   for(unsigned sam(0); sam < Samples.size(); sam++) if(Samples[sam].isSig) nsig++;
+
+  bool do_uncert(false);
+  vector<double> av_w2(Samples.size()+1,0);
 
   TString outname = "txt/table_cutflow_"+table.tag+".tex";
   ofstream out(outname);
@@ -181,18 +186,27 @@ void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yi
     out << " & "<<Samples[sam].label;
   out << "\\\\ \\hline \n ";
   for(size_t icut(0); icut < table.tcuts.size(); icut++){
+    if(table.options[icut]=="=") do_uncert = true;
+    if(icut==9) digits = 2;
     for(int ind(0); ind < table.options[icut].CountChar('='); ind++) out << " \\hline ";
     out<<table.texnames[icut];
     double bkg(0), ebkg(0);
     for(unsigned sam(0); sam < Samples.size()-nsig; sam++) {
       double val(yields[sam][ini+icut]), errval(sqrt(w2[sam][ini+icut]));
+      if(w2[sam][ini+icut]>0) av_w2[sam] = w2[sam][ini+icut]/entries[sam][ini+icut];
+      else errval = sqrt(av_w2[sam]);
       bkg += val;
       ebkg += pow(errval, 2);
-      out <<" & "<< RoundNumber(val,digits);
+      if(!do_uncert) out <<" & "<< RoundNumber(val,digits);
+      else out <<" & $"<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$";
     } // Loop over background samples
-    out<<" & "<<RoundNumber(bkg, digits);
-    for(unsigned sam(Samples.size()-nsig); sam < Samples.size(); sam++)
-      out <<" & "<< RoundNumber(yields[sam][ini+icut],digits); 
+    if(!do_uncert) out <<" & "<< RoundNumber(bkg,digits);
+    else out <<" & $"<< RoundNumber(bkg,digits)<<"\\pm"<<RoundNumber(sqrt(ebkg),digits)<<"$";
+    for(unsigned sam(Samples.size()-nsig); sam < Samples.size(); sam++){
+      double val(yields[sam][ini+icut]), errval(sqrt(w2[sam][ini+icut]));
+      if(!do_uncert) out <<" & "<< RoundNumber(val,digits);
+      else out <<" & $"<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$";
+    }
     out<<" \\\\ ";
     for(int ind(0); ind < table.options[icut].CountChar('-'); ind++) out << " \\hline";
     out<<endl;

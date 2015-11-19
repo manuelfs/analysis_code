@@ -131,8 +131,8 @@ void calc_chi2_diff(TH1D *histo1, TH1D *histo2, float &chi2, int &ndof, float &p
 void calc_chi2(TH1D *histo, float &chi2, int &ndof, float &pvalue, float &average);
 long getYieldErr(TChain& tree, TString cut, double& yield, double& uncertainty);
 
-void getYields(baby_basic &baby, bcut baseline, std::vector<bcut> bincuts, std::vector<double> &yields, std::vector<double> &w2,
-	       double lumi=1., bool do_trig=false);
+std::vector<double> getYields(baby_basic &baby, bcut baseline, std::vector<bcut> bincuts, std::vector<double> &yields, 
+			      std::vector<double> &w2, double lumi=1., bool do_trig=false);
 void plot_distributions(std::vector<sfeats> Samples, std::vector<hfeats> vars, TString luminosity="10", 
 			TString filetype=".eps", TString namestyle="LargeLabels", TString dir = "1d", bool doRatio=false);
 void plot_2D_distributions(std::vector<sfeats> Samples, std::vector<hfeats> vars, TString luminosity,

@@ -906,8 +906,9 @@ void calc_chi2_diff(TH1D *histo1, TH1D *histo2, float &chi2, int &ndof, float &p
   pvalue = TMath::Prob(chi2,ndof);
 }
 
-void getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts, 
-               vector<double> &yield, vector<double> &w2, double lumi, bool do_trig){
+vector<double> getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts, 
+			 vector<double> &yield, vector<double> &w2, double lumi, bool do_trig){
+  vector<double> entries = vector<double>(bincuts.size(), 0);
   yield = vector<double>(bincuts.size(), 0);
   w2 = yield;
   long nentries(baby.GetEntries());
@@ -920,6 +921,7 @@ void getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts,
     if(!baseline.pass(&baby)) continue;
     for(size_t ind(0); ind<bincuts.size(); ind++){ 
       if(bincuts[ind].pass(&baby)) {
+	entries[ind]++;
         yield[ind] += baby.weight();
         w2[ind] += baby.weight()*baby.weight();
       }
@@ -929,6 +931,7 @@ void getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts,
      yield[ind] *= lumi;
      w2[ind] *= pow(lumi, 2);
   }
+  return entries;
 }
 
 long getYieldErr(TChain& tree, TString cut, double& yield, double& uncertainty){
