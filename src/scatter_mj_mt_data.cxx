@@ -37,10 +37,10 @@ namespace{
   double met_max = 0.;
   int njets_min = 6;
   int njets_max = 0;
-  int seed = 3247;
+  int seed = 1099;
   bool merge_ttbar = true;
   bool compressed = false;
-  bool no_signal = true; 
+  bool no_signal = false; 
   bool full_stats = false;
   float luminosity = 1.264;
 }
@@ -57,8 +57,8 @@ int main(int argc, char *argv[]){
   styles style("2Dnobar");
   style.setDefaultStyle();
   
-  string folder_data="/cms2r0/babymaker/babies/2015_11_05/data/singlelep/combined/skim_1lht500met200/";
-  string folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
+  string folder_data="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_05/data/singlelep/combined/skim_1lht500met200/";
+  string folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_10_19/mc/skim_1lht500met200/";
   //string folder = "/cms5r0/ald77/archive/2015_05_25/skim/";
   //folder = "/afs/cern.ch/user/m/manuelf/work/ucsb/2015_05_25/skim/";
   string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]){
   double rho_bkg1 = g_bkg1_full.GetCorrelationFactor();
   double rho_bkg2 = g_bkg2_full.GetCorrelationFactor();
   
-  double rho_data = g_data_full.GetCorrelationFactor();
+  //double rho_data = g_data_full.GetCorrelationFactor();
 
   TLegend l(style.PadLeftMargin, 1.-style.PadTopMargin, 1.-style.PadRightMargin, 1.0);
   if(merge_ttbar){
@@ -144,18 +144,18 @@ int main(int argc, char *argv[]){
   if(!no_signal){
     l.AddEntry(&g_sig, GetLabel((compressed?"T1tttt(1200,800)":"T1tttt(1500,100)"),rho_sig).c_str(), "p");
   }
-  l.AddEntry(&g_bkg, GetLabel("data",rho_data).c_str(), "p");
+  //l.AddEntry(&g_bkg, GetLabel("data",rho_data).c_str(), "p");
 
   double height = 0.125;
-  double width = 0.125;
-  TPaveText l1(style.PadLeftMargin+0.2, style.PadBottomMargin,
-	       style.PadLeftMargin+0.2+width, style.PadBottomMargin+height, "NDCNB");
-  TPaveText l2(1.-style.PadRightMargin-width, style.PadBottomMargin,
-	       1.-style.PadRightMargin, style.PadBottomMargin+height, "NDCNB");
-  TPaveText l3(style.PadLeftMargin+0.2, 1.-style.PadTopMargin-1.5*height,
-	       style.PadLeftMargin+0.2+width, 1.-style.PadTopMargin-0.5*height, "NDCNB");
-  TPaveText l4(1.-style.PadRightMargin-width, 1.-style.PadTopMargin-1.5*height,
-	       1.-style.PadRightMargin, 1.-style.PadTopMargin-0.5*height, "NDCNB");
+  double width = 0.1;
+  TPaveText l1(style.PadLeftMargin+0.16, style.PadBottomMargin,
+	       style.PadLeftMargin+0.16+width, style.PadBottomMargin+height, "NDCNB");
+  TPaveText l2(1.-style.PadRightMargin-width-0.05, style.PadBottomMargin,
+	       1.-style.PadRightMargin-0.05, style.PadBottomMargin+height, "NDCNB");
+  TPaveText l3(style.PadLeftMargin+0.16, 1.-style.PadTopMargin-1.5*height+0.07,
+	       style.PadLeftMargin+0.16+width, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
+  TPaveText l4(1.-style.PadRightMargin-width-0.05, 1.-style.PadTopMargin-1.5*height+0.07,
+	       1.-style.PadRightMargin-0.05, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
   TPaveText lcms(style.PadLeftMargin+0.55, 1.-style.PadTopMargin-0.5*height-0.01,
 		 style.PadLeftMargin+0.55+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
 
@@ -176,7 +176,6 @@ int main(int argc, char *argv[]){
   cout << "h_data integral : " << h_data.Integral() << endl;  
   cout << "data/MC="  << h_data.Integral()/h_bkg.Integral() << endl;
   
-  
   const Int_t NRGBs = 5;
   const Int_t NCont = /*255*/999;
 
@@ -186,7 +185,6 @@ int main(int argc, char *argv[]){
   Double_t blue[NRGBs] = { 0.98, 1.00, 0.12, 0.00, 0.00 };
   TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
   gStyle->SetNumberContours(NCont);
-   
 
   // grey pallete 
   /*
@@ -201,8 +199,8 @@ int main(int argc, char *argv[]){
 
   TCanvas c;
   c.SetRightMargin(0.1);
-  h_bkg.Scale(h_data.Integral()/h_bkg.Integral());
-  h_bkg.SetMinimum(-0.001); 
+  //h_bkg.Scale(h_data.Integral()/h_bkg.Integral());
+  h_bkg.SetMinimum(-0.01); 
   h_bkg.Draw("colz"); 
   /*
   if(merge_ttbar){
@@ -213,7 +211,11 @@ int main(int argc, char *argv[]){
   } 
   */
   if(!no_signal){
-    g_sig_full.Draw("psame");
+    //h_sig.SetMarkerStyle(20);
+    //h_sig.SetMarkerColor(kRed);
+    //h_sig.Draw("norm same");
+    //g_sig_full.Draw("psame");
+    g_sig.Draw("psame");
   }
   h_data.SetMarkerStyle(20);
   h_data.Draw("scat same");
@@ -237,7 +239,8 @@ int main(int argc, char *argv[]){
 	  << (merge_ttbar?"_merged":"_split")
 	  << (no_signal ? "_no_signal" : (compressed ? "_T1tttt_1200_800" : "_T1tttt_1500_100"))
 	  << (full_stats ? "_shapes" : "_lumi") << luminosity
-	  << ".pdf";
+	  //<< ".pdf";
+	  << ".root";
   c.Print(outname.str().c_str());
 }
 
@@ -275,7 +278,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
        //|| (st.mt()>140 && st.mj()>400) // for blinding
        //|| st.nbm()<2 //nb>=2
        //|| st.nbm()!=1 //nb==1
-       || st.nbm()<1 //nb==1
+       || st.nbm()<1 //nb>=1
        || st.njets()<njets_min
        || (njets_max > 0 && st.njets()>njets_max)
        || st.met()<=met_min
@@ -311,7 +314,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
   g.SetMarkerColor(color);
   g.SetMarkerStyle(marker);
   g.SetMarkerSize(size);
-}
+} 
 
 string GetLabel(const string &str, double rho){
   ostringstream oss;
