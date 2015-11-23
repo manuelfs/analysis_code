@@ -36,8 +36,9 @@ using namespace std;
 
 namespace{
   int seed = /*3247*/3248;
-  bool compressed = false;
   float luminosity = 1.264;
+  int mg = 1500;
+  int mlsp = 100;
   bool debug = false;
   const char* syst = "lepeff";
 }
@@ -49,7 +50,7 @@ int main(int argc, char *argv[]){
   TRandom3 rand(seed);
   
   string folder="/Users/jaehyeok/scratch/";
-  string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
+  string sig_name=Form("*T1tttt*%i_*%i_*",mg,mlsp);
   baby_basic st_sig(folder+sig_name);
 
   // met 200-400
@@ -142,7 +143,7 @@ void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsys
   }
 
   // string for name of nuisance
-  string nbregion = "allnb"; 
+  string nbregion = "allnb";   
   if(regionname=="r2" || regionname=="r4"){ 
     if(nbm_low==1) nbregion="1b";
     if(nbm_low==2) nbregion="2b";
@@ -150,6 +151,7 @@ void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsys
   }
 
   // print a line for systematics txt
+  cout << "mg= " << mg << "\t mlsp= " << mlsp << "\t";
   cout << region << "_";
   if(met_low==200) cout << "lowmet_"; 
   else cout << "highmet_";
@@ -173,7 +175,8 @@ void GetOptions(int argc, char *argv[]){
     static struct option long_options[] = {
       {"seed", required_argument, 0, 0},
       {"syst", required_argument, 0, 0},
-      {"compressed", no_argument, 0, 0},
+      {"mg", required_argument, 0, 0},
+      {"mlsp", required_argument, 0, 0},
       {0, 0, 0, 0}
     };
 
@@ -187,11 +190,13 @@ void GetOptions(int argc, char *argv[]){
     case 0:
       optname = long_options[option_index].name;
       if(optname == "seed"){
-	seed = atoi(optarg);
+	    seed = atoi(optarg);
       } else if(optname == "syst"){
-	syst =optarg;
-      }else if(optname == "compressed"){
-	compressed = true;
+	    syst =optarg;
+      }else if(optname == "mg"){
+	    mg = atoi(optarg);
+      }else if(optname == "mlsp"){
+	    mlsp = atoi(optarg);
       }
       break;
     default: break;
@@ -207,9 +212,22 @@ float VaryWeight(baby_basic &st, const char *whichsyst, TRandom3 &rand){
     float weight_sigma=0.;
     float weight_fluct=1.;
 
+    // 
+    // The list of recommended signal systematics for Jamboree : 
+    // https://hypernews.cern.ch/HyperNews/CMS/get/susy/2112.html
+    // 
+
     //
     // Experimental
     //
+
+    // Luminosity = 12 %
+    // PU reweighting = 5 %
+    
+    // Btagging efficiency
+    if(systname=="btageff"){
+        { weight_central=1; weight_sigma=0.02; }
+    }
 
     // Lepton efficiency
     if(systname=="lepeff"){
@@ -223,10 +241,8 @@ float VaryWeight(baby_basic &st, const char *whichsyst, TRandom3 &rand){
         { weight_central=1; weight_sigma=0.02; }
     }
     
-    // Btagging efficiency
-    if(systname=="btageff"){
-        { weight_central=1; weight_sigma=0.02; }
-    }
+    // JEC 
+    
 
     //
     // Theory 
@@ -251,8 +267,19 @@ float VaryWeight(baby_basic &st, const char *whichsyst, TRandom3 &rand){
     if(systname=="muf"){
         { weight_central=1; weight_sigma=0.1; }
     }
-    
+   
+    // ISR
+    //   pt (gluino-gluino) between 0 and 400 GeV       : no uncertainty
+    //   pt (gluino-gluino) between 400 GeV and 600 GeV : 15% uncertainty
+    //   pt (gluino-gluino) above 600 GeV               : 30% uncertainty
+    //if(systname=="isrpt"){
+    //    if (st.isrpt()<400) { weight_central=1; weight_sigma=0.0; }
+    //    else if (st.isrpt()<600) { weight_central=1; weight_sigma=0.15; }
+    //    else { weight_central=1; weight_sigma=0.3; }
+    //}
+
     // get the weight
+    //
     if(systname=="lepeff" || systname=="trgeff" || systname=="btageff") weight_fluct=GetFluctWeight(weight_central,weight_sigma,rand); // 0% correlated (fluctuated)
     else weight_fluct=(weight_central+weight_sigma)/weight_central;  // 100% correlated 
 
