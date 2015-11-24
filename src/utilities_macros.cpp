@@ -531,15 +531,21 @@ TString cuts2tex(TString cuts){
       cuts.ReplaceAll("met>200", "met>400");
     }
   }
-  cuts.ReplaceAll("1&&", ""); cuts.ReplaceAll("&&1", "");
-  cuts.ReplaceAll("trig[0]", "\\text{HT350\\_MET100}");
+  //cuts.ReplaceAll("1&&", ""); 
+  cuts.ReplaceAll("&&1", "");
+  cuts.ReplaceAll("trig[0]", "\\text{HT350\\_MET100}");  cuts.ReplaceAll("trig[22]", "\\text{Ele27\\_eta2p1}");   
   cuts.ReplaceAll("trig[4]", "\\text{Mu15\\_VVVL}"); cuts.ReplaceAll("trig[8]", "\\text{Ele15\\_VVVL}");   
   cuts.ReplaceAll("&&&&", "&&");  cuts.ReplaceAll("&&", ", ");  
+  cuts.ReplaceAll("elelv_m", "m_{ee}"); cuts.ReplaceAll("elel_m", "m_{ee}"); cuts.ReplaceAll("elelv_pt", "p^{ee}_T"); 
+  cuts.ReplaceAll("mumuv_m", "m_{\\mu\\mu}"); cuts.ReplaceAll("mumu_m", "m_{\\mu\\mu}"); 
+  cuts.ReplaceAll("mumuv_pt", "p^{\\mu\\mu}_T"); 
   cuts.ReplaceAll("ht_ra2", "H_T"); cuts.ReplaceAll("ht", "H_T"); 
   cuts.ReplaceAll("mj", "M_J"); cuts.ReplaceAll("met", "\\mathrm{MET}");  
   cuts.ReplaceAll("njets", "n_j");  cuts.ReplaceAll("nbm", "n_b");  cuts.ReplaceAll("nleps", "n_{\\ell}"); 
-  cuts.ReplaceAll("nvels", "n_e");  
+  cuts.ReplaceAll("nvels", "n_e"); cuts.ReplaceAll("nels", "n_e");  
+  cuts.ReplaceAll("nvmus", "n_\\mu"); cuts.ReplaceAll("nmus", "n_\\mu");  
   cuts.ReplaceAll(">=", "\\geq ");  cuts.ReplaceAll("<=", " \\leq "); cuts.ReplaceAll("==", " = ");
+  cuts.ReplaceAll("pass","");
 
   cuts = "$"+cuts+"$";
   return cuts;
@@ -587,6 +593,10 @@ TString cuts2title(TString title){
   title.ReplaceAll("_ra2b", "^{ra2b}");
   title.ReplaceAll("npv", "n_{PV}");  
   title.ReplaceAll("mumu_pt1", "p_{T}^{#mu}");  title.ReplaceAll("elel_pt1", "p_{T}^{e}");  
+  title.ReplaceAll("mumu_pt", "p_{T}^{#mu#mu}");  title.ReplaceAll("elel_pt", "p_{T}^{ee}");  
+  title.ReplaceAll("mumuv_pt", "p_{T}^{#mu#mu}");  title.ReplaceAll("elelv_pt", "p_{T}^{ee}");  
+  title.ReplaceAll("mumu_m", "m_{#mu#mu}");  title.ReplaceAll("elel_m", "m_{ee}");  
+  title.ReplaceAll("mumuv_m", "m_{#mu#mu}");  title.ReplaceAll("elelv_m", "m_{ee}");  
 
   title.ReplaceAll("onmet", "MET^{on}"); title.ReplaceAll("onht", "H_{T}^{on}");  
   title.ReplaceAll("njets30","n_{jets}^{30}"); 
