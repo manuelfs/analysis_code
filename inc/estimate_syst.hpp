@@ -21,4 +21,7 @@ float GetFluctWeight(float weight_central, float weight_sigma, TRandom3 &rand);
 void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsyst, TRandom3 &rand, 
                         int njets_low, int njets_high, int nbm_low, int nbm_high, float met_low, float met_high);
 
+void GetJECSystOneRegion ( baby_basic &st, const char *region, 
+                        int njets_low, int njets_high, int nbm_low, int nbm_high, float met_low, float met_high);
+
 #endif

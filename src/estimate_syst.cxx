@@ -41,6 +41,7 @@ namespace{
   int mlsp = 100;
   bool debug = false;
   const char* syst = "lepeff";
+  bool dojecsyst=true;
 }
 
 int main(int argc, char *argv[]){
@@ -48,8 +49,9 @@ int main(int argc, char *argv[]){
   gErrorIgnoreLevel=6000; // Turns off errors due to missing branches
   GetOptions(argc, argv);
   TRandom3 rand(seed);
-  
-  string folder="/Users/jaehyeok/scratch/";
+
+  //NOTE: This is skimmed and so may throw away events that pass the varied baseline
+  string folder="//Users/jaehyeok/scratch/"; 
   string sig_name=Form("*T1tttt*%i_*%i_*",mg,mlsp);
   baby_basic st_sig(folder+sig_name);
 
@@ -80,6 +82,37 @@ int main(int argc, char *argv[]){
   GetSystOneRegion(st_sig, "r4", syst, rand, 9, 99, 1, 1,  400, 99999);
   GetSystOneRegion(st_sig, "r4", syst, rand, 6, 8,  2, 99, 400, 99999);
   GetSystOneRegion(st_sig, "r4", syst, rand, 9, 99, 2, 99, 400, 99999);
+
+  if(dojecsyst){
+
+    // met 200-400
+    GetJECSystOneRegion(st_sig, "r1", 6, 8,  1, 99, 200, 400);
+    GetJECSystOneRegion(st_sig, "r2", 6, 8,  1, 1,  200, 400);
+    GetJECSystOneRegion(st_sig, "r2", 9, 99, 1, 1,  200, 400);
+    GetJECSystOneRegion(st_sig, "r2", 6, 8,  2, 2,  200, 400);
+    GetJECSystOneRegion(st_sig, "r2", 9, 99, 2, 2,  200, 400);
+    GetJECSystOneRegion(st_sig, "r2", 6, 8,  3, 99, 200, 400);
+    GetJECSystOneRegion(st_sig, "r2", 9, 99, 3, 99, 200, 400);
+    GetJECSystOneRegion(st_sig, "r3", 6, 8,  1, 99, 200, 400);
+    GetJECSystOneRegion(st_sig, "r4", 6, 8,  1, 1,  200, 400);
+    GetJECSystOneRegion(st_sig, "r4", 9, 99, 1, 1,  200, 400);
+    GetJECSystOneRegion(st_sig, "r4", 6, 8,  2, 2,  200, 400);
+    GetJECSystOneRegion(st_sig, "r4", 9, 99, 2, 2,  200, 400);
+    GetJECSystOneRegion(st_sig, "r4", 6, 8,  3, 99, 200, 400);
+    GetJECSystOneRegion(st_sig, "r4", 9, 99, 3, 99, 200, 400);
+  
+    // met 400-
+    GetJECSystOneRegion(st_sig, "r1", 6, 8,  1, 99, 400, 99999);
+    GetJECSystOneRegion(st_sig, "r2", 6, 8,  1, 1,  400, 99999);
+    GetJECSystOneRegion(st_sig, "r2", 9, 99, 1, 1,  400, 99999);
+    GetJECSystOneRegion(st_sig, "r2", 6, 8,  2, 99, 400, 99999);
+    GetJECSystOneRegion(st_sig, "r2", 9, 99, 2, 99, 400, 99999);
+    GetJECSystOneRegion(st_sig, "r3", 6, 8,  1, 99, 400, 99999);
+    GetJECSystOneRegion(st_sig, "r4", 6, 8,  1, 1,  400, 99999);
+    GetJECSystOneRegion(st_sig, "r4", 9, 99, 1, 1,  400, 99999);
+    GetJECSystOneRegion(st_sig, "r4", 6, 8,  2, 99, 400, 99999);
+    GetJECSystOneRegion(st_sig, "r4", 9, 99, 2, 99, 400, 99999);
+  }
 
 }
 
@@ -168,6 +201,136 @@ void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsys
       delete c;
   } 
   delete h;
+}
+
+void GetJECSystOneRegion ( baby_basic &st, const char *region,
+			   int njets_low, int njets_high, int nbm_low, int nbm_high, float met_low, float met_high) {
+
+  string regionname=region; 
+
+  float n_novariation=0.;
+  float n_variation_up=0.;
+  float n_variation_down=0.;
+  
+  int num_entries = st.GetEntries();
+  Timer timer(num_entries, 1.);
+  timer.Start();
+  for(int entry = 0; entry < num_entries; ++entry){
+    timer.Iterate();
+    st.GetEntry(entry);
+
+    //NOMINAL
+    bool pass_nom=true;
+    if(regionname=="r1" && !(st.mj()>250 && st.mj()<400 && st.mt()<140)) pass_nom=false;
+    if(regionname=="r2" && !(st.mj()>400                && st.mt()<140)) pass_nom=false;
+    if(regionname=="r3" && !(st.mj()>250 && st.mj()<400 && st.mt()>140)) pass_nom=false;
+    if(regionname=="r4" && !(st.mj()>400                && st.mt()>140)) pass_nom=false;
+
+    // baseline 
+    if(   (st.nmus()+st.nels())!=1
+       || st.ht()<=500.
+       || st.met()<=200
+       || st.njets()<6
+       || st.nbm()<1 //nb>=1
+     ) pass_nom=false;
+
+    // select region 
+    if(    st.met()>met_high 
+        || st.met()<=met_low 
+        || st.njets()>njets_high
+        || st.njets()<njets_low
+        || st.nbm()>nbm_high
+        || st.nbm()<nbm_low
+      ) pass_nom=false;
+
+    //VARIATION UP
+    bool pass_var_up=true;
+    if(regionname=="r1" && !(st.sys_mj().at(1)>250 && st.sys_mj().at(1)<400   &&  st.sys_mt().at(1)<140)) pass_var_up=false;
+    if(regionname=="r2" && !(st.sys_mj().at(1)>400                            &&  st.sys_mt().at(1)<140)) pass_var_up=false;
+    if(regionname=="r3" && !(st.sys_mj().at(1)>250 && st.sys_mj().at(1)<400   &&  st.sys_mt().at(1)>140)) pass_var_up=false;
+    if(regionname=="r4" && !(st.sys_mj().at(1)>400                            &&  st.sys_mt().at(1)>140)) pass_var_up=false;
+
+    // baseline 
+    if(   (st.nmus()+st.nels())!=1
+        || st.sys_ht().at(1)<=500.
+        || st.sys_met().at(1)<=200
+        || st.sys_njets().at(1)<6
+        || st.sys_nbm().at(1)<1 //nb>=1
+      ) pass_var_up = false;
+
+    // select region 
+    if(    st.met()>met_high 
+        || st.sys_met().at(1)<=met_low 
+        || st.sys_njets().at(1)>njets_high
+        || st.sys_njets().at(1)<njets_low
+        || st.sys_nbm().at(1)>nbm_high
+        || st.sys_nbm().at(1)<nbm_low
+      ) pass_var_up = false;
+
+    //VARIATION DOWN
+    bool pass_var_down=true;
+    if(regionname=="r1" && !(st.sys_mj().at(2)>250 && st.sys_mj().at(2)<400   &&  st.sys_mt().at(2)<140)) pass_var_down=false;
+    if(regionname=="r2" && !(st.sys_mj().at(2)>400                            &&  st.sys_mt().at(2)<140)) pass_var_down=false;
+    if(regionname=="r3" && !(st.sys_mj().at(2)>250 && st.sys_mj().at(2)<400   &&  st.sys_mt().at(2)>140)) pass_var_down=false;
+    if(regionname=="r4" && !(st.sys_mj().at(2)>400                            &&  st.sys_mt().at(2)>140)) pass_var_down=false;
+
+    // baseline 
+    if(   (st.nmus()+st.nels())!=1
+        || st.sys_ht().at(2)<=500.
+        || st.sys_met().at(2)<=200
+        || st.sys_njets().at(2)<6
+        || st.sys_nbm().at(2)<1 //nb>=1
+      ) pass_var_down = false;
+
+    // select region 
+    if(    st.met()>met_high 
+        || st.sys_met().at(2)<=met_low 
+        || st.sys_njets().at(2)>njets_high
+        || st.sys_njets().at(2)<njets_low
+        || st.sys_nbm().at(2)>nbm_high
+        || st.sys_nbm().at(2)<nbm_low
+      ) pass_var_down = false;
+
+    if(pass_nom)
+      n_novariation=n_novariation+st.weight()*luminosity;
+    if(pass_var_up)
+      n_variation_up=n_variation_up+st.weight()*luminosity;
+    if(pass_var_down)
+      n_variation_down=n_variation_down+st.weight()*luminosity;
+  }
+
+  /*  cout << region << " :: " 
+       << Form("%i<=njets<=%i, %i<=nbm<=%i, %.0f<met<%.0f", njets_low,njets_high,nbm_low,nbm_high,met_low,met_high) 
+       << Form(" :: before variation=%.3f, after variation up=%.3f",n_novariation,n_variation_up) 
+       << Form(" :: syst up = %.3f",(n_variation_up-n_novariation)/n_novariation)
+       << Form(" :: before variation=%.3f, after variation down=%.3f",n_novariation,n_variation_down) 
+       << Form(" :: syst down = %.3f",(n_variation_down-n_novariation)/n_novariation) << endl; */
+
+       
+  // final systmatics 
+  float final_syst=0.;
+  //Only print the larger systematic
+  if((n_variation_up-n_novariation) > (n_variation_down-n_novariation))
+    final_syst=(n_variation_up-n_novariation)/n_novariation;
+  else
+    final_syst=(n_variation_down-n_novariation)/n_novariation;
+
+  // string for name of nuisance
+  string nbregion = "allnb";   
+  if(regionname=="r2" || regionname=="r4"){ 
+    if(nbm_low==1) nbregion="1b";
+    if(nbm_low==2) nbregion="2b";
+    if(nbm_low==3) nbregion="3b";
+  }
+
+  // print a line for systematics txt
+  cout << "mg= " << mg << "\t mlsp= " << mlsp << "\t";
+  cout << region << "_";
+  if(met_low==200) cout << "lowmet_"; 
+  else cout << "highmet_";
+  if(njets_low==6) cout << "lownj_";
+  else cout << "highnj_";
+  cout << nbregion  << Form("\t%.2f",final_syst) << endl;
 }
 
 void GetOptions(int argc, char *argv[]){
