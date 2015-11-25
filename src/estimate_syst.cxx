@@ -52,8 +52,11 @@ int main(int argc, char *argv[]){
   string folder="/hadoop/cms/store/user/rheller/babymaker/out/151123_112940/";
   string sig_name=Form("*SMS*T1tttt*mgluino%i_mlsp%i.root",mg,mlsp);
   baby_basic st_sig(folder+sig_name);
-
-
+  if(st_sig.GetEntries()==0) { 
+    cout << Form("[Hello] mgluino=%i, mlsp=%i does not exist!",mg,mlsp) << endl;
+    return 0; 
+  }
+  
   if(dojecsyst){
 
     // met 200-400
@@ -402,10 +405,14 @@ std::vector<float> VaryWeight(baby_basic &st, const char *whichsyst){
     // Btagging efficiency
     // Lepton efficiency
     if(systname=="lepeff"){
-        if(st.leps_pt().at(0)>20 && st.leps_pt().at(0)<=30)  { weight_up=0.20; weight_down=0.20; }
-        if(st.leps_pt().at(0)>30 && st.leps_pt().at(0)<=50)  { weight_up=0.16; weight_down=0.16; }
-        if(st.leps_pt().at(0)>50 && st.leps_pt().at(0)<=100) { weight_up=0.08; weight_down=0.08; }
-        if(st.leps_pt().at(0)>100                          ) { weight_up=0.04; weight_down=0.04; }
+        if(fabs(st.leps_id().at(0))==11) {
+            if(st.leps_pt().at(0)>20 && st.leps_pt().at(0)<=30)  { weight_up=1.08; weight_down=0.92; }
+            if(st.leps_pt().at(0)>30                          )  { weight_up=1.08; weight_down=0.92; } 
+        }
+        if(fabs(st.leps_id().at(0))==13) {
+            if(st.leps_pt().at(0)>20 && st.leps_pt().at(0)<=30)  { weight_up=1.03; weight_down=0.97; }
+            if(st.leps_pt().at(0)>30                          )  { weight_up=1.03; weight_down=0.97; } 
+        }
     }
     
     // Trigger efficiency 
@@ -439,8 +446,8 @@ std::vector<float> VaryWeight(baby_basic &st, const char *whichsyst){
     //
 
     vector<float> weight_fluct;
-    weight_fluct.push_back(exp(weight_up));   
-    weight_fluct.push_back(exp(-weight_down));   
+    weight_fluct.push_back(exp(weight_up-1));   
+    weight_fluct.push_back(exp(weight_down-1));   
 
     return weight_fluct; 
 } 
