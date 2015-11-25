@@ -14,11 +14,11 @@
 
 void GetOptions(int argc, char *argv[]);
 
-float VaryWeight(baby_basic &st, const char* whichsyst, TRandom3 &rand); 
+std::vector<float> VaryWeight(baby_basic &st, const char* whichsyst); 
 
-float GetFluctWeight(float weight_central, float weight_sigma, TRandom3 &rand); 
+float GetFluctWeight(float weight_central, float weight_sigma); 
 
-void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsyst, TRandom3 &rand, 
+void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsyst, 
                         int njets_low, int njets_high, int nbm_low, int nbm_high, float met_low, float met_high);
 
 void GetJECSystOneRegion ( baby_basic &st, const char *region, 

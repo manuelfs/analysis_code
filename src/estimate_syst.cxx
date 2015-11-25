@@ -36,12 +36,11 @@ using namespace std;
 
 namespace{
   int seed = /*3247*/3248;
-  float luminosity = 1.264;
+  float luminosity = 2.1;
   int mg = 1500;
   int mlsp = 100;
-  bool debug = false;
   const char* syst = "lepeff";
-  bool dojecsyst=true;
+  bool dojecsyst=false;
 }
 
 int main(int argc, char *argv[]){
@@ -50,50 +49,22 @@ int main(int argc, char *argv[]){
   GetOptions(argc, argv);
   TRandom3 rand(seed);
 
-  //NOTE: This is skimmed and so may throw away events that pass the varied baseline
-  string folder="//Users/jaehyeok/scratch/"; 
-  string sig_name=Form("*T1tttt*%i_*%i_*",mg,mlsp);
+  string folder="/hadoop/cms/store/user/rheller/babymaker/out/151123_112940/";
+  string sig_name=Form("*SMS*T1tttt*mgluino%i_mlsp%i.root",mg,mlsp);
   baby_basic st_sig(folder+sig_name);
 
-  // met 200-400
-  GetSystOneRegion(st_sig, "r1", syst, rand, 6, 8,  1, 99, 200, 400);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 6, 8,  1, 1,  200, 400);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 9, 99, 1, 1,  200, 400);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 6, 8,  2, 2,  200, 400);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 9, 99, 2, 2,  200, 400);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 6, 8,  3, 99, 200, 400);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 9, 99, 3, 99, 200, 400);
-  GetSystOneRegion(st_sig, "r3", syst, rand, 6, 8,  1, 99, 200, 400);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 6, 8,  1, 1,  200, 400);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 9, 99, 1, 1,  200, 400);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 6, 8,  2, 2,  200, 400);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 9, 99, 2, 2,  200, 400);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 6, 8,  3, 99, 200, 400);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 9, 99, 3, 99, 200, 400);
-  
-  // met 400-
-  GetSystOneRegion(st_sig, "r1", syst, rand, 6, 8,  1, 99, 400, 99999);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 6, 8,  1, 1,  400, 99999);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 9, 99, 1, 1,  400, 99999);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 6, 8,  2, 99, 400, 99999);
-  GetSystOneRegion(st_sig, "r2", syst, rand, 9, 99, 2, 99, 400, 99999);
-  GetSystOneRegion(st_sig, "r3", syst, rand, 6, 8,  1, 99, 400, 99999);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 6, 8,  1, 1,  400, 99999);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 9, 99, 1, 1,  400, 99999);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 6, 8,  2, 99, 400, 99999);
-  GetSystOneRegion(st_sig, "r4", syst, rand, 9, 99, 2, 99, 400, 99999);
 
   if(dojecsyst){
 
     // met 200-400
-    GetJECSystOneRegion(st_sig, "r1", 6, 8,  1, 99, 200, 400);
+    GetJECSystOneRegion(st_sig, "r1", 6, 99,  1, 99, 200, 400);
     GetJECSystOneRegion(st_sig, "r2", 6, 8,  1, 1,  200, 400);
     GetJECSystOneRegion(st_sig, "r2", 9, 99, 1, 1,  200, 400);
     GetJECSystOneRegion(st_sig, "r2", 6, 8,  2, 2,  200, 400);
     GetJECSystOneRegion(st_sig, "r2", 9, 99, 2, 2,  200, 400);
     GetJECSystOneRegion(st_sig, "r2", 6, 8,  3, 99, 200, 400);
     GetJECSystOneRegion(st_sig, "r2", 9, 99, 3, 99, 200, 400);
-    GetJECSystOneRegion(st_sig, "r3", 6, 8,  1, 99, 200, 400);
+    GetJECSystOneRegion(st_sig, "r3", 6, 99,  1, 99, 200, 400);
     GetJECSystOneRegion(st_sig, "r4", 6, 8,  1, 1,  200, 400);
     GetJECSystOneRegion(st_sig, "r4", 9, 99, 1, 1,  200, 400);
     GetJECSystOneRegion(st_sig, "r4", 6, 8,  2, 2,  200, 400);
@@ -102,51 +73,92 @@ int main(int argc, char *argv[]){
     GetJECSystOneRegion(st_sig, "r4", 9, 99, 3, 99, 200, 400);
   
     // met 400-
-    GetJECSystOneRegion(st_sig, "r1", 6, 8,  1, 99, 400, 99999);
+    GetJECSystOneRegion(st_sig, "r1", 6, 99,  1, 99, 400, 99999);
     GetJECSystOneRegion(st_sig, "r2", 6, 8,  1, 1,  400, 99999);
     GetJECSystOneRegion(st_sig, "r2", 9, 99, 1, 1,  400, 99999);
     GetJECSystOneRegion(st_sig, "r2", 6, 8,  2, 99, 400, 99999);
     GetJECSystOneRegion(st_sig, "r2", 9, 99, 2, 99, 400, 99999);
-    GetJECSystOneRegion(st_sig, "r3", 6, 8,  1, 99, 400, 99999);
+    GetJECSystOneRegion(st_sig, "r3", 6, 99,  1, 99, 400, 99999);
     GetJECSystOneRegion(st_sig, "r4", 6, 8,  1, 1,  400, 99999);
     GetJECSystOneRegion(st_sig, "r4", 9, 99, 1, 1,  400, 99999);
     GetJECSystOneRegion(st_sig, "r4", 6, 8,  2, 99, 400, 99999);
     GetJECSystOneRegion(st_sig, "r4", 9, 99, 2, 99, 400, 99999);
+  } else { 
+      // met 200-400
+    GetSystOneRegion(st_sig, "r1", syst, 6, 99, 1, 99, 200, 400);
+    GetSystOneRegion(st_sig, "r2", syst, 6, 8,  1, 1,  200, 400);
+    GetSystOneRegion(st_sig, "r2", syst, 9, 99, 1, 1,  200, 400);
+    GetSystOneRegion(st_sig, "r2", syst, 6, 8,  2, 2,  200, 400);
+    GetSystOneRegion(st_sig, "r2", syst, 9, 99, 2, 2,  200, 400);
+    GetSystOneRegion(st_sig, "r2", syst, 6, 8,  3, 99, 200, 400);
+    GetSystOneRegion(st_sig, "r2", syst, 9, 99, 3, 99, 200, 400);
+    GetSystOneRegion(st_sig, "r3", syst, 6, 99,  1, 99, 200, 400);
+    GetSystOneRegion(st_sig, "r4", syst, 6, 8,  1, 1,  200, 400);
+    GetSystOneRegion(st_sig, "r4", syst, 9, 99, 1, 1,  200, 400);
+    GetSystOneRegion(st_sig, "r4", syst, 6, 8,  2, 2,  200, 400);
+    GetSystOneRegion(st_sig, "r4", syst, 9, 99, 2, 2,  200, 400);
+    GetSystOneRegion(st_sig, "r4", syst, 6, 8,  3, 99, 200, 400);
+    GetSystOneRegion(st_sig, "r4", syst, 9, 99, 3, 99, 200, 400);
+
+    // met 400-
+    GetSystOneRegion(st_sig, "r1", syst, 6, 99,  1, 99, 400, 99999);
+    GetSystOneRegion(st_sig, "r2", syst, 6, 8,  1, 1,  400, 99999);
+    GetSystOneRegion(st_sig, "r2", syst, 9, 99, 1, 1,  400, 99999);
+    GetSystOneRegion(st_sig, "r2", syst, 6, 8,  2, 99, 400, 99999);
+    GetSystOneRegion(st_sig, "r2", syst, 9, 99, 2, 99, 400, 99999);
+    GetSystOneRegion(st_sig, "r3", syst, 6, 99,  1, 99, 400, 99999);
+    GetSystOneRegion(st_sig, "r4", syst, 6, 8,  1, 1,  400, 99999);
+    GetSystOneRegion(st_sig, "r4", syst, 9, 99, 1, 1,  400, 99999);
+    GetSystOneRegion(st_sig, "r4", syst, 6, 8,  2, 99, 400, 99999);
+    GetSystOneRegion(st_sig, "r4", syst, 9, 99, 2, 99, 400, 99999);
   }
 
 }
 
-void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsyst, TRandom3 &rand, 
+void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsyst, 
                         int njets_low, int njets_high, int nbm_low, int nbm_high, float met_low, float met_high) {
 
-  TH1D *h = new TH1D("h", "h", 50,0,2);
   string regionname=region; 
   string systname=whichsyst; 
+ 
+  bool renorm=false; 
+  //if(systname=="isr" || systname=="pdf" || systname=="scale") renorm=true;
+  if(systname=="isr" || systname=="pdf" || systname=="scale") renorm=true;
 
   float n_novariation=0.;
-  float n_variation=0.;
+  float n_upvariation=0.;
+  float n_downvariation=0.;
+  float n_novariation_region=0.;
+  float n_upvariation_region=0.;
+  float n_downvariation_region=0.;
   
   int num_entries = st.GetEntries();
   Timer timer(num_entries, 1.);
   timer.Start();
   for(int entry = 0; entry < num_entries; ++entry){
-    timer.Iterate();
+    //timer.Iterate();
     st.GetEntry(entry);
-
-    if(regionname=="r1" && !(st.mj()>250 && st.mj()<400 && st.mt()<140)) continue;
-    if(regionname=="r2" && !(st.mj()>400                && st.mt()<140)) continue;
-    if(regionname=="r3" && !(st.mj()>250 && st.mj()<400 && st.mt()>140)) continue;
-    if(regionname=="r4" && !(st.mj()>400                && st.mt()>140)) continue;
 
     // baseline 
     if(   (st.nmus()+st.nels())!=1
        || st.ht()<=500.
        || st.met()<=200
-       || st.njets()<6
-       || st.nbm()<1 //nb>=1
+       || st.njets()<6 // njets>=6
+       || st.nbm()<1   // nb>=1
+       || st.mj()<=250   // nb>=1
       ) continue;
+    
+    n_novariation=n_novariation+st.weight()*luminosity;
+    n_upvariation=n_upvariation+st.weight()*luminosity*VaryWeight(st,whichsyst).at(0); 
+    n_downvariation=n_downvariation+st.weight()*luminosity*VaryWeight(st,whichsyst).at(1); 
 
-    // select region 
+    // ABCD regions
+    if(regionname=="r1" && !(st.mj()<=400 && st.mt()<=140)) continue;
+    if(regionname=="r2" && !(st.mj()>400 && st.mt()<=140)) continue;
+    if(regionname=="r3" && !(st.mj()<=400 && st.mt()>140)) continue;
+    if(regionname=="r4" && !(st.mj()>400 && st.mt()>140)) continue;
+
+    // select MET/njets/nb regions
     if(    st.met()>met_high 
         || st.met()<=met_low 
         || st.njets()>njets_high
@@ -155,10 +167,9 @@ void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsys
         || st.nbm()<nbm_low
       ) continue;
 
-    n_novariation=n_novariation+st.weight()*luminosity;
-    n_variation=n_variation+st.weight()*luminosity*VaryWeight(st,whichsyst,rand); 
-
-    h->Fill(VaryWeight(st,whichsyst,rand));
+    n_novariation_region=n_novariation_region+st.weight()*luminosity;
+    n_upvariation_region=n_upvariation_region+st.weight()*luminosity*VaryWeight(st,whichsyst).at(0); 
+    n_downvariation_region=n_downvariation_region+st.weight()*luminosity*VaryWeight(st,whichsyst).at(1); 
   }
 
 //  cout << region << " :: " 
@@ -167,13 +178,20 @@ void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsys
 //       //<< Form(" :: syst = %.3f",(n_variation-n_novariation)/n_novariation) << endl;
 //       << Form(" :: syst = %.3f",h->GetRMS()) << endl;
 
-  // final systmatics 
-  float final_syst=0.;
-  if(systname=="lepeff"){   // from toy : get the width of toys 
-    final_syst=h->GetRMS();
-  }else{                    // from 100% correlation : compare yields 
-    final_syst=(n_variation-n_novariation)/n_novariation;
+//  cout << n_upvariation << "/" << n_novariation << endl;
+//  cout << n_downvariation << "/" << n_novariation << endl;
+  
+  //renormalization
+  if(renorm){
+    n_upvariation_region=n_upvariation_region/(n_upvariation/n_novariation);
+    n_downvariation_region=n_downvariation_region/(n_downvariation/n_novariation);
   }
+
+  // final systmatics 
+  float final_syst_up=0.;
+  float final_syst_down=0.;
+  final_syst_up=(n_upvariation_region-n_novariation_region)/n_novariation_region;
+  final_syst_down=(n_novariation_region-n_downvariation_region)/n_novariation_region;
 
   // string for name of nuisance
   string nbregion = "allnb";   
@@ -190,17 +208,9 @@ void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsys
   else cout << "highmet_";
   if(njets_low==6) cout << "lownj_";
   else cout << "highnj_";
-  cout << nbregion  << Form("\t%.2f",final_syst) << endl;
+  //cout << nbregion  << Form("\t%.2f\t%.2f",final_syst_up,final_syst_down) << endl;
+  cout << nbregion  << Form("\t%.5f\t%.5f",final_syst_up,final_syst_down) << endl;
 
-  // toy distribution 
-  if(debug){ 
-      TCanvas *c = new TCanvas();
-      c->cd();
-      h->Draw("hist"); 
-      c->Print(Form("toy_%s_njets%ito%i_nbm%ito%i_met%.0fto%.0f.pdf",region,njets_low,njets_high,nbm_low,nbm_high,met_low,met_high));
-      delete c;
-  } 
-  delete h;
 }
 
 void GetJECSystOneRegion ( baby_basic &st, const char *region,
@@ -216,7 +226,7 @@ void GetJECSystOneRegion ( baby_basic &st, const char *region,
   Timer timer(num_entries, 1.);
   timer.Start();
   for(int entry = 0; entry < num_entries; ++entry){
-    timer.Iterate();
+    //timer.Iterate();
     st.GetEntry(entry);
 
     //NOMINAL
@@ -340,6 +350,7 @@ void GetOptions(int argc, char *argv[]){
       {"syst", required_argument, 0, 0},
       {"mg", required_argument, 0, 0},
       {"mlsp", required_argument, 0, 0},
+      {"dojecsyst", no_argument, 0, 0},
       {0, 0, 0, 0}
     };
 
@@ -360,6 +371,8 @@ void GetOptions(int argc, char *argv[]){
 	    mg = atoi(optarg);
       }else if(optname == "mlsp"){
 	    mlsp = atoi(optarg);
+      }else if(optname == "dojecsyst"){
+	    dojecsyst = true;
       }
       break;
     default: break;
@@ -367,13 +380,12 @@ void GetOptions(int argc, char *argv[]){
   }
 }
 
-float VaryWeight(baby_basic &st, const char *whichsyst, TRandom3 &rand){ 
+std::vector<float> VaryWeight(baby_basic &st, const char *whichsyst){ 
     
     string systname = whichsyst;
   
-    float weight_central=1.;
-    float weight_sigma=0.;
-    float weight_fluct=1.;
+    float weight_up=0.;
+    float weight_down=0.;
 
     // 
     // The list of recommended signal systematics for Jamboree : 
@@ -388,22 +400,15 @@ float VaryWeight(baby_basic &st, const char *whichsyst, TRandom3 &rand){
     // PU reweighting = 5 %
     
     // Btagging efficiency
-    if(systname=="btageff"){
-        { weight_central=1; weight_sigma=0.02; }
-    }
-
     // Lepton efficiency
     if(systname=="lepeff"){
-        if(st.leps_pt().at(0)>20 && st.leps_pt().at(0)<=30) { weight_central=1; weight_sigma=0.02; }
-        if(st.leps_pt().at(0)>30 && st.leps_pt().at(0)<=50) { weight_central=1; weight_sigma=0.03; }
-        if(st.leps_pt().at(0)>50                          ) { weight_central=1; weight_sigma=0.05; }
+        if(st.leps_pt().at(0)>20 && st.leps_pt().at(0)<=30)  { weight_up=0.20; weight_down=0.20; }
+        if(st.leps_pt().at(0)>30 && st.leps_pt().at(0)<=50)  { weight_up=0.16; weight_down=0.16; }
+        if(st.leps_pt().at(0)>50 && st.leps_pt().at(0)<=100) { weight_up=0.08; weight_down=0.08; }
+        if(st.leps_pt().at(0)>100                          ) { weight_up=0.04; weight_down=0.04; }
     }
     
     // Trigger efficiency 
-    if(systname=="trgeff"){
-        { weight_central=1; weight_sigma=0.02; }
-    }
-    
     // JEC 
     
 
@@ -411,25 +416,13 @@ float VaryWeight(baby_basic &st, const char *whichsyst, TRandom3 &rand){
     // Theory 
     //
 
-    // Factorization scale 
-    if(systname=="muf"){
-        { weight_central=1; weight_sigma=0.1; }
-    }
-
-    // Renormalization scale 
-    if(systname=="mur"){
-        { weight_central=1; weight_sigma=0.15; }
-    }
-
     // Factorization and renormalization scales
-    if(systname=="murf"){
-        { weight_central=1; weight_sigma=0.2; }
+    if(systname=="scale"){ 
+        weight_up = st.sys_murf().at(0);
+        weight_down = st.sys_murf().at(1);
     }
     
     // PDF 
-    if(systname=="muf"){
-        { weight_central=1; weight_sigma=0.1; }
-    }
    
     // ISR
     //   pt (gluino-gluino) between 0 and 400 GeV       : no uncertainty
@@ -441,17 +434,14 @@ float VaryWeight(baby_basic &st, const char *whichsyst, TRandom3 &rand){
     //    else { weight_central=1; weight_sigma=0.3; }
     //}
 
+    //
     // get the weight
     //
-    if(systname=="lepeff" || systname=="trgeff" || systname=="btageff") weight_fluct=GetFluctWeight(weight_central,weight_sigma,rand); // 0% correlated (fluctuated)
-    else weight_fluct=(weight_central+weight_sigma)/weight_central;  // 100% correlated 
+
+    vector<float> weight_fluct;
+    weight_fluct.push_back(exp(weight_up));   
+    weight_fluct.push_back(exp(-weight_down));   
 
     return weight_fluct; 
 } 
-
-float GetFluctWeight(float weight_central, float weight_sigma, TRandom3 &rand){ 
-    double factor = exp(rand.Gaus(0,weight_sigma/weight_central)); // log-normal
-    //double factor = rand.Gaus(1,weight_sigma/weight_central); // testing gaussian
-    return factor;
-}
 
