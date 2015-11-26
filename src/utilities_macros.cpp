@@ -534,18 +534,23 @@ TString cuts2tex(TString cuts){
   //cuts.ReplaceAll("1&&", ""); 
   cuts.ReplaceAll("&&1", "");
   cuts.ReplaceAll("trig[0]", "\\text{HT350\\_MET100}");  cuts.ReplaceAll("trig[22]", "\\text{Ele27\\_eta2p1}");   
-  cuts.ReplaceAll("trig[4]", "\\text{Mu15\\_VVVL}"); cuts.ReplaceAll("trig[8]", "\\text{Ele15\\_VVVL}");   
+  cuts.ReplaceAll("trig[4]", "\\text{Mu15\\_VVVL}"); cuts.ReplaceAll("trig[8]", "\\text{Ele15\\_VVVL}"); 
+  cuts.ReplaceAll("trig[14]", "\\text{MET170}");  cuts.ReplaceAll("trig[28]", "\\text{MET90}");  
+  cuts.ReplaceAll("trig[12]", "\\text{HT800}");  
+
   cuts.ReplaceAll("&&&&", "&&");  cuts.ReplaceAll("&&", ", ");  
   cuts.ReplaceAll("elelv_m", "m_{ee}"); cuts.ReplaceAll("elel_m", "m_{ee}"); cuts.ReplaceAll("elelv_pt", "p^{ee}_T"); 
   cuts.ReplaceAll("mumuv_m", "m_{\\mu\\mu}"); cuts.ReplaceAll("mumu_m", "m_{\\mu\\mu}"); 
   cuts.ReplaceAll("mumuv_pt", "p^{\\mu\\mu}_T"); 
-  cuts.ReplaceAll("ht_ra2", "H_T"); cuts.ReplaceAll("ht", "H_T"); 
+  cuts.ReplaceAll("ht_ra2", "H_T"); cuts.ReplaceAll("ht_clean", "H_T"); cuts.ReplaceAll("ht", "H_T"); 
   cuts.ReplaceAll("mj", "M_J"); cuts.ReplaceAll("met", "\\mathrm{MET}");  
-  cuts.ReplaceAll("njets", "n_j");  cuts.ReplaceAll("nbm", "n_b");  cuts.ReplaceAll("nleps", "n_{\\ell}"); 
+  cuts.ReplaceAll("njets_ra2", "n_j");  cuts.ReplaceAll("njets_clean", "n_j");  cuts.ReplaceAll("njets", "n_j");  
+  cuts.ReplaceAll("nbm", "n_b");  cuts.ReplaceAll("nleps", "n_{\\ell}"); 
   cuts.ReplaceAll("nvels", "n_e"); cuts.ReplaceAll("nels", "n_e");  
   cuts.ReplaceAll("nvmus", "n_\\mu"); cuts.ReplaceAll("nmus", "n_\\mu");  
   cuts.ReplaceAll(">=", "\\geq ");  cuts.ReplaceAll("<=", " \\leq "); cuts.ReplaceAll("==", " = ");
-  cuts.ReplaceAll("pass","");
+  cuts.ReplaceAll("pass_jets","\\text{JetID}"); cuts.ReplaceAll("pass_ra2, ","");cuts.ReplaceAll("pass, ","");
+  cuts.ReplaceAll("pass","\\text{all filters}");
 
   cuts = "$"+cuts+"$";
   return cuts;
@@ -802,11 +807,12 @@ trigfeats::trigfeats(TString icuts, TString itag):
   cuts(icuts),
   tag(itag){
   }
-void trigfeats::add(TString texname, baby_basic *baby, TString num, TString den){
+void trigfeats::add(TString texname, baby_basic *baby, TString num, TString den, TString option){
   texnames.push_back(texname);
   babies.push_back(baby);
   nums.push_back(num);
   dens.push_back(den);
+  options.push_back(option);
   effi.push_back(-1.);	  // Will be filled in setYields
   errup.push_back(-1.);	  // Will be filled in setYields
   errdown.push_back(-1.); // Will be filled in setYields

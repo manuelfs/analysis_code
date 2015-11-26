@@ -129,6 +129,9 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="ht_ra2"){
     cutType_ = kFloat;
     bf_ = &baby_base::ht_ra2;
+  }else if(var=="ht_clean"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::ht_clean;
   }else if(var=="mht"){
     cutType_ = kFloat;
     bf_ = &baby_base::mht;
@@ -138,6 +141,9 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="elelv_pt"){
     cutType_ = kFloat;
     bf_ = &baby_base::elelv_pt;
+  }else if(var=="elel_pt"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::elel_pt;
   }else if(var=="elelv_m"){
     cutType_ = kFloat;
     bf_ = &baby_base::elelv_m;
@@ -147,6 +153,9 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="mumuv_pt"){
     cutType_ = kFloat;
     bf_ = &baby_base::mumuv_pt;
+  }else if(var=="mumu_pt"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::mumu_pt;
   }else if(var=="mumuv_m"){
     cutType_ = kFloat;
     bf_ = &baby_base::mumuv_m;
@@ -177,12 +186,27 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="njets"){
     cutType_ = kInt;
     bi_ = &baby_base::njets;
+  }else if(var=="njets_ra2"){
+    cutType_ = kInt;
+    bi_ = &baby_base::njets_ra2;
+  }else if(var=="njets_clean"){
+    cutType_ = kInt;
+    bi_ = &baby_base::njets_clean;
+  }else if(var=="run"){
+    cutType_ = kInt;
+    bi_ = &baby_base::run;
   }else if(var=="nbm"){
     cutType_ = kInt;
     bi_ = &baby_base::nbm;
   }else if(var=="pass"){
     cutType_ = kBool;
     bb_ = &baby_base::pass;
+  }else if(var=="pass_ra2"){
+    cutType_ = kBool;
+    bb_ = &baby_base::pass_ra2;
+  }else if(var=="pass_jets"){
+    cutType_ = kBool;
+    bb_ = &baby_base::pass_jets;
   } else if(var.Contains("[")){ // if var is a vector element
     TString index_s(var);
     var.Remove(var.Index("["), var.Length());
@@ -218,11 +242,11 @@ void onecut::assignBranch(TString var, TString val){
       bvf_ = &baby_base::sys_mt;
     }else {
       cout<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl;
-      cutType_ = kAlwaysFalse;
+      exit(0);
     }
   }else {
     cout<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl;
-    cutType_ = kAlwaysFalse;
+    exit(0);
   } 
 
   if(cutType_ == kFloat || cutType_ == kvFloat) cutf_ = val.Atof();

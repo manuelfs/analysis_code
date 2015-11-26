@@ -94,10 +94,10 @@ public:
 class trigfeats {
 public:
   trigfeats(TString icuts, TString itag);
-  void add(TString texname, baby_basic *baby, TString num, TString den);
+  void add(TString texname, baby_basic *baby, TString num, TString den, TString option="");
   void setYields(size_t index, double num, double den);
   TString cuts, tag;
-  std::vector<TString> texnames, nums, dens;
+  std::vector<TString> texnames, nums, dens, options;
   std::vector<baby_basic*> babies;
   std::vector<double> effi, errup, errdown;
 };
