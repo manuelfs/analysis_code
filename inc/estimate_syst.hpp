@@ -24,4 +24,11 @@ void GetSystOneRegion ( baby_basic &st, const char *region, const char *whichsys
 void GetJECSystOneRegion ( baby_basic &st, const char *region, 
                         int njets_low, int njets_high, int nbm_low, int nbm_high, float met_low, float met_high);
 
+void SetSyst(float &n_novariation, float &n_upvariation, float &n_downvariation, 
+             baby_basic &st, const char *whichsyst);
+
+float addTwoSyst(float a, float b); 
+
+void signalCrossSectionUncert(int glu_mass, double &xsec, double &xsec_unc);
+
 #endif

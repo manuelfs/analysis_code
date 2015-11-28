@@ -52,26 +52,26 @@ int main(int argc, char *argv[]){
   float uncert = -999.;
 
   string region[24] = {
-    "r1_lowmet_lownj_allnb",	
+    "r1_lowmet_allnb",	
  	"r2_lowmet_lownj_1b",	
  	"r2_lowmet_highnj_1b",	
  	"r2_lowmet_lownj_2b",	
  	"r2_lowmet_highnj_2b",	
  	"r2_lowmet_lownj_3b",	
  	"r2_lowmet_highnj_3b",	
- 	"r3_lowmet_lownj_allnb",	
+ 	"r3_lowmet_allnb",	
  	"r4_lowmet_lownj_1b",	
  	"r4_lowmet_highnj_1b",	
  	"r4_lowmet_lownj_2b",	
  	"r4_lowmet_highnj_2b",	
  	"r4_lowmet_lownj_3b",	
  	"r4_lowmet_highnj_3b",	
- 	"r1_highmet_lownj_allnb",	
+ 	"r1_highmet_allnb",	
  	"r2_highmet_lownj_1b",	
  	"r2_highmet_highnj_1b",	
  	"r2_highmet_lownj_2b",	
  	"r2_highmet_highnj_2b",	
- 	"r3_highmet_lownj_allnb",	
+ 	"r3_highmet_allnb",	
  	"r4_highmet_lownj_1b",	
  	"r4_highmet_highnj_1b",	
  	"r4_highmet_lownj_2b",	
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]){
 
   TH2D *h2_syst[24];
   for(int i=0; i<24; i++){
-    h2_syst[i] = new TH2D(region[i].c_str(), region[i].c_str(),57,587.5,2012.5,57,-12.5,1412.5);
+    h2_syst[i] = new TH2D(region[i].c_str(), region[i].c_str(),57,587.5,2012.5,65,-12.5,1612.5);
   }
 
   string line;
