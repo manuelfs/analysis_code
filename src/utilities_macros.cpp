@@ -938,8 +938,9 @@ vector<double> getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts,
     for(size_t ind(0); ind<bincuts.size(); ind++){ 
       if(bincuts[ind].pass(&baby)) {
 	entries[ind]++;
-        yield[ind] += baby.weight();
-        w2[ind] += baby.weight()*baby.weight();
+	float wgt(bincuts[ind].weight(&baby));
+        yield[ind] += wgt;
+        w2[ind] += wgt*wgt;
       }
     }
   } // Loop over entries

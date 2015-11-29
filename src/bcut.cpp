@@ -3,6 +3,71 @@
 
 using namespace std;
 
+void bcut::parseWeights(TString weights){
+  weights.ReplaceAll(" ", "");
+  cutTypes_.clear();
+  fWeights_.clear();
+  fvWeights_.clear();
+  indWeights_.clear();
+  TString weight;
+  int pos;
+  do{
+    pos = weights.Index("*");
+    weight = weights;
+    if(pos != -1) weight.Remove(pos, weight.Length());
+    parseWeight(weight);
+    weights.Remove(0, pos+1);
+  } while(pos != -1);
+}
+
+void bcut::parseWeight(TString weight){
+  cutTypes_.push_back(kFloat);
+  fWeights_.push_back(NULL);
+  fvWeights_.push_back(NULL);
+  indWeights_.push_back(-1);
+  constWeights_.push_back(1.);
+
+  if(weight=="weight")		fWeights_.back() = &baby_base::weight;
+  else if(weight=="w_lumi")	fWeights_.back() = &baby_base::w_lumi;
+  else if(weight=="w_pu")	fWeights_.back() = &baby_base::w_pu;
+  else if(weight=="w_lep")	fWeights_.back() = &baby_base::w_lep;
+  else if(weight=="w_fs_lep")	fWeights_.back() = &baby_base::w_fs_lep;
+  else if(weight=="w_toppt")	fWeights_.back() = &baby_base::w_toppt;
+  else if(weight=="w_btag")	fWeights_.back() = &baby_base::w_btag;
+  else if(weight=="eff_trig")	fWeights_.back() = &baby_base::eff_trig;
+  else if(weight.Contains("[")){ // if weight is a vector element
+    TString index_s(weight);
+    weight.Remove(weight.Index("["), weight.Length());
+    index_s.Remove(0, index_s.Index("[")+1);
+    index_s.Remove(index_s.Index("]"), index_s.Length());
+    indWeights_.back() = index_s.Atoi();
+    cutTypes_.back() = kvFloat;
+    if(weight=="w_pdf")        fvWeights_.back() = &baby_base::w_pdf;
+    else if(weight=="sys_pdf") fvWeights_.back() = &baby_base::sys_pdf;
+    else {
+      cout<<"Weight \""<<weight<<" not defined. Add it to bcut::parseWeight in bcut.cpp"<<endl;
+      exit(0);
+    }
+  }else if(weight.Atof()>0) {
+    constWeights_.back() = weight.Atof();
+    cutTypes_.back() = kConst;
+  } else {
+    cout<<"Weight \""<<weight<<" not defined. Add it to bcut::parseWeight  in bcut.cpp"<<endl;
+    exit(0);
+  }   
+}
+
+float bcut::weight(baby_base *baby){
+  float result(1.);
+  for(size_t ind(0); ind < cutTypes_.size(); ind++){
+    if(cutTypes_[ind] == kFloat) result *= (baby->*fWeights_[ind])();
+    else if(cutTypes_[ind] == kvFloat) result *= (baby->*fvWeights_[ind])()[indWeights_[ind]];
+    else result *= constWeights_[ind];
+  } // Loop over individual weights
+
+  return result;
+}
+
 void bcut::parseCuts(TString cuts){
   vcuts_.clear(); // Starting the parsing every time
   cuts.ReplaceAll(" ", "");
@@ -32,9 +97,11 @@ bcut bcut::operator+(bcut &ibcut){
   return bcut(cuts_+"&&"+ibcut.cuts_);
 }
 
-bcut::bcut(TString cuts):
-  cuts_(cuts){
+bcut::bcut(TString cuts, TString weights):
+  cuts_(cuts),
+  weights_(weights){
   parseCuts(cuts);
+  parseWeights(weights);
 }
 
 bcut::~bcut(){
@@ -90,7 +157,6 @@ bool onecut::pass(baby_base *baby){
 
   return false;
 }
-
 
 void onecut::parseCut(TString cut){
   if(cut=="" || cut=="1"){

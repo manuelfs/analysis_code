@@ -34,19 +34,6 @@ int main(){
   time_t begtime, endtime;
   time(&begtime);
 
-  float mSigma, pSigma;
-  vector<vector<float> > entries = {{0},{16}};
-  vector<vector<float> > weights = {{1},{1}};
-
-  vector<float> powersk;
-  powersk.push_back(1);  //  mt<=140  mj<=400   R1
-  powersk.push_back(-1); //  mt<=140  mj>400    R2
-
-  double k = calcKappa(entries, weights, powersk, mSigma, pSigma);
-  cout<<entries[0][0]<<" over "<<entries[1][0]<<" is "<<k<<" +"<<pSigma<<" -"<<mSigma<<endl;
-  
-  return 0;
-
   //// Defining samples, i.e. columns in the table
   TString folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
   vector<TString> s_tt;
@@ -181,13 +168,13 @@ int main(){
     vector<bcut> samcuts;
     //// Adding specific sample cut to bin cuts
     for(size_t bin(0); bin < bincuts.size(); bin++)
-      samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam].cut));
+      samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam].cut, "10*weight"));
     for(size_t sam2(sam+1); sam2 < Samples.size(); sam2++){
       //// If 2 samples are the same, the bincuts are concatened so that the yields are found in one go
       if(Samples[sam].file == Samples[sam2].file) {
 	repeat_sam[sam2] = sam;
 	for(size_t bin(0); bin < bincuts.size(); bin++)
-	  samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut));	
+	  samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut, "10*weight"));	
       }
     } // Loop over future samples
     if(repeat_sam[sam]==-1){
