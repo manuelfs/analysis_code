@@ -27,6 +27,8 @@ void GetJECSystOneRegion ( baby_basic &st, const char *region,
 void SetSyst(float &n_novariation, float &n_upvariation, float &n_downvariation, 
              baby_basic &st, const char *whichsyst);
 
+void GetSystematic(std::vector<float> &final_syst);
+
 float addTwoSyst(float a, float b); 
 
 void signalCrossSectionUncert(int glu_mass, double &xsec, double &xsec_unc);

@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 
 #include <string>
 #include <sstream>
@@ -41,30 +42,33 @@ namespace{
   int mlsp = 100;
   const char* syst = "lepeff";
   string region[24] = {
-      "r1_lowmet_allnb",
-      "r2_lowmet_lownj_1b",
-      "r2_lowmet_highnj_1b",
-      "r2_lowmet_lownj_2b",
-      "r2_lowmet_highnj_2b",
-      "r2_lowmet_lownj_3b",
-      "r2_lowmet_highnj_3b",
-      "r3_lowmet_allnb",
-      "r4_lowmet_lownj_1b",
-      "r4_lowmet_highnj_1b",
-      "r4_lowmet_lownj_2b",
-      "r4_lowmet_highnj_2b",
-      "r4_lowmet_lownj_3b",
-      "r4_lowmet_highnj_3b",
-      "r1_highmet_allnb",
-      "r2_highmet_lownj_1b",
-      "r2_highmet_highnj_1b",
-      "r2_highmet_lownj_2b",
-      "r2_highmet_highnj_2b",
-      "r3_highmet_allnb",
-      "r4_highmet_lownj_1b",
-      "r4_highmet_highnj_1b",
-      "r4_highmet_lownj_2b",
-      "r4_highmet_highnj_2b"
+      "r1_lowmet_allnb",     // 0
+      "r2_lowmet_lownj_1b",  // 1
+      "r2_lowmet_highnj_1b", // 2
+      "r2_lowmet_lownj_2b",  // 3
+      "r2_lowmet_highnj_2b", // 4 
+      "r2_lowmet_lownj_3b",  // 5
+      "r2_lowmet_highnj_3b", // 6
+      "r3_lowmet_allnb",     // 7
+
+      "r4_lowmet_lownj_1b",  // 8
+      "r4_lowmet_highnj_1b", // 9
+      "r4_lowmet_lownj_2b",  // 10
+      "r4_lowmet_highnj_2b", // 11
+      "r4_lowmet_lownj_3b",  // 12
+      "r4_lowmet_highnj_3b", // 13
+      
+      "r1_highmet_allnb",    // 14
+      "r2_highmet_lownj_1b", // 15
+      "r2_highmet_highnj_1b",// 16
+      "r2_highmet_lownj_2b", // 17
+      "r2_highmet_highnj_2b",// 18
+      "r3_highmet_allnb",    // 19
+      
+      "r4_highmet_lownj_1b", // 20
+      "r4_highmet_highnj_1b",// 21
+      "r4_highmet_lownj_2b", // 22
+      "r4_highmet_highnj_2b" // 23
   };
 }
 
@@ -74,14 +78,82 @@ int main(int argc, char *argv[]){
   GetOptions(argc, argv);
   TRandom3 rand(seed);
 
+  if (string(syst)=="all"){
+
+    //setup table
+    TString fnm = "table_sig_syst.tex";
+    ofstream tab(fnm);
+    tab<<"\\documentclass{article}\n";
+    tab<<"\\usepackage{rotating}\n";
+    tab<<"\\usepackage{multirow}\n";
+    tab<<"\\begin{document}\n";
+    tab<<"\\begin{sidewaystable}[p!]\\centering\n";
+    tab<<"\\caption{Summary of the signal systematic uncertainties. Systematics are considered fully\
+                    correlated between bins and opposite signs indicate anti-correlation.\
+                    Different sources of uncertainties are considered uncorrelated. }\n";
+    tab<<"\\label{tab:unc:sig}\n";
+    tab<<"\\renewcommand{\\arraystretch}{1.2}\n";
+    tab<<"\\begin{tabular}[tbp!]{ l |c|c|c|c|c|c|c|c|c|c}\\hline\\hline\n";
+    tab<<"\\multirow{3}{*}{Uncertainty [\\%]} & \\multicolumn{5}{c|}{$7 \\leq N_{\\rm jets} \\leq 8$} & \\multicolumn{5}{c}{$N_{\\rm jets}\\geq 9$} \\\\\n";
+    tab<<"\\cline{2-11} & \\multicolumn{3}{c|}{${200 \\leq\\rm MET}\\leq 400$} & \\multicolumn{2}{c|}{${\\rm MET}>400$} \n";
+    tab<<"& \\multicolumn{3}{c|}{${200\\leq \\rm MET}\\leq 400$} & \\multicolumn{2}{c}{${\\rm MET}>400$} \\\\\n";
+    tab<<"\\cline{2-11} &$N_{\\rm b} = 1$ & $N_{\\rm b} = 2$ & $N_{\\rm b} \\geq 3$ & $N_{\\rm b} = 1$ & $N_{\\rm b} \\geq 2$ \n";
+    tab<<"& $N_{\\rm b} = 1$ & $N_{\\rm b} = 2$ & $N_{\\rm b} \\geq 3$ & $N_{\\rm b} = 1$ & $N_{\\rm b} \\geq 2$ \\\\ \n";
+    tab<<"\\hline\n";
+
+    vector<pair<string,string> > sys_tags;
+    sys_tags.push_back(make_pair("Lepton efficiency", "lepeff"));
+    sys_tags.push_back(make_pair("Trigger efficiency", "trig"));
+    sys_tags.push_back(make_pair("B-tag efficiency", "bctag"));
+    sys_tags.push_back(make_pair("Mistag efficiency", "udsgtag"));
+    sys_tags.push_back(make_pair("Jet energy corrections", "jec"));
+    sys_tags.push_back(make_pair("PDFs", "pdf"));
+    sys_tags.push_back(make_pair("QCD scales", "murf"));
+    sys_tags.push_back(make_pair("ISR", "isr"));
+    // sys_tags.push_back(make_pair("Cross-section", "xsec"));
+    sys_tags.push_back(make_pair("Pile up", "pu"));
+    sys_tags.push_back(make_pair("Luminosity", "lumi"));
+    // order of regions in the table
+    vector<unsigned> regs = {8,10,12,20,22,9,11,13,21,23};
+    for (size_t imp(0); imp<2; imp++){
+      if (imp==0) {mg=1500; mlsp=100;}
+      else {mg=1200; mlsp=800;}
+      if (imp==1) tab<<"\\hline \n";
+      tab<<" & \\multicolumn{10}{c}{Signal model: T1tttt("<<to_string(mg)<<","<<to_string(mlsp)<<")}\\\\\n"; 
+      tab<<"\\hline \n";
+      for (size_t isys(0); isys<sys_tags.size(); isys++){
+        vector<float> vsys = vector<float>();
+        syst = sys_tags[isys].second.c_str();
+        GetSystematic(vsys);
+        tab<<sys_tags[isys].first;
+        for (size_t ir(0); ir<regs.size(); ir++) {
+          if (fabs(vsys[regs[ir]])<0.01) tab<<" & $<$ 1";
+          else tab<<" & "<<RoundNumber(vsys[regs[ir]]*100.,0);
+        }
+        tab<<"\\\\"<<endl;
+      }
+    }
+    tab<<"\\hline\\hline \n";
+    tab<<"\\end{tabular} \n";
+    tab<<"\\end{sidewaystable} \n";
+    tab<<"\\end{document} \n";
+    tab.close();
+    cout<<"pdflatex "<<fnm<<endl;
+  } else {
+    vector<float> final_syst = vector<float>();
+    GetSystematic(final_syst);
+  }
+}
+
+void GetSystematic(vector<float> &final_syst) {
   //string folder="/hadoop/cms/store/user/rheller/babymaker/out/151123_112940/";
   //string sig_name=Form("*SMS*T1tttt*mgluino%i_mlsp%i.root",mg,mlsp);
-  string folder="/hadoop/cms/store/user/jaehyeok/babies/2015_11_28/";
+  string folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/";
   string sig_name=Form("*SMS*T1tttt*mGluino-%i_mLSP-%i_*.root",mg,mlsp);
   baby_basic st(folder+sig_name);
   if(st.GetEntries()==0) { 
     cout << Form("[Hello] mgluino=%i, mlsp=%i does not exist!",mg,mlsp) << endl;
-    return 0; 
+    return; 
   }
 
   string syst_name = syst;
@@ -369,33 +441,35 @@ int main(int argc, char *argv[]){
   // get the final systmatics  
   //cout << "mg= " << mg << "\t mlsp= " << mlsp << "\tRegion\tsyst_up\tsyst_down\t\tsyst_up\tsyst_down\tfinal"<<endl;;  
   for(int i=0; i<24; i++) {
-    float final_syst_up=0.;
-    float final_syst_down=0.;
-    float final_syst=0.;
-    final_syst_up=(n_upvariation[i]-n_novariation[i])/n_novariation[i];
-    final_syst_down=(n_downvariation[i]-n_novariation[i])/n_novariation[i];  
+    float final_syst_up = (n_upvariation[i]-n_novariation[i])/n_novariation[i];
+    float final_syst_down = (n_downvariation[i]-n_novariation[i])/n_novariation[i];  
 
     cout << "    mg= " << mg << "\t mlsp= " << mlsp << "\t";  
     cout << region[i] << "\t" << Form("\t%.2f\t%.2f",final_syst_up,final_syst_down);
 
-    if(final_syst_up<0. && final_syst_down>0.) {   
-      if(final_syst_up<0.)    final_syst_up=1./(1+final_syst_up)-1; 
-      if(final_syst_down<0.)  final_syst_down=1./(1+final_syst_down)-1; 
-      final_syst=-1*final_syst_up; 
-      if(final_syst_down>final_syst_up) final_syst=-1*final_syst_down;
-    } else if(final_syst_up<0. && final_syst_down<0.) {   
-      final_syst_up=1./(1+final_syst_up)-1; 
-      final_syst_down=1./(1+final_syst_down)-1; 
-      final_syst=-1*final_syst_up; 
-      if(final_syst_down>final_syst_up) final_syst=-1*final_syst_down;
-    } else /*if(final_syst_up>0. && final_syst_down<0.)*/ {   
-      if(final_syst_up<0.)    final_syst_up=1./(1+final_syst_up)-1; 
-      if(final_syst_down<0.)  final_syst_down=1./(1+final_syst_down)-1; 
-      final_syst=final_syst_up; 
-      if(final_syst_down>final_syst_up) final_syst=final_syst_down;
+    float for_ra4stats = 0.;
+    if (string(syst)=="lumi"){
+      for_ra4stats = final_syst_up;
+    } else {  
+      if(final_syst_up<0. && final_syst_down>0.) {   
+        if(final_syst_up<0.)    final_syst_up=1./(1+final_syst_up)-1; 
+        if(final_syst_down<0.)  final_syst_down=1./(1+final_syst_down)-1; 
+        for_ra4stats=-1*final_syst_up; 
+        if(final_syst_down>final_syst_up) for_ra4stats=-1*final_syst_down;
+      } else if(final_syst_up<0. && final_syst_down<0.) {   
+        final_syst_up=1./(1+final_syst_up)-1; 
+        final_syst_down=1./(1+final_syst_down)-1; 
+        for_ra4stats=-1*final_syst_up; 
+        if(final_syst_down>final_syst_up) for_ra4stats=-1*final_syst_down;
+      } else /*if(final_syst_up>0. && final_syst_down<0.)*/ {   
+        if(final_syst_up<0.)    final_syst_up=1./(1+final_syst_up)-1; 
+        if(final_syst_down<0.)  final_syst_down=1./(1+final_syst_down)-1; 
+        for_ra4stats=final_syst_up; 
+        if(final_syst_down>final_syst_up) for_ra4stats=final_syst_down;
+      }
     }
-    
-    cout << "\t" << Form("\t%.2f\t%.2f\t%.2f",final_syst_up,final_syst_down,final_syst) << endl;
+    final_syst.push_back(for_ra4stats);
+    cout << "\t" << Form("\t%.2f\t%.2f\t%.2f",final_syst_up,final_syst_down,for_ra4stats) << endl;
     //cout << Form("\t%.5f + \t%.5f - \t%.5f",n_novariation[i],n_upvariation[i],n_downvariation[i]) << endl; // FIXME
   } 
 }
@@ -431,9 +505,11 @@ void GetOptions(int argc, char *argv[]){
       } else if(optname == "syst"){
 	    syst =optarg;
       }else if(optname == "mg"){
-	    mg = atoi(optarg);
+        if (string(syst)=="all") mg = 0;
+        else mg = atoi(optarg);
       }else if(optname == "mlsp"){
-	    mlsp = atoi(optarg);
+	      if (string(syst)=="all") mlsp = 0;
+        else mlsp = atoi(optarg);
       }
       break;
     default: break;

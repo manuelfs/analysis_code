@@ -44,6 +44,7 @@ void bcut::parseWeight(TString weight){
     cutTypes_.back() = kvFloat;
     if(weight=="w_pdf")        fvWeights_.back() = &baby_base::w_pdf;
     else if(weight=="sys_pdf") fvWeights_.back() = &baby_base::sys_pdf;
+    else if(weight=="sys_isr") fvWeights_.back() = &baby_base::sys_isr;
     else {
       cout<<"Weight \""<<weight<<" not defined. Add it to bcut::parseWeight in bcut.cpp"<<endl;
       exit(0);
