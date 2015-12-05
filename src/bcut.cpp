@@ -45,6 +45,16 @@ void bcut::parseWeight(TString weight){
     if(weight=="w_pdf")        fvWeights_.back() = &baby_base::w_pdf;
     else if(weight=="sys_pdf") fvWeights_.back() = &baby_base::sys_pdf;
     else if(weight=="sys_isr") fvWeights_.back() = &baby_base::sys_isr;
+    else if(weight=="sys_mur") fvWeights_.back() = &baby_base::sys_mur;
+    else if(weight=="sys_muf") fvWeights_.back() = &baby_base::sys_muf;
+    else if(weight=="sys_murf") fvWeights_.back() = &baby_base::sys_murf;
+    else if(weight=="sys_trig") fvWeights_.back() = &baby_base::sys_trig;
+    else if(weight=="sys_lep") fvWeights_.back() = &baby_base::sys_lep;
+    else if(weight=="sys_fs_lep") fvWeights_.back() = &baby_base::sys_fs_lep;
+    else if(weight=="sys_bctag") fvWeights_.back() = &baby_base::sys_bctag;
+    else if(weight=="sys_fs_bctag") fvWeights_.back() = &baby_base::sys_fs_bctag;
+    else if(weight=="sys_udsgtag") fvWeights_.back() = &baby_base::sys_udsgtag;
+    else if(weight=="sys_fs_udsgtag") fvWeights_.back() = &baby_base::sys_fs_udsgtag;
     else {
       cout<<"Weight \""<<weight<<" not defined. Add it to bcut::parseWeight in bcut.cpp"<<endl;
       exit(0);
