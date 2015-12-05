@@ -1,9 +1,11 @@
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <string>
 #include <sstream>
 #include <ctime>
+#include <algorithm>
 #include <unistd.h> // getopt in Macs
 #include <getopt.h>
 
@@ -64,7 +66,7 @@ int main(int argc, char *argv[]){
   // TString infile = "/cms2r0/babymaker/babies/2015_11_27/sms/split_sms/renorm/baby_SMS-T1tttt_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15FSPremix-MCRUN2_74_V9_renorm.root";
   string prs = infile.Data();
   int mglu = stoi(prs.substr(prs.find("ino-")+4,prs.find("_mLSP")-prs.find("ino-")-4));
-  int mlsp = stoi(prs.substr(prs.find("LSP-")+5,prs.find("_Tune")-prs.find("LSP-")-5));
+  int mlsp = stoi(prs.substr(prs.find("LSP-")+4,prs.find("_Tune")-prs.find("LSP-")-4));
   cout<<"Working on: mGluino = "<<mglu<<" mLSP = "<<mlsp<<endl;
 
   vector<sysdef> v_sys;

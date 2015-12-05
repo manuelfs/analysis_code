@@ -28,17 +28,17 @@ for file in inputfiles:
   # Creating executable
   if ifile % files_job == 1:
     ijob += 1
-    exename = runfolder+"/sms_syscalc_"+str(ijob)+".sh"
+    exename = runfolder+"/syscalc_scan_"+str(ijob)+".sh"
     fexe = open(exename,"w")
     os.system("chmod u+x "+exename)
     fexe.write("#!/bin/bash\n\n")
-  fexe.write("./run/sms_syscalc.exe "+infolder+' "*'+file+'*" '+outfolder+'\n')
+  fexe.write("./run/syscalc_scan.exe -i "+infolder+' -f '+file+' -o '+outfolder+'\n')
   if ifile % files_job == 0 or ifile == len(inputfiles): 
     fexe.close()
     cmd = "JobSubmit.csh ./run/wrapper.sh ./"+exename
     #print cmd
     os.system(cmd)
-    #sys.exit(0)
+    # sys.exit(0)
 
 print "\nSubmitted "+str(ifile)+" files in "+str(ijob)+" jobs. Output goes to "+outfolder+"\n"
 sys.exit(0)
