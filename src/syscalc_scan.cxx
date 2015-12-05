@@ -55,6 +55,7 @@ public:
 
 TString nom2sys_bin(TString ibin, size_t shift_index);
 void GetOptions(int argc, char *argv[], TString &infolder, TString &outfolder, TString &infile);
+void fillTtbarSys(ofstream &fsys);
 
 int main(int argc, char *argv[]){
   gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
@@ -67,6 +68,7 @@ int main(int argc, char *argv[]){
   string prs = infile.Data();
   int mglu = stoi(prs.substr(prs.find("ino-")+4,prs.find("_mLSP")-prs.find("ino-")-4));
   int mlsp = stoi(prs.substr(prs.find("LSP-")+4,prs.find("_Tune")-prs.find("LSP-")-4));
+  string outfile = prs.substr(0, prs.find("_TuneCUETP"));
   cout<<"Working on: mGluino = "<<mglu<<" mLSP = "<<mlsp<<endl;
 
   vector<sysdef> v_sys;
@@ -172,15 +174,21 @@ int main(int argc, char *argv[]){
 
 
   //calculate uncertainties and write results to three files
-  TString outname = outfolder+"/"+infile.Copy().ReplaceAll(".root",".txt").ReplaceAll("baby_","sys_");
-  cout<<"Writing to "<<outname<<endl;
-  ofstream fsys(outname);
-  ofstream fsysdbg(outname.ReplaceAll("sys_","sysdbg_"));
-  ofstream fsysent(outname.ReplaceAll("sysdbg_","sysent_"));
+  TString outpath = outfolder+"/"+TString(outfile).ReplaceAll("baby_","sys_") + ".txt"; 
+  cout<<"Writing to "<<outpath<<endl;
+  ofstream fsys(outpath);
+  fillTtbarSys(fsys);
+  ofstream fsysrms(outpath.ReplaceAll("sys_","sysrms_"));
+  fillTtbarSys(fsysrms);
+  ofstream fsysdbg(outpath.ReplaceAll("sysrms_","sysdbg_"));
+  ofstream fsysent(outpath.ReplaceAll("sysdbg_","sysent_"));
   size_t nbins = v_bins.size();
   for (auto &sys: v_sys) {
-    fsys<<"\nSYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
-    fsysdbg<<"\nSYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
+    if (sys.tag != "nominal") {
+      if (sys.tag != "rms_pdf") fsys<<"\nSYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
+      if (sys.tag != "pdf") fsysrms<<"\nSYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
+      fsysdbg<<"\nSYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
+    }
     for (size_t ibin(0); ibin<nbins; ibin++) {
       const double nom_yield(yields[ibin]);
       size_t nwgts = sys.v_wgts.size();
@@ -191,8 +199,8 @@ int main(int argc, char *argv[]){
       }
       else if (sys.sys_type == kWeight) {
         if (sys.tag == "nominal") {
-          if (ibin==0) fsysent<<"SYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
-          fsysent <<"    " <<setw(25)<<v_bins[ibin].tag <<" "<<setw(10)<<entries[ibin] <<" "<<setw(10)<<yields[ibin] <<" "<<setw(10)<<w2[ibin] <<endl;
+          if (ibin==0) fsysent<<fixed<<"SYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
+          fsysent <<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setprecision(0)<<setw(25)<<entries[ibin] <<" "<<setprecision(5)<<setw(15)<<yields[ibin] <<" "<<setprecision(10)<<setw(15)<<w2[ibin] <<endl;
           continue;
         }
         else if (sys.tag == "rms_pdf") { 
@@ -225,11 +233,13 @@ int main(int argc, char *argv[]){
       // convert to ra4_stats input and write to file
       double ln = (up>0 ? 1:-1)*max(up>0 ? up : (1/(1+up)-1), dn>0 ? dn : (1/(1+dn)-1));
       if (sys.sys_type == kConst) ln = up;
-      fsys    <<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
+      if (sys.tag !="rms_pdf") fsys<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
+      if (sys.tag !="pdf") fsysrms<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
       fsysdbg <<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<"mg="<<setw(5)<<mglu <<" "<<"mlsp="<<setw(10)<<mlsp <<" "<<std::right<<setw(10)<<Form("%.2f",up) <<" "<<setw(10)<<Form("%.2f",dn) <<endl;
     } // loop over bins
   } // loop over systematics
   fsys.close();
+  fsysrms.close();
   fsysdbg.close();
   fsysent.close();
 
@@ -272,4 +282,85 @@ void GetOptions(int argc, char *argv[], TString &infolder, TString &outfolder, T
       default: printf("Bad option! getopt_long returned character code 0%o\n", opt); break;
     }
   }
+}
+
+void fillTtbarSys(ofstream &fsys){
+  fsys<<"SYSTEMATIC isr_pt"<<endl;
+  fsys<<" PROCESSES ttbar"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.04"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.03"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   0.05"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.04"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    0.04"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.04"<<endl;
+  fsys<<"  r2_highmet_lownj_2b   0.04"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.03"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.03"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  0.04"<<endl<<endl;
+
+  fsys<<"SYSTEMATIC jec"<<endl;
+  fsys<<" PROCESSES ttbar"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.04"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   0.04"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.03"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    0.02"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
+  fsys<<"  r2_highmet_lownj_2b   0.02"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.05"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.03"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  0.04"<<endl<<endl;
+
+  fsys<<"SYSTEMATIC top_pt"<<endl;
+  fsys<<" PROCESSES ttbar"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.001"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.03"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   0.02"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.02"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    0.001"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.001"<<endl;
+  fsys<<"  r2_highmet_lownj_2b   0.03"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.002"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.002"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  0.01"<<endl<<endl;
+
+  fsys<<"SYSTEMATIC jet_mismeas"<<endl;
+  fsys<<" PROCESSES ttbar"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.03"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   0.02"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.07"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    0.03"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.04"<<endl;
+  fsys<<"  r2_highmet_lownj_2b   0.01"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.02"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.07"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  0.07"<<endl<<endl;
+
+  fsys<<"SYSTEMATIC non_ttbar"<<endl;
+  fsys<<" PROCESSES other"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    1.00"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   1.00"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   1.00"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  1.00"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    1.00"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    1.00"<<endl;
+  fsys<<"  r2_highmet_lownj_2b   1.00"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   1.00"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   1.00"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  1.00"<<endl<<endl;
+
+  fsys<<"SYSTEMATIC dilep_closure"<<endl;
+  fsys<<" PROCESSES ttbar"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.366"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.366"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.366"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   0.895"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.895"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    0.366"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.366"<<endl;
+  fsys<<"  r2_highmet_lownj_2b   0.366"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.895"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.895"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  0.895"<<endl;
 }

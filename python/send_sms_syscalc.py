@@ -10,7 +10,7 @@ import time
 
 # Setting folders
 infolder  = "/net/cms2/cms2r0/babymaker/babies/2015_11_28/mc/scan/skim_sysabcd/"
-outfolder = "/net/cms2/cms2r0/babymaker/sys/2015_11_28/scan/" 
+outfolder = "out/" 
 runfolder = outfolder+"run/" 
 if not os.path.exists(runfolder):
   os.system("mkdir -p "+runfolder)
