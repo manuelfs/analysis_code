@@ -56,13 +56,22 @@ public:
 class bcut {
 public:
   std::vector<onecut> vcuts_;
-  TString cuts_;
+  TString cuts_, weights_;
+  enum cutType{kFloat, kvFloat, kConst};
+  std::vector<cutType> cutTypes_;
+  std::vector<baby_float> fWeights_;
+  std::vector<baby_vfloat> fvWeights_;
+  std::vector<int> indWeights_;
+  std::vector<float> constWeights_;
 
+  void parseWeights(TString weights);
+  void parseWeight(TString weight);
   void parseCuts(TString cuts);
   bool pass(baby_base *baby);
+  float weight(baby_base *baby);
   void operator+=(TString &cut);
   bcut operator+(bcut &ibcut);
-  bcut(TString cuts="");
+  bcut(TString cuts="", TString weights="weight");
   ~bcut();
 
 };

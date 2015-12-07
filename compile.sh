@@ -14,7 +14,7 @@ else
     exit_code=$?
     
     if [[ $exit_code != 0 ]] ; then
-	printf "\n\n\e[01;31m==========  ERRORS AND WARNINGS  ============\e[0m\]\n"
+	printf "\n\n\e[01;31m==========  ERRORS AND WARNINGS  ============\e[0m\n"
 	cat $bad_file >&2
     else
 	printf "\n\e[01;32mCompiled successfully without errors or warnings!\e[0m\n\n"

@@ -35,6 +35,7 @@ bin/*
 *.eps
 *.tex
 *.aux
+*.txt
 gmon.out
 out
 archive
