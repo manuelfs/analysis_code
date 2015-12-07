@@ -42,7 +42,7 @@ namespace{
   bool compressed = false;
   bool no_signal = false; 
   bool full_stats = false;
-  float luminosity = 1.264;
+  float luminosity = 2.1;
 }
 
 //Not sure why I can't get the colors from utilities_macros...
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
   styles style("2Dnobar");
   style.setDefaultStyle();
   
-  string folder_data="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_05/data/singlelep/combined/skim_1lht500met200/";
+  string folder_data="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
   string folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_10_19/mc/skim_1lht500met200/";
   //string folder = "/cms5r0/ald77/archive/2015_05_25/skim/";
   //folder = "/afs/cern.ch/user/m/manuelf/work/ucsb/2015_05_25/skim/";
@@ -118,33 +118,35 @@ int main(int argc, char *argv[]){
   }
   Process(st_data, g_data, g_data_full, h_data, 2, 20, 1, indices_data, 0, true);
 
-  double rho_sig = g_sig_full.GetCorrelationFactor();
-  
-  double rho_bkg = g_bkg_full.GetCorrelationFactor();
-  double rho_bkg1 = g_bkg1_full.GetCorrelationFactor();
-  double rho_bkg2 = g_bkg2_full.GetCorrelationFactor();
-  
+  //double rho_sig = g_sig_full.GetCorrelationFactor();
+  //double rho_bkg = g_bkg_full.GetCorrelationFactor();
+  //double rho_bkg1 = g_bkg1_full.GetCorrelationFactor();
+  //double rho_bkg2 = g_bkg2_full.GetCorrelationFactor();
   //double rho_data = g_data_full.GetCorrelationFactor();
 
-  TLegend l(style.PadLeftMargin, 1.-style.PadTopMargin, 1.-style.PadRightMargin, 1.0);
+  TLegend l(style.PadLeftMargin+0.5, 1.-style.PadTopMargin-0.2, 1.-style.PadRightMargin-0.05, 1.-style.PadTopMargin);
   if(merge_ttbar){
-    l.SetNColumns(2);
+    l.SetNColumns(1);
   }else{
     l.SetNColumns(3);
   }
   l.SetFillColor(0);
-  l.SetFillStyle(4000);
-  l.SetBorderSize(0);
-  if(merge_ttbar){
-    l.AddEntry(&g_bkg, GetLabel("ttbar",rho_bkg).c_str(), "p");
-  }else{
-    l.AddEntry(&g_bkg1, GetLabel("t#bar{t} (1l)",rho_bkg1).c_str(), "p");
-    l.AddEntry(&g_bkg2, GetLabel("t#bar{t} (2l)",rho_bkg2).c_str(), "p");
-  }
+  l.SetFillStyle(0);
+  l.SetTextSize(); 
+  l.SetLineWidth(2);
+  l.SetTextAlign(12);
+  l.SetTextSize(0.04);
+  
+  //if(merge_ttbar){
+  //  l.AddEntry(&h_bkg, "Backgrounds", "f");
+  //}else{
+  //  l.AddEntry(&h_bkg1, "t#bar{t} (1l)", "f");
+  //   l.AddEntry(&h_bkg2, "t#bar{t} (2l)", "f");
+  //}
   if(!no_signal){
-    l.AddEntry(&g_sig, GetLabel((compressed?"T1tttt(1200,800)":"T1tttt(1500,100)"),rho_sig).c_str(), "p");
+    l.AddEntry(&g_sig, compressed?"T1tttt(1200,800)":"T1tttt(1500,100)", "p");
   }
-  //l.AddEntry(&g_bkg, GetLabel("data",rho_data).c_str(), "p");
+  l.AddEntry(&h_data, "Data", "p");
 
   double height = 0.125;
   double width = 0.1;
@@ -156,21 +158,27 @@ int main(int argc, char *argv[]){
 	       style.PadLeftMargin+0.16+width, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
   TPaveText l4(1.-style.PadRightMargin-width-0.05, 1.-style.PadTopMargin-1.5*height+0.07,
 	       1.-style.PadRightMargin-0.05, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
-  TPaveText lcms(style.PadLeftMargin+0.55, 1.-style.PadTopMargin-0.5*height-0.01,
-		 style.PadLeftMargin+0.55+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
+  TPaveText lcms(style.PadLeftMargin+0., 1.-style.PadTopMargin,
+		 style.PadLeftMargin+2.*width, 1.-style.PadTopMargin+0.5*height, "NDCNB");
+  TPaveText llumi(style.PadLeftMargin+0.57, 1.-style.PadTopMargin,
+		 style.PadLeftMargin+0.57+2.*width, 1.-style.PadTopMargin+0.5*height, "NDCNB");
 
   l1.AddText("R1");
   l2.AddText("R2");
   l3.AddText("R3");
   l4.AddText("R4");
-  lcms.AddText("#font[62]{CMS Simulation}");
+  //lcms.AddText("#font[62]{CMS Simulation}");
+  lcms.AddText("#font[62]{CMS} #scale[0.8]{#font[52]{Preliminary}}");
+  llumi.AddText(Form("L = %.1f fb^{-1} (13 TeV)",luminosity));
 
   SetStyle(l1);
   SetStyle(l2);
   SetStyle(l3);
   SetStyle(l4);
   SetStyle(lcms);
+  SetStyle(llumi);
   lcms.SetTextColorAlpha(1,1.);
+  llumi.SetTextColorAlpha(1,1.);
 
   cout << "h_bkg integral : " << h_bkg.Integral() << endl;  
   cout << "h_data integral : " << h_data.Integral() << endl;  
@@ -224,12 +232,13 @@ int main(int argc, char *argv[]){
   l_mt.DrawLine(250.,140.,mj_max,140.);
   l_mj.DrawLine(250.,0.,250.,mt_max);
   //  arrow.DrawArrow(150,30,325,30);
-  //l.Draw("same");
+  l.Draw("same");
   //l1.Draw("same");
   //l2.Draw("same");
   //l3.Draw("same");
   //l4.Draw("same");
-  //lcms.Draw("same");
+  lcms.Draw("same");
+  llumi.Draw("same");
 
   ostringstream outname;
   outname << "plots/scat_mj_mt_met_"
@@ -239,8 +248,8 @@ int main(int argc, char *argv[]){
 	  << (merge_ttbar?"_merged":"_split")
 	  << (no_signal ? "_no_signal" : (compressed ? "_T1tttt_1200_800" : "_T1tttt_1500_100"))
 	  << (full_stats ? "_shapes" : "_lumi") << luminosity
-	  //<< ".pdf";
-	  << ".root";
+	  << ".pdf";
+	  //<< ".root";
   c.Print(outname.str().c_str());
 }
 
@@ -276,9 +285,9 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
 
     if(false
        //|| (st.mt()>140 && st.mj()>400) // for blinding
-       //|| st.nbm()<2 //nb>=2
+       || st.nbm()<2 //nb>=2
        //|| st.nbm()!=1 //nb==1
-       || st.nbm()<1 //nb>=1
+       //|| st.nbm()<1 //nb>=1
        || st.njets()<njets_min
        || (njets_max > 0 && st.njets()>njets_max)
        || st.met()<=met_min
