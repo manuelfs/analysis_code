@@ -20,6 +20,7 @@
 #include "TLine.h"
 #include "TArrow.h"
 #include "TLegend.h"
+#include "TLegendEntry.h"
 #include "TRandom3.h"
 #include "TError.h" // Turns off "no dictionary for class" warnings
 #include "TSystem.h"
@@ -54,9 +55,9 @@ int main(int argc, char *argv[]){
   GetOptions(argc, argv);
   TRandom3 rand3(seed);
   
-  styles style("2Dnobar");
+  styles style("2Dtitle");
   style.setDefaultStyle();
-  
+
   string folder_data="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
   string folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_10_19/mc/skim_1lht500met200/";
   //string folder = "/cms5r0/ald77/archive/2015_05_25/skim/";
@@ -80,14 +81,14 @@ int main(int argc, char *argv[]){
   double mj_max = 1200.;
   double mt_max = 600.;
 
-  TH2D h_sig("h_sig", ";M_{J} [GeV];m_{T} [GeV]", 20, 0., mj_max, 20, 0., mt_max);
-  TH2D h_bkg("h_bkg", ";M_{J} [GeV];m_{T} [GeV]", 20, 0., mj_max, 20, 0., mt_max);
-  TH2D h_bkg1("h_bkg1", ";M_{J} [GeV];m_{T} [GeV]", 20, 0., mj_max, 20, 0., mt_max);
-  TH2D h_bkg2("h_bkg2", ";M_{J} [GeV];m_{T} [GeV]", 20, 0., mj_max, 20, 0., mt_max);
-  TH2D h_data("h_data", ";M_{J} [GeV];m_{T} [GeV]", 2000, 0., mj_max, 2000, 0., mt_max);
+  TH2D h_sig("h_sig", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
+  TH2D h_bkg("h_bkg", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
+  TH2D h_bkg1("h_bkg1", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
+  TH2D h_bkg2("h_bkg2", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
+  TH2D h_data("h_data", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 2000, 0., mj_max, 2000, 0., mt_max);
   TGraph g_sig, g_bkg, g_bkg1, g_bkg2, g_data;
   TGraph g_sig_full, g_bkg_full, g_bkg1_full, g_bkg2_full, g_data_full;
-  TH2D h("h", ";M_{J} [GeV];m_{T} [GeV]", 1, 0., mj_max, 1, 0., mt_max);
+  TH2D h("h", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 1, 0., mj_max, 1, 0., mt_max);
   
   int line_width = 4;
   TArrow arrow; arrow.SetLineColor(kGray+2); arrow.SetFillColor(0);
@@ -109,7 +110,7 @@ int main(int argc, char *argv[]){
   set<size_t> indices_bkg = GetRandomIndices(st_bkg, ttbar_norm, rand3);
   set<size_t> indices_data = GetRandomIndices(st_data, 1, rand3);
 
-  Process(st_sig, g_sig, g_sig_full, h_sig, 2, 20, 1, indices_sig, 0, false);
+  Process(st_sig, g_sig, g_sig_full, h_sig, 2, 21, 1, indices_sig, 0, false);
   if(merge_ttbar){
     Process(st_bkg, g_bkg, g_bkg_full, h_bkg, 1006, 21, 1, indices_bkg, 0, false);
   }else{
@@ -124,15 +125,15 @@ int main(int argc, char *argv[]){
   //double rho_bkg2 = g_bkg2_full.GetCorrelationFactor();
   //double rho_data = g_data_full.GetCorrelationFactor();
 
-  TLegend l(style.PadLeftMargin+0.5, 1.-style.PadTopMargin-0.2, 1.-style.PadRightMargin-0.05, 1.-style.PadTopMargin);
+  TLegend l(style.PadLeftMargin+0.34, 1.-style.PadTopMargin-0.13, 1.-style.PadRightMargin, 1.-style.PadTopMargin);
   if(merge_ttbar){
     l.SetNColumns(1);
   }else{
     l.SetNColumns(3);
   }
-  l.SetFillColor(0);
-  l.SetFillStyle(0);
-  l.SetTextSize(); 
+  l.SetFillColor(kWhite);
+  //  l.SetFillStyle(0);
+  l.SetTextSize(1.8); 
   l.SetLineWidth(2);
   l.SetTextAlign(12);
   l.SetTextSize(0.04);
@@ -144,7 +145,9 @@ int main(int argc, char *argv[]){
   //   l.AddEntry(&h_bkg2, "t#bar{t} (2l)", "f");
   //}
   if(!no_signal){
-    l.AddEntry(&g_sig, compressed?"T1tttt(1200,800)":"T1tttt(1500,100)", "p");
+    //    TLegendEntry *le = l.AddEntry(&g_sig, compressed?"T1tttt(1200,800)":"T1tttt(1500,100)", "p");
+    TLegendEntry *le = l.AddEntry(&g_sig, "#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0} (1500,100)", "p");
+    le->SetTextColor(kRed);
   }
   l.AddEntry(&h_data, "Data", "p");
 
@@ -161,7 +164,7 @@ int main(int argc, char *argv[]){
   TPaveText lcms(style.PadLeftMargin+0., 1.-style.PadTopMargin,
 		 style.PadLeftMargin+2.*width, 1.-style.PadTopMargin+0.5*height, "NDCNB");
   TPaveText llumi(style.PadLeftMargin+0.57, 1.-style.PadTopMargin,
-		 style.PadLeftMargin+0.57+2.*width, 1.-style.PadTopMargin+0.5*height, "NDCNB");
+		  1-style.PadRightMargin, 1.-style.PadTopMargin+0.5*height, "NDCNB");
 
   l1.AddText("R1");
   l2.AddText("R2");
@@ -170,6 +173,7 @@ int main(int argc, char *argv[]){
   //lcms.AddText("#font[62]{CMS Simulation}");
   lcms.AddText("#font[62]{CMS} #scale[0.8]{#font[52]{Preliminary}}");
   llumi.AddText(Form("L = %.1f fb^{-1} (13 TeV)",luminosity));
+  llumi.SetTextSize(0.043);
 
   SetStyle(l1);
   SetStyle(l2);
@@ -185,12 +189,12 @@ int main(int argc, char *argv[]){
   cout << "data/MC="  << h_data.Integral()/h_bkg.Integral() << endl;
   
   const Int_t NRGBs = 5;
-  const Int_t NCont = /*255*/999;
+  const Int_t NCont = 999;
 
   Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
-  Double_t red[NRGBs] = { 0.00, 0.00, 0.87, 1.00, 0.51 };
-  Double_t green[NRGBs] = { 0.33, 0.81, 1.00, 0.20, 0.00 };
-  Double_t blue[NRGBs] = { 0.98, 1.00, 0.12, 0.00, 0.00 };
+  Double_t red[NRGBs] = { 0.50, 0.50, 1.00, 1.00, 1.00 };
+  Double_t green[NRGBs] = { 0.50, 1.00, 1.00, 0.60, 0.50 };
+  Double_t blue[NRGBs] = { 1.00, 1.00, 0.50, 0.40, 0.50 };
   TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
   gStyle->SetNumberContours(NCont);
 
@@ -206,7 +210,7 @@ int main(int argc, char *argv[]){
  */
 
   TCanvas c;
-  c.SetRightMargin(0.1);
+  //  c.SetRightMargin(0.1);
   //h_bkg.Scale(h_data.Integral()/h_bkg.Integral());
   h_bkg.SetMinimum(-0.01); 
   h_bkg.Draw("colz"); 
@@ -233,9 +237,9 @@ int main(int argc, char *argv[]){
   l_mj.DrawLine(250.,0.,250.,mt_max);
   //  arrow.DrawArrow(150,30,325,30);
   l.Draw("same");
-  //l1.Draw("same");
-  //l2.Draw("same");
-  //l3.Draw("same");
+  //  l1.Draw("same");
+  //  l2.Draw("same");
+  //  l3.Draw("same");
   //l4.Draw("same");
   lcms.Draw("same");
   llumi.Draw("same");
