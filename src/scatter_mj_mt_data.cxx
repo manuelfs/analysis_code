@@ -154,17 +154,17 @@ int main(int argc, char *argv[]){
   double height = 0.125;
   double width = 0.1;
   TPaveText l1(style.PadLeftMargin+0.16, style.PadBottomMargin,
-	       style.PadLeftMargin+0.16+width, style.PadBottomMargin+height, "NDCNB");
+               style.PadLeftMargin+0.16+width, style.PadBottomMargin+height, "NDCNB");
   TPaveText l2(1.-style.PadRightMargin-width-0.05, style.PadBottomMargin,
-	       1.-style.PadRightMargin-0.05, style.PadBottomMargin+height, "NDCNB");
+               1.-style.PadRightMargin-0.05, style.PadBottomMargin+height, "NDCNB");
   TPaveText l3(style.PadLeftMargin+0.16, 1.-style.PadTopMargin-1.5*height+0.07,
-	       style.PadLeftMargin+0.16+width, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
+               style.PadLeftMargin+0.16+width, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
   TPaveText l4(1.-style.PadRightMargin-width-0.05, 1.-style.PadTopMargin-1.5*height+0.07,
-	       1.-style.PadRightMargin-0.05, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
+               1.-style.PadRightMargin-0.05, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
   TPaveText lcms(style.PadLeftMargin+0., 1.-style.PadTopMargin,
-		 style.PadLeftMargin+2.*width, 1.-style.PadTopMargin+0.5*height, "NDCNB");
+                 style.PadLeftMargin+2.*width, 1.-style.PadTopMargin+0.5*height, "NDCNB");
   TPaveText llumi(style.PadLeftMargin+0.57, 1.-style.PadTopMargin,
-		  1-style.PadRightMargin, 1.-style.PadTopMargin+0.5*height, "NDCNB");
+                  1-style.PadRightMargin, 1.-style.PadTopMargin+0.5*height, "NDCNB");
 
   l1.AddText("R1");
   l2.AddText("R2");
@@ -246,14 +246,14 @@ int main(int argc, char *argv[]){
 
   ostringstream outname;
   outname << "plots/scat_mj_mt_met_"
-	  << met_min << '_' << met_max
-	  << "_njets_" << njets_min << '_' << njets_max
-	  << "_seed" << seed
-	  << (merge_ttbar?"_merged":"_split")
-	  << (no_signal ? "_no_signal" : (compressed ? "_T1tttt_1200_800" : "_T1tttt_1500_100"))
-	  << (full_stats ? "_shapes" : "_lumi") << luminosity
-	  << ".pdf";
-	  //<< ".root";
+          << met_min << '_' << met_max
+          << "_njets_" << njets_min << '_' << njets_max
+          << "_seed" << seed
+          << (merge_ttbar?"_merged":"_split")
+          << (no_signal ? "_no_signal" : (compressed ? "_T1tttt_1200_800" : "_T1tttt_1500_100"))
+          << (full_stats ? "_shapes" : "_lumi") << luminosity
+          << ".pdf";
+          //<< ".root";
   c.Print(outname.str().c_str());
 }
 
@@ -263,9 +263,9 @@ set<size_t> GetRandomIndices(baby_basic &st, double norm, TRandom3 &rand3){
   st.GetEntry(0);
   double weight = st.weight();
   int num_points = std::min((norm<=0.
-			     ?num_entries
-			     :TMath::Nint(luminosity*weight*num_entries*norm)),
-			    num_entries);
+                             ?num_entries
+                             :TMath::Nint(luminosity*weight*num_entries*norm)),
+                            num_entries);
   cout << "Selecting " << num_points << " out of " << num_entries << "..." << endl;
   set<size_t> indices;
   while(indices.size() < static_cast<size_t>(num_points)){
@@ -275,8 +275,8 @@ set<size_t> GetRandomIndices(baby_basic &st, double norm, TRandom3 &rand3){
 }
 
 void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
-	     int color, int marker, int size,
-	     const set<size_t> &indices, int nleps, bool isData){
+             int color, int marker, int size,
+             const set<size_t> &indices, int nleps, bool isData){
   g = TGraph(0);
   g_full = TGraph(0);
   int num_entries = st.GetEntries();
@@ -361,23 +361,23 @@ void GetOptions(int argc, char *argv[]){
     case 0:
       optname = long_options[option_index].name;
       if(optname == "met_min"){
-	met_min = atof(optarg);
+        met_min = atof(optarg);
       }else if(optname == "met_max"){
-	met_max = atof(optarg);
+        met_max = atof(optarg);
       }else if(optname == "njets_min"){
-	njets_min = atoi(optarg);
+        njets_min = atoi(optarg);
       }else if(optname == "seed"){
-	seed = atoi(optarg);
+        seed = atoi(optarg);
       }else if(optname == "njets_max"){
-	njets_max = atoi(optarg);
+        njets_max = atoi(optarg);
       }else if(optname == "merge_ttbar"){
-	merge_ttbar = true;
+        merge_ttbar = true;
       }else if(optname == "compressed"){
-	compressed = true;
+        compressed = true;
       }else if(optname == "no_signal"){
-	no_signal = true;
+        no_signal = true;
       }else if(optname == "full_stats"){
-	full_stats = true;
+        full_stats = true;
       }
       break;
     default: break;
