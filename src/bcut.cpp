@@ -278,6 +278,9 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="pass"){
     cutType_ = kBool;
     bb_ = &baby_base::pass;
+  }else if(var=="stitch"){
+    cutType_ = kBool;
+    bb_ = &baby_base::stitch;
   }else if(var=="pass_ra2"){
     cutType_ = kBool;
     bb_ = &baby_base::pass_ra2;
