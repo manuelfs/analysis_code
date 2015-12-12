@@ -42,3 +42,4 @@ archive
 .nfs*
 .#-emacs*
 .DS_Store
+sftp-config.json

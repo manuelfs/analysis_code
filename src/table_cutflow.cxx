@@ -24,11 +24,11 @@
 
 using namespace std;
 namespace {
-  TString luminosity = "3";
+  TString luminosity = "2.1";
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
-		vector<vector<double> > entries, size_t ini);
+    vector<vector<double> > entries, size_t ini);
 
 int main(){
   gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
@@ -37,7 +37,7 @@ int main(){
 
 
   //// Defining samples, i.e. columns in the table
-  TString folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
+  TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
   vector<TString> s_tt;
   s_tt.push_back(folder+"*_TTJets*Lept*");
   s_tt.push_back(folder+"*_TTJets_HT*");
@@ -49,8 +49,10 @@ int main(){
   s_other.push_back(folder+"*DYJetsToLL*");
   s_other.push_back(folder+"*_ZJet*");
   s_other.push_back(folder+"*_WWTo*");
+  s_other.push_back(folder+"*_WZTo*");
   s_other.push_back(folder+"*ggZH_HToBB*");
   s_other.push_back(folder+"*ttHJetTobb*");
+  s_other.push_back(folder+"*_TTTT*");
   vector<TString> s_qcd;
   s_qcd.push_back(folder+"*_QCD_HT*");
   s_qcd.push_back(folder+"*_TTJets_TuneCUET*");
@@ -59,6 +61,7 @@ int main(){
   vector<TString> s_ttv;
   s_ttv.push_back(folder+"*_TTWJets*");
   s_ttv.push_back(folder+"*_TTZTo*");
+  s_ttv.push_back(folder+"*_TTG*");
   vector<TString> s_single;
   s_single.push_back(folder+"*_ST_*");
  
@@ -75,18 +78,18 @@ int main(){
 
   //// tables has a vector of the tables you want to print
   vector<tfeats> tables;
-  TString baseline_s("1"); 
+  TString baseline_s("stitch"); 
 
   //////////// Standard cutflow ////////////
   // Pushing first table and adding rows
   tables.push_back(tfeats("1", "an"));
-  tables.back().add("No selection", "1");
-  tables.back().add("$1\\ell$", "nleps==1");
-  tables.back().add("$H_T>500$ GeV", "ht>500&&nleps==1");
+  // tables.back().add("No selection", "1");
+  // tables.back().add("$1\\ell$", "nleps==1");
+  // tables.back().add("$H_T>500$ GeV", "ht>500&&nleps==1");
   tables.back().add("MET$>200$ GeV", "met>200&&ht>500&&nleps==1");
   tables.back().add("$N_{\\rm jets}\\geq6$", "njets>=6&&met>200&&ht>500&&nleps==1");
   tables.back().add("$N_{\\rm b}\\geq1$", "nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$M_J>250$ GeV", "mj>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1","=");
+  tables.back().add("$M_J>250$ GeV", "mj>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
   tables.back().add("$N_{\\rm b}\\geq2$", "mj>250&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
   tables.back().add("$m_T>140$ GeV", "mt>140&&mj>250&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
   tables.back().add("$M_J>400$ GeV", "mt>140&&mj>400&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
@@ -116,9 +119,9 @@ int main(){
     for(size_t sam2(sam+1); sam2 < Samples.size(); sam2++){
       //// If 2 samples are the same, the bincuts are concatened so that the yields are found in one go
       if(Samples[sam].file == Samples[sam2].file) {
-	repeat_sam[sam2] = sam;
-	for(size_t bin(0); bin < bincuts.size(); bin++)
-	  samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut));	
+  repeat_sam[sam2] = sam;
+  for(size_t bin(0); bin < bincuts.size(); bin++)
+    samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut)); 
       }
     } // Loop over future samples
     if(repeat_sam[sam]==-1){
@@ -130,7 +133,7 @@ int main(){
       w2.push_back(vector<double>());
       time(&endtime); 
       cout<<setw(3)<<difftime(endtime, begtime)<<" seconds passed. Finding yields for \""<<Samples[sam].label
-	  <<"\" with "<<baby.GetEntries()<<" entries"<<endl;
+    <<"\" with "<<baby.GetEntries()<<" entries"<<endl;
       entries.push_back(getYields(baby, baseline, samcuts, yields.back(), w2.back(), luminosity.Atof()));
     } else {
       //// If the yields were calculated earlier, put them in the correct vector and erase them from the previous sample
@@ -155,7 +158,7 @@ int main(){
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
-		vector<vector<double> > entries, size_t ini) {
+    vector<vector<double> > entries, size_t ini) {
   int nsig(0), digits(1);
   for(unsigned sam(0); sam < Samples.size(); sam++) if(Samples[sam].isSig) nsig++;
 
