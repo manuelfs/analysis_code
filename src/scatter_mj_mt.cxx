@@ -34,14 +34,14 @@ using namespace std;
 namespace{
   double met_min = 200.;
   double met_max = 0.;
-  int njets_min = 7;
+  int njets_min = 6;
   int njets_max = 0;
-  int seed = 3247;
+  int seed = 1129;
   bool merge_ttbar = false;
   bool compressed = false;
   bool no_signal = false;
   bool full_stats = false;
-  float luminosity = 3.;
+  float luminosity = 2.1;
 }
 
 //Not sure why I can't get the colors from utilities_macros...
@@ -56,7 +56,8 @@ int main(int argc, char *argv[]){
   styles style("2Dnobar");
   style.setDefaultStyle();
   
-  string folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
+  string folder ="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/skim_1lht500met200/";
+  //  string folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
   //string folder = "/cms5r0/ald77/archive/2015_05_25/skim/";
   //folder = "/afs/cern.ch/user/m/manuelf/work/ucsb/2015_05_25/skim/";
   string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
@@ -132,22 +133,32 @@ int main(int argc, char *argv[]){
 	       style.PadLeftMargin+0.2+width, 1.-style.PadTopMargin-0.5*height, "NDCNB");
   TPaveText l4(1.-style.PadRightMargin-width, 1.-style.PadTopMargin-1.5*height,
 	       1.-style.PadRightMargin, 1.-style.PadTopMargin-0.5*height, "NDCNB");
-  TPaveText lcms(style.PadLeftMargin+0.55, 1.-style.PadTopMargin-0.5*height-0.01,
-		 style.PadLeftMargin+0.55+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
+  TPaveText lcms(style.PadLeftMargin, 1.-style.PadTopMargin-0.5*height-0.01,
+		 style.PadLeftMargin-0.13+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
+  TPaveText lsim(style.PadLeftMargin, 1.-style.PadTopMargin-0.5*2*height-0.01,
+  		 style.PadLeftMargin-0.08+2.*width, 1.-style.PadTopMargin-0.5*height-0.01, "NDCNB");
+
+  TPaveText l13(style.PadLeftMargin+0.59, 1.-style.PadTopMargin-0.5*height-0.01,
+		 style.PadLeftMargin+0.59+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
 
   l1.AddText("R1");
   l2.AddText("R2");
   l3.AddText("R3");
   l4.AddText("R4");
-  lcms.AddText("#font[62]{CMS Simulation}");
+  lcms.AddText("#font[62]{CMS}");
+  lsim.AddText("#scale[0.8]{#font[52]{Simulation}}");
+  l13.AddText("#sqrt{s} = 13 TeV");
 
   SetStyle(l1);
   SetStyle(l2);
   SetStyle(l3);
   SetStyle(l4);
   SetStyle(lcms);
+  SetStyle(lsim);
+  SetStyle(l13);
+  l13.SetTextColorAlpha(1,1.);
   lcms.SetTextColorAlpha(1,1.);
-
+  lsim.SetTextColorAlpha(1,1.);
   TCanvas c;
   h.Draw();
   if(merge_ttbar){
@@ -169,6 +180,8 @@ int main(int argc, char *argv[]){
   l3.Draw("same");
   l4.Draw("same");
   lcms.Draw("same");
+  lsim.Draw("same");
+  l13.Draw("same");
 
   ostringstream outname;
   outname << "plots/scat_mj_mt_met_"
@@ -186,7 +199,7 @@ set<size_t> GetRandomIndices(baby_basic &st, double norm, TRandom3 &rand3){
   int num_entries = st.GetEntries();
   if(num_entries<1) return set<size_t>();
   st.GetEntry(0);
-  double weight = st.weight();
+  double weight = st.w_lumi();
   int num_points = std::min((norm<=0.
 			     ?num_entries
 			     :TMath::Nint(luminosity*weight*num_entries*norm)),
@@ -213,7 +226,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full,
     st.GetEntry(entry);
 
     if(false
-       || st.nbm()<2
+       || st.nbm()<1
        || st.njets()<njets_min
        || (njets_max > 0 && st.njets()>njets_max)
        || st.met()<=met_min
