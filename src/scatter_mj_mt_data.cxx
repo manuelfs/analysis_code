@@ -38,6 +38,7 @@ namespace{
   double met_max = 0.;
   int njets_min = 6;
   int njets_max = 0;
+  int nb_bin = 2; // 1 = exactly 1 b-tag; 2 = 2 or more b-tags
   int seed = 1099;
   bool merge_ttbar = true;
   bool compressed = false;
@@ -58,10 +59,9 @@ int main(int argc, char *argv[]){
   styles style("2Dtitle");
   style.setDefaultStyle();
 
-  string folder_data="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
-  string folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_10_19/mc/skim_1lht500met200/";
-  //string folder = "/cms5r0/ald77/archive/2015_05_25/skim/";
-  //folder = "/afs/cern.ch/user/m/manuelf/work/ucsb/2015_05_25/skim/";
+  string folder_data="/cms2r0/babymaker/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
+  string folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
+
   string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
   baby_basic st_sig(folder+sig_name);
   baby_basic st_bkg(folder+"*TTJets*Lept*");
@@ -69,6 +69,8 @@ int main(int argc, char *argv[]){
   st_bkg.Add(folder+"*_WJetsToLNu*"); 
   st_bkg.Add(folder+"*_TTWJets*");
   st_bkg.Add(folder+"*_TTZTo*");
+  st_bkg.Add(folder+"*_TTG*");
+  st_bkg.Add(folder+"*_TTTT*");
   st_bkg.Add(folder+"*_ST_*"); 
   st_bkg.Add(folder+"*DYJetsToLL*"); 
   st_bkg.Add(folder+"*_QCD_HT*"); 
@@ -211,7 +213,7 @@ int main(int argc, char *argv[]){
 
   TCanvas c;
   //  c.SetRightMargin(0.1);
-  //h_bkg.Scale(h_data.Integral()/h_bkg.Integral());
+  h_bkg.Scale(h_data.Integral()/h_bkg.Integral());
   h_bkg.SetMinimum(-0.01); 
   h_bkg.Draw("colz"); 
   /*
@@ -245,13 +247,14 @@ int main(int argc, char *argv[]){
   llumi.Draw("same");
 
   ostringstream outname;
-  outname << "plots/scat_mj_mt_met_"
-          << met_min << '_' << met_max
-          << "_njets_" << njets_min << '_' << njets_max
+  outname << "plots/scat_mj_mt_"
+          << "nbm" << nb_bin
+          // << "met_" << met_min << '_' << met_max
+          // << "_njets_" << njets_min << '_' << njets_max
           << "_seed" << seed
-          << (merge_ttbar?"_merged":"_split")
+          // << (merge_ttbar?"_merged":"_split")
           << (no_signal ? "_no_signal" : (compressed ? "_T1tttt_1200_800" : "_T1tttt_1500_100"))
-          << (full_stats ? "_shapes" : "_lumi") << luminosity
+          // << (full_stats ? "_shapes" : "_lumi") << luminosity
           << ".pdf";
           //<< ".root";
   c.Print(outname.str().c_str());
@@ -261,11 +264,9 @@ set<size_t> GetRandomIndices(baby_basic &st, double norm, TRandom3 &rand3){
   int num_entries = st.GetEntries();
   if(num_entries<1) return set<size_t>();
   st.GetEntry(0);
-  double weight = st.weight();
-  int num_points = std::min((norm<=0.
-                             ?num_entries
-                             :TMath::Nint(luminosity*weight*num_entries*norm)),
-                            num_entries);
+  double weight = st.w_lumi();
+  if (weight<0) weight = 1.; //for data
+  int num_points = std::min((norm<=0. ? num_entries :TMath::Nint(luminosity*weight*num_entries*norm)), num_entries);
   cout << "Selecting " << num_points << " out of " << num_entries << "..." << endl;
   set<size_t> indices;
   while(indices.size() < static_cast<size_t>(num_points)){
@@ -287,18 +288,18 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
     timer.Iterate();
     st.GetEntry(entry);
 
+    if (!isData && !st.stitch()) continue;
+
     if(false
-       //|| (st.mt()>140 && st.mj()>400) // for blinding
-       || st.nbm()<2 //nb>=2
-       //|| st.nbm()!=1 //nb==1
-       //|| st.nbm()<1 //nb>=1
+       || nleps
+       || (nb_bin==1 && st.nbm()!=1) //nb==1
+       || (nb_bin==2 && st.nbm()<2) //nb>=2
        || st.njets()<njets_min
        || (njets_max > 0 && st.njets()>njets_max)
        || st.met()<=met_min
        || (met_max > 0. && st.met()>met_max)
        || st.ht()<=500.
-       || (st.nmus()+st.nels())!=1
-       || ((nleps == 1 && st.ntruleps()>1) || (nleps == 2 && st.ntruleps()<2))
+       || (st.nleps())!=1
        ) continue;
     
     if(isData && !((st.trig()[4] ||st.trig()[8]) && st.pass())) continue; 
@@ -343,6 +344,7 @@ void GetOptions(int argc, char *argv[]){
       {"met_max", required_argument, 0, 0},
       {"njets_min", required_argument, 0, 0},
       {"njets_max", required_argument, 0, 0},
+      {"nbm", required_argument, 0, 0},
       {"seed", required_argument, 0, 0},
       {"merge_ttbar", no_argument, 0, 0},
       {"compressed", no_argument, 0, 0},
@@ -366,6 +368,8 @@ void GetOptions(int argc, char *argv[]){
         met_max = atof(optarg);
       }else if(optname == "njets_min"){
         njets_min = atoi(optarg);
+      }else if(optname == "nbm"){
+        nb_bin = atoi(optarg);
       }else if(optname == "seed"){
         seed = atoi(optarg);
       }else if(optname == "njets_max"){
