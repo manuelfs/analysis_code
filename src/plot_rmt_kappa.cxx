@@ -32,7 +32,6 @@ using namespace std;
 
 namespace{
   bool verbose(false);
-  TString tag("old");
   TString title_style("CMSPaper");
   bool do_data(false);
   bool only_tt(false);
@@ -47,7 +46,7 @@ namespace{
   TString basenj("4"); //only 4 implemeted so far...
   TString lownj("6"); // 6 or 7 lowest to go into kappa (only 6 yields validated)
   TString highnj("9"); // 8 or 9 (only 9 yields validated)
-  double lumi(3.);
+  double lumi(2.1);
 }
 
 void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin);
@@ -58,19 +57,14 @@ int main(){
 
   time_t begtime, endtime;
   time(&begtime);
-   // TString folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_10_19/mc/skim_1lht500met200/"; tag="old";
-  TString folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/skim_1lht500met200/"; tag = "";
-  
+  TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/"; 
   TString folderdata="";
   // TString folderdata="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/"; 
 
-  // For kappa plots only...
-  // TString folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/bkg/skim_abcd/";
-  // TString folderdata="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_abcd/";
 
   ////// Creating babies
   baby_basic data(folderdata+"*root");
-  // baby_basic bkg(folder+"*TTJets_Tu*");
+  // baby_basic bkg(folder+"*_ST*");
   baby_basic bkg(folder+"*TTJets*Lept*");
   bkg.Add(folder+"*TTJets*HT*");
   if(!only_tt){
@@ -88,9 +82,7 @@ int main(){
   }
 
   ////// Defining cuts
-  TString stitch = "&&stitch";
-  if (tag=="old") stitch ="";
-  bcut baseline("nleps==1&&mj>"+lowmj+"&&njets>="+basenj+"&&nbm>=1"+stitch);
+  bcut baseline("nleps==1&&mj>"+lowmj+"&&njets>="+basenj+"&&nbm>=1&&stitch");
   
   map<TString, vector<bcut> > cutmap;
   //RmT and kappa calculation depend on mt cuts ordering, assumed 0 = low, 1 = high
@@ -157,7 +149,7 @@ int main(){
   }
 
   rmt(baseline.cuts_, cutmap, yield, w2, ini, fin);
-  // cout<<"Plotting kappa..."<<endl;
+  cout<<"Plotting kappa..."<<endl;
   if (!do_data && do_metbins) kappa(baseline.cuts_, cutmap, m3_njbin_ind, yield, w2, ini, fin);
   else cout<<"Kappa is blinded in data, or needs the MET bins"<<endl;
 
@@ -195,9 +187,9 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
   TString totcut("");
   for(unsigned imet(0); imet<cutmap["met"].size(); imet++){
     for(unsigned inb(0); inb<cutmap["nb"].size(); inb++){
+      if(imet==1 && inb==2 && fatbins) continue;
       for(unsigned inj(0); inj<m3_njbin_ind.size(); inj++){ //loop over the meta njet bins, instead of the fine bins of cutmap["nj"]
         for(size_t idata(ini); idata<=fin; idata++){
-          if(imet==1 && inb==2 && fatbins) continue;
           vector<vector<float> > entries;
           vector<vector<float> > weights;
           for(unsigned obs(0); obs < powersk.size(); obs++) {
@@ -231,31 +223,31 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
                                 + imet*cutmap["mj"].size()*cutmap["mt"].size()*cutmap["nj"].size()*cutmap["nb"].size());
                 }
               }
-            }
+            } 
             double totw2(0.);
             double totyield(0.);
             for (size_t ibin(0); ibin<ind.size(); ibin++){
               totw2 += w2[idata][ind[ibin]];
               totyield += yield[idata][ind[ibin]]; 
-            }
+            } 
             //print values
             if (imj%2==0 && fatbins){ 
               if (inj==0 && inb==0 && obs==0){
-                if(obs==0) cout<<endl;
+                if (verbose) if(obs==0) cout<<endl;
                 if (verbose) cout<<"r"<<obs+1<<"_"<<(imet==0 ? "lowmet":"highmet")<<"_allnj_allnb \t= "<<setw(7)<<RoundNumber(totyield,2)<<endl;
               }
             } else {
-              if(obs==0) cout<<endl;
+              if (verbose) if(obs==0) cout<<endl;
               if (verbose) cout<<"r"<<obs+1<<"_"<<(imet==0 ? "lowmet":"highmet")<<"_"<<(inj==0 ? "lownj":"highnj")
                   <<"_nb"<<inb+1<<" \t= "<<setw(7)<<RoundNumber(totyield,2)<<endl;
             }
             entries[obs].push_back(pow(totyield,2)/totw2);
             weights[obs].push_back(totw2/totyield);
-            // cout<<"Total yield for inj "<<inj<<", imet "<<imet<<", inb "<<inb<<", obs "<<obs<<" = "<<entries[obs].back()<<endl;
           } // Loop over number of observables going into kappa
    
           double kappa(0);
           kappa = calcKappa(entries, weights, powersk, mSigma, pSigma, (idata%2)==1, false);   
+          // cout<<"Calculated kappa = "<<kappa<<endl;
           //collapse information into the vectors that will be fed into the 4 graphs nb==1, nb==2, nb>=3 and nb>=2
           unsigned iinb(inb);
           float xpoint = inj*wnj+imet*wmet+(iinb+2)*wnb;
@@ -304,11 +296,13 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     histo.Draw();
 
     TLatex cmslabel; 
-    cmslabel.SetNDC(kTRUE);
-    cmslabel.SetTextAlign(11);
-    cmslabel.DrawLatex(0.18,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
-    cmslabel.SetTextAlign(31);
-    cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13TeV");  
+    if (title_style=="CMSPaper"){
+      cmslabel.SetNDC(kTRUE);
+      cmslabel.SetTextAlign(11);
+      cmslabel.DrawLatex(0.18,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
+      cmslabel.SetTextAlign(31);
+      cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13TeV");  
+    }
 
     TString ytitle("#kappa^{MC}"); 
     if(is_data) ytitle += " (data uncert.)";
@@ -335,11 +329,13 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
       graph[inb].SetMarkerStyle(styles[inb]); graph[inb].SetMarkerSize(1.4); 
       graph[inb].SetMarkerColor(colors[inb]); graph[inb].SetLineColor(colors[inb]);
       graph[inb].Draw("p same");   
-      cutmap["nb"][inb].cuts_.ReplaceAll("nbm","n_{b}");
-      cutmap["nb"][inb].cuts_.ReplaceAll("=="," = ");
-      cutmap["nb"][inb].cuts_.ReplaceAll(">="," #geq ");
       if (inb==3) leg.AddEntry(&graph[inb], "n_{b} #geq 2", "p");
-      else leg.AddEntry(&graph[inb], cutmap["nb"][inb].cuts_, "p");
+      else {
+        cutmap["nb"][inb].cuts_.ReplaceAll("nbm","n_{b}");
+        cutmap["nb"][inb].cuts_.ReplaceAll("=="," = ");
+        cutmap["nb"][inb].cuts_.ReplaceAll(">="," #geq ");
+        leg.AddEntry(&graph[inb], cutmap["nb"][inb].cuts_, "p");
+      }
     }
 
     leg.Draw();
@@ -361,7 +357,6 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
       else  pname += "_allmc";
     }
     pname += "_mt"+mtcut+".pdf";
-    if (tag!="") pname.ReplaceAll(".pdf","_"+tag+".pdf");
     can.SaveAs(pname);
     cout<<endl<<" open "<<pname<<endl<<endl;
 
@@ -396,12 +391,12 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
 
     for(size_t imj(0); imj<cutmap["mj"].size(); imj++){
       for(size_t inb(0); inb<cutmap["nb"].size(); inb++){
+        if (imet==1 && inb==2) continue; 
         for(size_t inj(0); inj<cutmap["nj"].size(); inj++){
           vector<vector<float> > entries;
           vector<vector<float> > weights;
           for(size_t idata(ini); idata<=fin; idata++){
             for(size_t imt(0); imt<cutmap["mt"].size(); imt++){ // This is the loop over powersk as well
-              // if (imet==1 && inb==2) continue; 
               entries.push_back(vector<float>());
               weights.push_back(vector<float>());
               size_t ind(imt + inj*cutmap["mt"].size() + inb*cutmap["mt"].size()*cutmap["nj"].size()
@@ -454,11 +449,13 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     histo.Draw();
 
     TLatex cmslabel; 
-    cmslabel.SetNDC(kTRUE);
-    cmslabel.SetTextAlign(11);
-    cmslabel.DrawLatex(0.13,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
-    cmslabel.SetTextAlign(31);
-    cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13TeV");  
+    if (title_style=="CMSPaper"){
+      cmslabel.SetNDC(kTRUE);
+      cmslabel.SetTextAlign(11);
+      cmslabel.DrawLatex(0.13,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
+      cmslabel.SetTextAlign(31);
+      cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13TeV");  
+    }
 
     TString ytitle("R_{m_{T}}"); 
     histo.SetYTitle(ytitle);
@@ -495,7 +492,6 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     if(nbsize>3) leg.SetNColumns(2);
     TGraphAsymmErrors graph[20];
     int colors[] = {4,2,kMagenta+2,kGreen+3}, styles[] = {20, 21, 22, 23};
-    // int colors[] = {2,kCyan+1}, styles[] = {20, 23};
     for(size_t inb(0); inb<nbsize; inb++){
       if (imet==1 && inb==2) continue;
       graph[inb] = TGraphAsymmErrors(vx[ini][inb].size(), &(vx[ini][inb][0]), &(vy[ini][inb][0]), 
@@ -524,7 +520,6 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       if(only_tt) pname.ReplaceAll("data","tt");
       else pname.ReplaceAll("data","allmc");
     }
-    if (tag!="") pname.ReplaceAll(".pdf","_"+tag+".pdf");
     can.SaveAs(pname);
     cout<<"open "<<pname<<endl;
   }
