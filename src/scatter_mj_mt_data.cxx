@@ -44,7 +44,7 @@ namespace{
   bool compressed = false;
   bool no_signal = false; 
   bool full_stats = false;
-  float luminosity = 2.1;
+  float luminosity = 2.15;
 }
 
 //Not sure why I can't get the colors from utilities_macros...
@@ -194,9 +194,9 @@ int main(int argc, char *argv[]){
   const Int_t NCont = 999;
 
   Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
-  Double_t red[NRGBs] = { 0.50, 0.50, 1.00, 1.00, 1.00 };
-  Double_t green[NRGBs] = { 0.50, 1.00, 1.00, 0.60, 0.50 };
-  Double_t blue[NRGBs] = { 1.00, 1.00, 0.50, 0.40, 0.50 };
+  Double_t red[NRGBs] = { 0.71, 0.50, 1.00, 1.00, 1.00 };
+  Double_t green[NRGBs] = { 0.80, 1.00, 1.00, 0.60, 0.50 };
+  Double_t blue[NRGBs] = { 0.95, 1.00, 0.50, 0.40, 0.50 };
   TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
   gStyle->SetNumberContours(NCont);
 
@@ -300,6 +300,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
        || (met_max > 0. && st.met()>met_max)
        || st.ht()<=500.
        || (st.nleps())!=1
+       || !st.pass()
        ) continue;
     
     if(isData && !((st.trig()[4] ||st.trig()[8]) && st.pass())) continue; 
