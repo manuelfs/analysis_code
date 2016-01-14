@@ -94,10 +94,10 @@ int main(int argc, char *argv[]){
   v_sys.back().shift_index = 1; // JEC Up index in sys_met, etc.
   // v_sys.push_back(sysdef("Jet energy resolution", "jer", kSmear));
   // v_sys.back().shift_index = 0; // JER index in sys_met, etc.
-  v_sys.push_back(sysdef("PDFs", "pdf", kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_pdf["+to_string(i)+"]");
-  v_sys.push_back(sysdef("RMS PDFs", "rms_pdf", kWeight));
-  for (size_t i(0); i<100; i++) v_sys.back().v_wgts.push_back("w_pdf["+to_string(i)+"]");
+  // v_sys.push_back(sysdef("PDFs", "pdf", kWeight));
+  // for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_pdf["+to_string(i)+"]");
+  // v_sys.push_back(sysdef("RMS PDFs", "rms_pdf", kWeight));
+  // for (size_t i(0); i<100; i++) v_sys.back().v_wgts.push_back("w_pdf["+to_string(i)+"]");
   v_sys.push_back(sysdef("QCD scales", "murf",kWeight));
   for (size_t i(0); i<2; i++) {
     v_sys.back().v_wgts.push_back("sys_mur["+to_string(i)+"]");
@@ -106,10 +106,12 @@ int main(int argc, char *argv[]){
   }
   v_sys.push_back(sysdef("ISR", "isr", kWeight));
   for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_isr["+to_string(i)+"]");
+  v_sys.push_back(sysdef("Jet ID FS", "jetid", kConst));
+  v_sys.back().v_wgts.push_back("0.01");
   v_sys.push_back(sysdef("Pile up", "pu", kConst));
   v_sys.back().v_wgts.push_back("0.05");
   v_sys.push_back(sysdef("Luminosity", "lumi", kConst));
-  v_sys.back().v_wgts.push_back("0.12");
+  v_sys.back().v_wgts.push_back("0.046");
 
   //// tables has a vector of the tables you want to print
   TString baseline("ht>500 && met>200 && mj>250 && njets>=6 && nbm>=1 && nleps==1");
@@ -178,15 +180,15 @@ int main(int argc, char *argv[]){
   cout<<"Writing to "<<outpath<<endl;
   ofstream fsys(outpath);
   fillTtbarSys(fsys);
-  ofstream fsysrms(outpath.ReplaceAll("sys_","sysrms_"));
-  fillTtbarSys(fsysrms);
-  ofstream fsysdbg(outpath.ReplaceAll("sysrms_","sysdbg_"));
+  // ofstream fsysrms(outpath.ReplaceAll("sys_","sysrms_"));
+  // fillTtbarSys(fsysrms);
+  ofstream fsysdbg(outpath.ReplaceAll("sys_","sysdbg_"));
   ofstream fsysent(outpath.ReplaceAll("sysdbg_","sysent_"));
   size_t nbins = v_bins.size();
   for (auto &sys: v_sys) {
     if (sys.tag != "nominal") {
       if (sys.tag != "rms_pdf") fsys<<"\nSYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
-      if (sys.tag != "pdf") fsysrms<<"\nSYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
+      // if (sys.tag != "pdf") fsysrms<<"\nSYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
       fsysdbg<<"\nSYSTEMATIC "<<sys.tag<<"\n  PROCESSES signal\n";
     }
     for (size_t ibin(0); ibin<nbins; ibin++) {
@@ -234,12 +236,12 @@ int main(int argc, char *argv[]){
       double ln = (up>0 ? 1:-1)*max(up>0 ? up : (1/(1+up)-1), dn>0 ? dn : (1/(1+dn)-1));
       if (sys.sys_type == kConst) ln = up;
       if (sys.tag !="rms_pdf") fsys<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
-      if (sys.tag !="pdf") fsysrms<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
+      // if (sys.tag !="pdf") fsysrms<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
       fsysdbg <<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<"mg="<<setw(5)<<mglu <<" "<<"mlsp="<<setw(10)<<mlsp <<" "<<std::right<<setw(10)<<Form("%.2f",up) <<" "<<setw(10)<<Form("%.2f",dn) <<endl;
     } // loop over bins
   } // loop over systematics
   fsys.close();
-  fsysrms.close();
+  // fsysrms.close();
   fsysdbg.close();
   fsysent.close();
 
@@ -285,18 +287,19 @@ void GetOptions(int argc, char *argv[], TString &infolder, TString &outfolder, T
 }
 
 void fillTtbarSys(ofstream &fsys){
+
   fsys<<"SYSTEMATIC isr_pt"<<endl;
   fsys<<" PROCESSES ttbar"<<endl;
-  fsys<<"  r2_lowmet_lownj_1b    0.04"<<endl;
-  fsys<<"  r2_highmet_lownj_1b   0.03"<<endl;
-  fsys<<"  r2_lowmet_highnj_1b   0.05"<<endl;
-  fsys<<"  r2_highmet_highnj_1b  0.04"<<endl;
-  fsys<<"  r2_lowmet_lownj_2b    0.04"<<endl;
-  fsys<<"  r2_lowmet_lownj_3b    0.04"<<endl;
-  fsys<<"  r2_highmet_lownj_2b   0.04"<<endl;
-  fsys<<"  r2_lowmet_highnj_2b   0.03"<<endl;
-  fsys<<"  r2_lowmet_highnj_3b   0.03"<<endl;
-  fsys<<"  r2_highmet_highnj_2b  0.04"<<endl<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.02"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   0.01"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.01"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    0.01"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.02"<<endl;
+  fsys<<"  r2_highmet_lownj_2b   0.01"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.01"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.02"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  0.01"<<endl<<endl;
 
   fsys<<"SYSTEMATIC jec"<<endl;
   fsys<<" PROCESSES ttbar"<<endl;
@@ -307,35 +310,35 @@ void fillTtbarSys(ofstream &fsys){
   fsys<<"  r2_lowmet_lownj_2b    0.02"<<endl;
   fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
   fsys<<"  r2_highmet_lownj_2b   0.02"<<endl;
-  fsys<<"  r2_lowmet_highnj_2b   0.05"<<endl;
-  fsys<<"  r2_lowmet_highnj_3b   0.03"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.02"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.05"<<endl;
   fsys<<"  r2_highmet_highnj_2b  0.04"<<endl<<endl;
 
   fsys<<"SYSTEMATIC top_pt"<<endl;
   fsys<<" PROCESSES ttbar"<<endl;
-  fsys<<"  r2_lowmet_lownj_1b    0.001"<<endl;
-  fsys<<"  r2_highmet_lownj_1b   0.03"<<endl;
-  fsys<<"  r2_lowmet_highnj_1b   0.02"<<endl;
-  fsys<<"  r2_highmet_highnj_1b  0.02"<<endl;
-  fsys<<"  r2_lowmet_lownj_2b    0.001"<<endl;
-  fsys<<"  r2_lowmet_lownj_3b    0.001"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   0.01"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.04"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    0.01"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
   fsys<<"  r2_highmet_lownj_2b   0.03"<<endl;
-  fsys<<"  r2_lowmet_highnj_2b   0.002"<<endl;
-  fsys<<"  r2_lowmet_highnj_3b   0.002"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.01"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.01"<<endl;
   fsys<<"  r2_highmet_highnj_2b  0.01"<<endl<<endl;
 
   fsys<<"SYSTEMATIC jet_mismeas"<<endl;
   fsys<<" PROCESSES ttbar"<<endl;
-  fsys<<"  r2_lowmet_lownj_1b    0.03"<<endl;
-  fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
-  fsys<<"  r2_lowmet_highnj_1b   0.02"<<endl;
-  fsys<<"  r2_highmet_highnj_1b  0.07"<<endl;
-  fsys<<"  r2_lowmet_lownj_2b    0.03"<<endl;
-  fsys<<"  r2_lowmet_lownj_3b    0.04"<<endl;
-  fsys<<"  r2_highmet_lownj_2b   0.01"<<endl;
-  fsys<<"  r2_lowmet_highnj_2b   0.02"<<endl;
-  fsys<<"  r2_lowmet_highnj_3b   0.07"<<endl;
-  fsys<<"  r2_highmet_highnj_2b  0.07"<<endl<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.05"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.05"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   0.10"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.02"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    0.04"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.07"<<endl;
+  fsys<<"  r2_highmet_lownj_2b   0.04"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.07"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.10"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  0.06"<<endl<<endl;
 
   fsys<<"SYSTEMATIC non_ttbar"<<endl;
   fsys<<" PROCESSES other"<<endl;
