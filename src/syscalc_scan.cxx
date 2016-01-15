@@ -290,16 +290,16 @@ void fillTtbarSys(ofstream &fsys){
 
   fsys<<"SYSTEMATIC isr_pt"<<endl;
   fsys<<" PROCESSES ttbar"<<endl;
-  fsys<<"  r2_lowmet_lownj_1b    0.02"<<endl;
-  fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.03"<<endl;
   fsys<<"  r2_lowmet_highnj_1b   0.01"<<endl;
-  fsys<<"  r2_highmet_highnj_1b  0.01"<<endl;
-  fsys<<"  r2_lowmet_lownj_2b    0.01"<<endl;
-  fsys<<"  r2_lowmet_lownj_3b    0.02"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.05"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    -0.01"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
   fsys<<"  r2_highmet_lownj_2b   0.01"<<endl;
   fsys<<"  r2_lowmet_highnj_2b   0.01"<<endl;
-  fsys<<"  r2_lowmet_highnj_3b   0.02"<<endl;
-  fsys<<"  r2_highmet_highnj_2b  0.01"<<endl<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.01"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  0.02"<<endl<<endl;
 
   fsys<<"SYSTEMATIC jec"<<endl;
   fsys<<" PROCESSES ttbar"<<endl;
