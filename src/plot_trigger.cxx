@@ -29,7 +29,8 @@
 namespace  {
   bool ra2_l(false);
   bool ra2_sig(false);
-  bool do_ra4(true);
+  bool do_ra4(false);
+  bool do_ra4an(true);
   TString plot_type = ".pdf";
 }
 
@@ -68,43 +69,122 @@ int main(){
     	       "trig[8]&&njets_clean>=4&&ht_clean>500&&nvels>=1", "trig[0]",      
     	       "Ele15_HT350, H_{T} > 500, n_{j} #geq 4, n_{e} #geq 1", "HT350_MET100");
     PlotTurnOn(&c_el, "mht", metbins,metmin,metmax, "H_{T}^{miss}",
-    	       "trig[8]&&njets_clean>=4&&ht_clean>500&&ht_clean<=800&&nvels>=1", "trig[0]",      
-    	       "Ele15_HT350, 500<H_{T}#leq800, n_{j}#geq4, n_{e}#geq1", "HT350_MET100");
-    PlotTurnOn(&c_el, "mht", metbins,metmin,metmax, "H_{T}^{miss}",
-    	       "trig[8]&&njets_clean>=4&&ht_clean>800&&ht_clean<=1200&&nvels>=1", "trig[0]",      
-    	       "Ele15_HT350, 800<H_{T}#leq1200, n_{j}#geq4, n_{e}#geq1", "HT350_MET100");
-    PlotTurnOn(&c_el, "mht", metbins,metmin,metmax, "H_{T}^{miss}",
-    	       "trig[8]&&njets_clean>=4&&ht_clean>1200&&nvels>=1", "trig[0]",      
-    	       "Ele15_HT350, H_{T} > 1200, n_{j} #geq 4, n_{e} #geq 1", "HT350_MET100");
+    	       "trig[22]&&njets_clean>=4&&ht_clean>500&&nvels>=1", "trig[0]",      
+    	       "Ele27_eta2p1, H_{T} > 500, n_{j} #geq 4, n_{e} #geq 1", "HT350_MET100");
+    // PlotTurnOn(&c_el, "mht", metbins,metmin,metmax, "H_{T}^{miss}",
+    // 	       "trig[8]&&njets_clean>=4&&ht_clean>500&&ht_clean<=800&&nvels>=1", "trig[0]",      
+    // 	       "Ele15_HT350, 500<H_{T}#leq800, n_{j}#geq4, n_{e}#geq1", "HT350_MET100");
+    // PlotTurnOn(&c_el, "mht", metbins,metmin,metmax, "H_{T}^{miss}",
+    // 	       "trig[8]&&njets_clean>=4&&ht_clean>800&&ht_clean<=1200&&nvels>=1", "trig[0]",      
+    // 	       "Ele15_HT350, 800<H_{T}#leq1200, n_{j}#geq4, n_{e}#geq1", "HT350_MET100");
+    // PlotTurnOn(&c_el, "mht", metbins,metmin,metmax, "H_{T}^{miss}",
+    // 	       "trig[8]&&njets_clean>=4&&ht_clean>1200&&nvels>=1", "trig[0]",      
+    // 	       "Ele15_HT350, H_{T} > 1200, n_{j} #geq 4, n_{e} #geq 1", "HT350_MET100");
 
+    float htmin(175), htmax(850);
+    int htbins(static_cast<int>((htmax-htmin)/12.5));
+    htmin = 225; htmax = 850; htbins = static_cast<int>((htmax-htmin)/12.5);
+    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
+    	       "trig[14]&&mht>200&&njets>=4", "trig[0]",
+    	       "MET170, MHT > 200, n_{j}#geq4", "HT350_MET100", 300);
   } //if ra2_sig
 
 
+  if(do_ra4an){
+    float metmin(0), metmax(540);
+    int metbins(static_cast<int>((metmax-metmin)/20));
+    metmin = 0; metmax = 550; metbins = static_cast<int>((metmax-metmin)/20);
+    PlotTurnOn(&c_el, "met", metbins,metmin,metmax, "MET",
+    	       "trig[8]&&njets>=4&&nels>=1&&ht>500", "trig[5]",      
+    	       "Ele15_HT350, n_{j} #geq 4, n_{e} #geq 1, H_{T} > 500", "Ele15_HT350_MET50");
+    PlotTurnOn(&c_lep, "met", metbins,metmin,metmax, "MET",
+    	       "trig[4]&&njets>=4&&nmus>=1&&ht>500", "trig[1]",      
+    	       "Mu15_HT350, n_{j} #geq 4, n_{#mu} #geq 1, H_{T} > 500", "Mu15_HT350_MET50");
+
+    float lmin(25), lmax(300);
+    int lbins(static_cast<int>((lmax-lmin)/12.5));
+    TString metcut("200");
+
+    // Lepton pT turn-on
+    lmin = 10; lmax = 80; lbins = static_cast<int>((lmax-lmin)/2.5);
+    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "e_{medium} p_{T}",
+    	       "trig[28]&&ht>500&&met>"+metcut, "trig[8]",
+    	       "MET90, H_{T} > 500, MET > "+metcut, "Ele15_HT350");
+    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "#mu_{medium} p_{T}",
+    	       "(trig[28])&&ht>500&&met>"+metcut, "trig[4]",
+	       "MET90, H_{T} > 500, MET > "+metcut, "Mu15_HT350");
+
+    float htmin(175), htmax(850);
+    int htbins(static_cast<int>((htmax-htmin)/12.5));
+    htmin = 225; htmax = 850; htbins = static_cast<int>((htmax-htmin)/12.5);
+    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
+    	       "trig[28]&&nvels==1&&met>200&&njets>=4&&Max$(els_vvvl)", "trig[8]",
+    	       "MET90, MET > 200, n_{j}#geq4, n_{e} = 1", "Ele15_HT350", 325);
+    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
+    	       "trig[28]&&nvmus==1&&Max$(mus_vvvl)&&met>200&&njets>=4", "trig[4]",
+	       "MET90, MET > 200, n_{j}#geq4, n_{#mu} = 1", "Mu15_HT350", 350);
+
+  }
   if(do_ra4){
 
     TString baseline;
 
 
-    cout<<"RA4: Single efficiency"<<endl;
-    baseline = "(trig[14])&&ht>500&&njets>=4&&met>200";
-    Efficiency(&c_had, baseline+"&&nels==1", "trig[8]");
-    Efficiency(&c_had, baseline+"&&nmus==1", "trig[4]");
+    // cout<<"RA4: Single efficiency"<<endl;
+    // baseline = "(trig[14])&&ht>500&&njets>=4&&met>200";
+    // Efficiency(&c_had, baseline+"&&nels==1", "trig[8]");
+    // Efficiency(&c_had, baseline+"&&nmus==1", "trig[4]");
 
-    cout<<endl<<endl<<"RA4: Dilepton efficiency"<<endl;
-    baseline = "(trig[0]||trig[12]||trig[14])&&ht>500";
-    Efficiency(&c_had2l, baseline+"&&elel_m>60&&nels==2", "trig[8]");
-    Efficiency(&c_had2l, baseline+"&&mumu_m>60&&nmus==2", "trig[4]");
-    Efficiency(&c_had, baseline+"&&elmu_m>60&&nmus==1&&nels==1", "trig[8]||trig[4]");
+    // cout<<endl<<endl<<"RA4: Dilepton efficiency"<<endl;
+    // baseline = "(trig[0]||trig[12]||trig[14])&&ht>500";
+    // Efficiency(&c_had2l, baseline+"&&elel_m>60&&nels==2", "trig[8]");
+    // Efficiency(&c_had2l, baseline+"&&mumu_m>60&&nmus==2", "trig[4]");
+    // Efficiency(&c_had, baseline+"&&elmu_m>60&&nmus==1&&nels==1", "trig[8]||trig[4]");
 
-    // // This gives worse stats due to the MET requirement
-    // baseline = "trig[28]&&ht>500&&njets>=3&&met>100";
-    // Efficiency(&c_had, baseline+"&&nels==2", "trig[8]");
-    // Efficiency(&c_had, baseline+"&&nmus==2", "trig[4]");
-    // Efficiency(&c_had, baseline+"&&nmus==1&&nels==1", "trig[8]||trig[4]");
-    cout<<endl;
-    return 0;
+    // // // This gives worse stats due to the MET requirement
+    // // baseline = "trig[28]&&ht>500&&njets>=3&&met>100";
+    // // Efficiency(&c_had, baseline+"&&nels==2", "trig[8]");
+    // // Efficiency(&c_had, baseline+"&&nmus==2", "trig[4]");
+    // // Efficiency(&c_had, baseline+"&&nmus==1&&nels==1", "trig[8]||trig[4]");
+    // cout<<endl;
+    // return 0;
 
 
+
+    float lmin(25), lmax(300);
+    int lbins(static_cast<int>((lmax-lmin)/12.5));
+    TString metcut("200");
+
+    // Lepton pT turn-on
+    lmin = 10; lmax = 80; lbins = static_cast<int>((lmax-lmin)/2.5);
+    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "e_{medium} p_{T}",
+    	       "trig[28]&&nvels==1&&ht_clean>500&&met>"+metcut, "trig[8]",
+    	       "MET90, H_{T} > 500, MET > "+metcut, "Ele15_HT350");
+    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "#mu_{medium} p_{T}",
+    	       "(trig[28])&&nvmus==1&&ht_clean>500&&met>"+metcut, "trig[4]",
+	       "MET90, H_{T} > 500, MET > "+metcut, "Mu15_HT350");
+
+    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "e_{medium} p_{T}",
+    	       "trig[28]&&nvels==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[8]",
+    	       "MET90, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Ele15_HT350");
+    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "#mu_{medium} p_{T}",
+    	       "(trig[28])&&nvmus==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[4]",
+	       "MET90, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Mu15_HT350");
+
+    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "e_{medium} p_{T}",
+    	       "trig[14]&&nvels==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[8]",
+    	       "MET170, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Ele15_HT350");
+    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "#mu_{medium} p_{T}",
+    	       "(trig[14])&&nvmus==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[4]",
+	       "MET170, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Mu15_HT350");
+    // High lepton pT
+    lmin = 10; lmax = 200; lbins = static_cast<int>((lmax-lmin)/10);
+    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "e_{medium} p_{T}",
+    	       "trig[14]&&nvels==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[8]",
+    	       "MET170, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Ele15_HT350");
+    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "#mu_{medium} p_{T}",
+    	       "(trig[14])&&nvmus==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[4]",
+    	       "MET170, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Mu15_HT350");
 
     float htmin(175), htmax(850);
     int htbins(static_cast<int>((htmax-htmin)/12.5));
@@ -125,27 +205,6 @@ int main(){
     	       "trig[14]&&nvmus==1&&met>200&&njets>=4&&Max$(mus_pt*(mus_miniso<0.2))>20", "trig[4]",
     	       "MET170, MET > 200, n_{j}#geq4, n_{#mu} = 1", "Mu15_HT350", 350);
 
-
-    float lmin(25), lmax(300);
-    int lbins(static_cast<int>((lmax-lmin)/12.5));
-    TString metcut("200");
-
-    // High lepton pT
-    lmin = 10; lmax = 200; lbins = static_cast<int>((lmax-lmin)/10);
-    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "e_{medium} p_{T}",
-    	       "trig[14]&&nvels==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[8]",
-    	       "MET170, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Ele15_HT350");
-    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "#mu_{medium} p_{T}",
-    	       "(trig[14])&&nvmus==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[4]",
-    	       "MET170, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Mu15_HT350");
-    // Lepton pT turn-on
-    lmin = 10; lmax = 80; lbins = static_cast<int>((lmax-lmin)/2.5);
-    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "e_{medium} p_{T}",
-    	       "trig[14]&&nvels==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[8]",
-    	       "MET170, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Ele15_HT350");
-    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "#mu_{medium} p_{T}",
-    	       "(trig[14])&&nvmus==1&&ht_clean>500&&njets>=4&&met>"+metcut, "trig[4]",
-	       "MET170, H_{T} > 500, n_{j} #geq 4, MET > "+metcut, "Mu15_HT350");
 
     ////////////// Lepton ID as a function of njets  //////////////
     float njmin(1.5), njmax(8.5);

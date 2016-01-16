@@ -521,6 +521,7 @@ void plot_2D_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString 
 }
 
 TString cuts2tex(TString cuts){
+  cuts.ReplaceAll(" ", "");
   if(cuts.Contains("met>200")){
     if(cuts.Contains("met<=400")) {
       cuts.ReplaceAll("met<=400", "");
@@ -947,6 +948,37 @@ vector<double> getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts,
   for(size_t ind(0); ind<bincuts.size(); ind++){ 
      yield[ind] *= lumi;
      w2[ind] *= pow(lumi, 2);
+  }
+  return entries;
+}
+
+// This is just a wrapper arount getYields with 2D vectors
+vector<vector<double> > getYields(baby_basic &baby, bcut baseline, vector<vector<bcut> > bincuts, 
+				  vector<vector<double> > &yield, vector<vector<double> > &w2, double lumi, bool do_trig){
+  vector<bcut> bincuts_1d;
+  vector<double> yield_1d, w2_1d, entries_1d;
+  yield.clear();
+  
+  for(size_t bin(0); bin < bincuts.size(); bin++){
+    yield.push_back(vector<double>());
+    for(size_t bin2(0); bin2 < bincuts[bin].size(); bin2++){
+      bincuts_1d.push_back(bincuts[bin][bin2]);
+      yield[bin].push_back(0.);
+    }
+  }
+  entries_1d = getYields(baby, baseline, bincuts_1d, yield_1d, w2_1d, lumi, do_trig);
+
+  w2 = yield;
+  vector<vector<double> > entries = yield;
+  size_t bin_1d(0);
+  for(size_t bin(0); bin < bincuts.size(); bin++){
+    for(size_t bin2(0); bin2 < bincuts[bin].size(); bin2++){
+      yield[bin][bin2] = yield_1d[bin_1d];
+      w2[bin][bin2] = w2_1d[bin_1d];
+      entries[bin][bin2] = entries_1d[bin_1d];
+      bin_1d++;
+    }
+    bin_1d++;
   }
   return entries;
 }

@@ -18,7 +18,7 @@
 using namespace std;
 
 namespace{
-  double lumi(1.264);
+  double lumi(2.246);
   bool do_other(false);
   float syst = 1.;
 }
@@ -28,7 +28,7 @@ int main(){
 
   time_t begtime, endtime;
   time(&begtime);
-  TString folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
+  TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
   TString folderdata="/cms2r0/babymaker/babies/2015_11_05/data/singlelep/combined/skim_1lht500met200/";
 
   ////// Creating babies
@@ -51,25 +51,24 @@ int main(){
   extra->Add(folder+"*ttHJetTobb*.root");
 
   ////// Defining cuts
-  bcut baseline("nleps==1&&mj>250&&njets>=6&&nbm>=1&&stitch&&pass");
+  bcut baseline("mj>250&&njets>=5&&stitch&&pass");
 
-  vector<TString> njbcuts = {"njets<=8&&nbm==1", "njets>=9&&nbm==1", 
-			     "njets<=8&&nbm==2", "njets>=9&&nbm==2", 
-			     "njets<=8&&nbm>=3", "njets>=9&&nbm>=3", 
-			     "njets<=8&&nbm==1", "njets>=9&&nbm==1", 
-			     "njets<=8&&nbm>=2", "njets>=9&&nbm>=2"}; 
+  vector<TString> njbcuts = {"njets>=6&&njets<=8", "njets>=9"}; 
+  vector<TString> njbcuts2l = {"njets>=5&&njets<=7", "njets>=8"}; 
  
-  vector<TString> metcuts = {"met<=400", "met>400"};
-  size_t ilowmet(6);
+  vector<TString> metcuts = {"met<=400", "met<=400"};
+  size_t ilowmet(1);
 
-  vector<TString> abcdcuts = {"mt<=140&&mj<=400", "mt<=140&&mj>400", "mt>140&&mj<=400", "mt>140&&mj>400"};
+  vector<TString> abcdcuts = {"mt<=140&&mj<=400&&njets>=6&&nbm>=1&&nleps==1", "mt<=140&&mj>400&&nbm>=1&&nleps==1", 
+			      "mj<=400&&njets>=5&&nbm<=2&&nleps==2",          "mj>400&&nbm<=2&&nleps==2"};
 
   ////// Combining cuts
   vector<bcut > bincuts;
   for(size_t ind(0); ind<njbcuts.size(); ind++){
     for(size_t obs(0); obs < abcdcuts.size(); obs++){
       TString totcut(abcdcuts[obs]+"&&"+metcuts[ind>=ilowmet]);
-      if(obs%2 == 1) totcut += ("&&"+njbcuts[ind]);
+      if(obs == 1) totcut += ("&&"+njbcuts[ind]);
+      if(obs == 3) totcut += ("&&"+njbcuts2l[ind]);
       bincuts.push_back(bcut(totcut));
     } // Loop over observables going into kappa
   } // Loop over signal bins
@@ -86,15 +85,20 @@ int main(){
   vector<float> pow_pred;
   pow_pred.push_back(-1);  //  mt<=140  mj<=400   R1
   pow_pred.push_back(1);   //  mt<=140  mj>400    R2
-  pow_pred.push_back(1);   //  mt>140   mj<=400   R3
+  pow_pred.push_back(1);   //  mt>140   mj<=400   D3
   vector<float> pow_tot;
   pow_tot.push_back(-1);   //  mt<=140  mj<=400   R1
   pow_tot.push_back(1);	   //  mt<=140  mj>400    R2
-  pow_tot.push_back(1);	   //  mt>140   mj<=400   R3
+  pow_tot.push_back(1);	   //  mt>140   mj<=400   D3
   pow_tot.push_back(1);	   //  mt<=140  mj<=400   R1
   pow_tot.push_back(-1);   //  mt<=140  mj>400    R2
-  pow_tot.push_back(-1);   //  mt>140   mj<=400   R3
-  pow_tot.push_back(1);	   //  mt>140   mj>400    R4
+  pow_tot.push_back(-1);   //  mt>140   mj<=400   D3
+  pow_tot.push_back(1);	   //  mt>140   mj>400    D4
+  vector<float> pow_k;
+  pow_k.push_back(1);	   //  mt<=140  mj<=400   R1
+  pow_k.push_back(-1);   //  mt<=140  mj>400    R2
+  pow_k.push_back(-1);   //  mt>140   mj<=400   D3
+  pow_k.push_back(1);	   //  mt>140   mj>400    D4
 
   float mSigma, pSigma, pred, pred_sys, mSigma_sys, pSigma_sys;
   size_t nabcd(abcdcuts.size()), digits(1);
@@ -112,6 +116,7 @@ int main(){
     } // Loop over observables for data
     //pred = calcKappa(entries, weights, pow_pred, mSigma, pSigma);
 
+    vector<vector<float> > kn, kw;
     float k(1.), kup(1.), kdown(1.);    
     fractions.push_back(vector<float>());
     for(size_t obs(0); obs < abcdcuts.size(); obs++){
@@ -122,6 +127,11 @@ int main(){
 	weights.push_back(vector<float>());
 	entries.back().push_back(pow(mcyield[index],2)/mcw2[index]);
 	weights.back().push_back(mcw2[index]/mcyield[index]);
+
+	kn.push_back(vector<float>());
+	kw.push_back(vector<float>());
+	kn.back().push_back(pow(mcyield[index],2)/mcw2[index]);
+	kw.back().push_back(mcw2[index]/mcyield[index]);
       } else {
 	k *= pow(mcyield[index]+otheryield[index], pow_tot[3+obs]);
 	float f(otheryield[index]/(mcyield[index]+otheryield[index]));
@@ -131,6 +141,8 @@ int main(){
 	kdown *= pow(mcyield[index]+exp(-log(1+syst))*otheryield[index], pow_tot[3+obs]);
       }
     } // Loop over observables for MC
+    pred = calcKappa(kn, kw, pow_k, mSigma, pSigma);
+    cout<<"k = "<<pred<<" +"<<pSigma<<" -"<<mSigma<<endl;
     if(do_other){
       kup = (kup-k)/k*100;
       kdown = (kdown-k)/k*100;
@@ -154,6 +166,7 @@ int main(){
     }
   } // Loop over signal bins
 
+  cout<<"Print table"<<endl;
   ///// Printing table
   TString outname = "txt/table_predictions.tex";
   if(do_other) outname.ReplaceAll("predictions", "other_sys");
@@ -184,14 +197,14 @@ int main(){
 	 << " \\pm " << sqrt(datayield[index]) <<"$ & "
 	 << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
     }
-    out << "R3: all $n_j,n_b$ & "<<mcyield[2] <<" & $"<<datayield[2] 
+    out << "D3: all $n_j,n_b$ & "<<mcyield[2] <<" & $"<<datayield[2] 
 	<< " \\pm " << sqrt(datayield[2]) <<"$ & $"<<datayield[2] 
 	<< " \\pm " << sqrt(datayield[2]) <<"$ & "
 	<< setprecision(0) << datayield[2] << setprecision(digits)<<" \\\\"<<endl;
     out << "\\hline"<<endl;
     for(size_t ind(0); ind<ilowmet; ind++){
       size_t index(nabcd*ind+3);
-      out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
+      out<<"D4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
 	 << "^{+" << preds[ind][1] <<"}_{-" << preds[ind][2] 
 	 <<"}$ & $"<<preds[ind][3] << "^{+" << preds[ind][4] 
 	 <<"}_{-" << preds[ind][5] <<"}$ & "
@@ -209,14 +222,14 @@ int main(){
 	 << " \\pm " << sqrt(datayield[index]) <<"$ & "
 	 << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
     }
-    out << "R3: all $n_j,n_b$ & "<<mcyield[nabcd*ilowmet+2] <<" & $"<<datayield[nabcd*ilowmet+2] 
+    out << "D3: all $n_j,n_b$ & "<<mcyield[nabcd*ilowmet+2] <<" & $"<<datayield[nabcd*ilowmet+2] 
 	<< " \\pm " << sqrt(datayield[nabcd*ilowmet+2]) <<"$ & $"<<datayield[nabcd*ilowmet+2] 
 	<< " \\pm " << sqrt(datayield[nabcd*ilowmet+2]) <<"$ & "
 	<< setprecision(0) <<datayield[nabcd*ilowmet+2]<<setprecision(digits)<<" \\\\"<<endl;
     out << "\\hline"<<endl;
     for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
       size_t index(nabcd*ind+3);
-      out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
+      out<<"D4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
 	 << "^{+" << preds[ind][1] <<"}_{-" << preds[ind][2] 
 	 <<"}$ & $"<<preds[ind][3] << "^{+" << preds[ind][4] 
 	 <<"}_{-" << preds[ind][5] <<"}$ & "<<datayield[index]

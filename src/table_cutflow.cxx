@@ -24,7 +24,7 @@
 
 using namespace std;
 namespace {
-  TString luminosity = "2.1";
+  TString luminosity = "2.246";
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
@@ -49,10 +49,11 @@ int main(){
   s_other.push_back(folder+"*DYJetsToLL*");
   s_other.push_back(folder+"*_ZJet*");
   s_other.push_back(folder+"*_WWTo*");
-  s_other.push_back(folder+"*_WZTo*");
-  s_other.push_back(folder+"*ggZH_HToBB*");
   s_other.push_back(folder+"*ttHJetTobb*");
   s_other.push_back(folder+"*_TTTT*");
+  s_other.push_back(folder+"*_TTGJets*.root");
+  s_other.push_back(folder+"*_WZ*.root");
+
   vector<TString> s_qcd;
   s_qcd.push_back(folder+"*_QCD_HT*");
   s_qcd.push_back(folder+"*_TTJets_TuneCUET*");
@@ -66,7 +67,7 @@ int main(){
   s_single.push_back(folder+"*_ST_*");
  
   vector<sfeats> Samples; 
-  Samples.push_back(sfeats(s_other, "Other", 1001));
+  Samples.push_back(sfeats(s_other, "Other", 1001,1,"stitch"));
   Samples.push_back(sfeats(s_qcd, "QCD", 1002, 1,"ntruleps==0"));
   Samples.push_back(sfeats(s_ttv, "$t\\bar{t}V$", 1002));
   Samples.push_back(sfeats(s_single, "Single $t$", 1005));
@@ -78,7 +79,7 @@ int main(){
 
   //// tables has a vector of the tables you want to print
   vector<tfeats> tables;
-  TString baseline_s("stitch"); 
+  TString baseline_s("stitch&&pass"); 
 
   //////////// Standard cutflow ////////////
   // Pushing first table and adding rows

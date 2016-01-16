@@ -46,7 +46,7 @@ namespace{
   TString basenj("4"); //only 4 implemeted so far...
   TString lownj("6"); // 6 or 7 lowest to go into kappa (only 6 yields validated)
   TString highnj("9"); // 8 or 9 (only 9 yields validated)
-  double lumi(2.1);
+  double lumi(2.246);
 }
 
 void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin);
@@ -64,25 +64,24 @@ int main(){
 
   ////// Creating babies
   baby_basic data(folderdata+"*root");
-  // baby_basic bkg(folder+"*_ST*");
   baby_basic bkg(folder+"*TTJets*Lept*");
-  bkg.Add(folder+"*TTJets*HT*");
+  //bkg.Add(folder+"*TTJets*HT*");
   if(!only_tt){
-    bkg.Add(folder+"*_WJetsToLNu*");
-    bkg.Add(folder+"*_TTWJets*");
-    bkg.Add(folder+"*_TTZTo*");
-    bkg.Add(folder+"*_TTG*");
-    bkg.Add(folder+"*_TTTT*");
-    bkg.Add(folder+"*_ST_*");
-    bkg.Add(folder+"*DYJetsToLL*");
-    bkg.Add(folder+"*_QCD_HT*");
-    bkg.Add(folder+"*ttHJetTobb*");
-    bkg.Add(folder+"*_WWTo*");
-    bkg.Add(folder+"*ggZH_HToBB*");
+    bkg.Add(folder+"*_WJetsToLNu*.root");
+    bkg.Add(folder+"*_TTWJets*.root");
+    bkg.Add(folder+"*_TTZTo*.root");
+    bkg.Add(folder+"*_ST_*.root");
+    bkg.Add(folder+"*DYJetsToLL*.root");
+    bkg.Add(folder+"*QCD_HT*.root");
+    bkg.Add(folder+"*_WWTo*.root");
+    bkg.Add(folder+"*_TTGJets*.root");
+    bkg.Add(folder+"*_TTTT*.root");
+    bkg.Add(folder+"*_WZ*.root");
+    bkg.Add(folder+"*ttHJetTobb*.root");
   }
 
   ////// Defining cuts
-  bcut baseline("nleps==1&&mj>"+lowmj+"&&njets>="+basenj+"&&nbm>=1&&stitch");
+  bcut baseline("nleps==1&&mj>"+lowmj+"&&njets>="+basenj+"&&nbm>=1&&pass");
   
   map<TString, vector<bcut> > cutmap;
   //RmT and kappa calculation depend on mt cuts ordering, assumed 0 = low, 1 = high
@@ -245,9 +244,12 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
             weights[obs].push_back(totw2/totyield);
           } // Loop over number of observables going into kappa
    
-          double kappa(0);
-          kappa = calcKappa(entries, weights, powersk, mSigma, pSigma, (idata%2)==1, false);   
-          // cout<<"Calculated kappa = "<<kappa<<endl;
+          double kappa(0), ksys(0.38);
+	  if(inj==1) ksys = 0.89;
+          kappa = calcKappa(entries, weights, powersk, mSigma, pSigma, (idata%2)==1, false); 
+	  double kstat = (mSigma+pSigma)/2.;
+          cout<<"k = $"<<RoundNumber(kappa,2)<<" \\pm "<<RoundNumber(kstat, 2)<<" \\pm "<<RoundNumber(kappa*ksys, 2)<<"$"
+	      <<"  -> kstat = "<<RoundNumber(kstat/kappa*100,0)<<endl;
           //collapse information into the vectors that will be fed into the 4 graphs nb==1, nb==2, nb>=3 and nb>=2
           unsigned iinb(inb);
           float xpoint = inj*wnj+imet*wmet+(iinb+2)*wnb;

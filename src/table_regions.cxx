@@ -23,7 +23,7 @@
 
 using namespace std;
 namespace {
-  TString luminosity = "3";
+  TString luminosity = "2.1";
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
@@ -35,7 +35,7 @@ int main(){
   time(&begtime);
 
   //// Defining samples, i.e. columns in the table
-  TString folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
+  TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
   vector<TString> s_tt;
   s_tt.push_back(folder+"*_TTJets*Lept*");
   s_tt.push_back(folder+"*_TTJets_HT*");
@@ -53,6 +53,10 @@ int main(){
   s_other.push_back(folder+"*_TTWJets*");
   s_other.push_back(folder+"*_TTZTo*");
   s_other.push_back(folder+"*ttHJetTobb*");
+  s_other.push_back(folder+"*_TTG*");
+  s_other.push_back(folder+"*_TTTT*");
+  s_other.push_back(folder+"*_WWTo*");
+  s_other.push_back(folder+"*_WZTo*");
   vector<TString> s_wjets;
   s_wjets.push_back(folder+"*_WJetsToLNu*");
   vector<TString> s_ttv;
@@ -67,8 +71,8 @@ int main(){
   //Samples.push_back(sfeats(s_ttv, "$t\\bar{t}V$", 1002));
   Samples.push_back(sfeats(s_single, "Single $t$", 1005));
   //Samples.push_back(sfeats(s_wjets, "W+jets", 1004));
-  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ (1$\\ell$)", 1000,1, "ntruleps<=1"));
-  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ ($2\\ell$)", 1006,1,"ntruleps>=2"));
+  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ (1$\\ell$)", 1000,1, "ntruleps<=1&&stitch"));
+  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ ($2\\ell$)", 1006,1,"ntruleps>=2&&stitch"));
   Samples.push_back(sfeats(s_t1t, "T1tttt NC", 2));
   Samples.push_back(sfeats(s_t1tc, "T1tttt C", 2,2));
 
@@ -168,13 +172,13 @@ int main(){
     vector<bcut> samcuts;
     //// Adding specific sample cut to bin cuts
     for(size_t bin(0); bin < bincuts.size(); bin++)
-      samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam].cut, "10*weight"));
+      samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam].cut, "weight"));
     for(size_t sam2(sam+1); sam2 < Samples.size(); sam2++){
       //// If 2 samples are the same, the bincuts are concatened so that the yields are found in one go
       if(Samples[sam].file == Samples[sam2].file) {
 	repeat_sam[sam2] = sam;
 	for(size_t bin(0); bin < bincuts.size(); bin++)
-	  samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut, "10*weight"));	
+	  samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut, "weight"));	
       }
     } // Loop over future samples
     if(repeat_sam[sam]==-1){
