@@ -42,9 +42,9 @@ namespace{
   int seed = 1099;
   bool merge_ttbar = true;
   bool compressed = false;
-  bool no_signal = false; 
+  bool no_signal = true; 
   bool full_stats = false;
-  float luminosity = 2.15;
+  float luminosity = 0.048;
 }
 
 //Not sure why I can't get the colors from utilities_macros...
@@ -78,7 +78,8 @@ int main(int argc, char *argv[]){
   st_bkg.Add(folder+"*_WWTo*"); 
   st_bkg.Add(folder+"*ggZH_HToBB*");
   st_bkg.Add(folder+"*ttHJetTobb*");
-  baby_basic st_data(folder_data+"*Single*");
+  //baby_basic st_data(folder_data+"*Single*");
+  baby_basic st_data(folder_data+"baby_Run2015D_SingleElectron*root"); // only for 48 ipb
 
   double mj_max = 1200.;
   double mt_max = 600.;
@@ -174,7 +175,8 @@ int main(int argc, char *argv[]){
   l4.AddText("R4");
   //lcms.AddText("#font[62]{CMS Simulation}");
   lcms.AddText("#font[62]{CMS} #scale[0.8]{#font[52]{Preliminary}}");
-  llumi.AddText(Form("L = %.1f fb^{-1} (13 TeV)",luminosity));
+  llumi.AddText(Form("L = %.0f pb^{-1} (13 TeV)",luminosity*1000)); // for 48 ipb
+  //llumi.AddText(Form("L = %.1f fb^{-1} (13 TeV)",luminosity));
   llumi.SetTextSize(0.043);
 
   SetStyle(l1);
@@ -292,6 +294,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
 
     if(false
        || nleps
+       //|| (nb_bin==1 && st.nbm()<1) //nb>=1
        || (nb_bin==1 && st.nbm()!=1) //nb==1
        || (nb_bin==2 && st.nbm()<2) //nb>=2
        || st.njets()<njets_min
