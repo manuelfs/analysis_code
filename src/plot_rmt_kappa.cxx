@@ -65,7 +65,7 @@ int main(){
   ////// Creating babies
   baby_basic data(folderdata+"*root");
   baby_basic bkg(folder+"*TTJets*Lept*");
-  //bkg.Add(folder+"*TTJets*HT*");
+  bkg.Add(folder+"*TTJets*HT*");
   if(!only_tt){
     bkg.Add(folder+"*_WJetsToLNu*.root");
     bkg.Add(folder+"*_TTWJets*.root");
@@ -81,7 +81,7 @@ int main(){
   }
 
   ////// Defining cuts
-  bcut baseline("nleps==1&&mj>"+lowmj+"&&njets>="+basenj+"&&nbm>=1&&pass");
+  bcut baseline("nleps==1&&mj>"+lowmj+"&&njets>="+basenj+"&&nbm>=1&&pass&&stitch");
   
   map<TString, vector<bcut> > cutmap;
   //RmT and kappa calculation depend on mt cuts ordering, assumed 0 = low, 1 = high
@@ -303,7 +303,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
       cmslabel.SetTextAlign(11);
       cmslabel.DrawLatex(0.18,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
       cmslabel.SetTextAlign(31);
-      cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13TeV");  
+      cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13 TeV");  
     }
 
     TString ytitle("#kappa^{MC}"); 
@@ -456,7 +456,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       cmslabel.SetTextAlign(11);
       cmslabel.DrawLatex(0.13,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
       cmslabel.SetTextAlign(31);
-      cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13TeV");  
+      cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13 TeV");  
     }
 
     TString ytitle("R_{m_{T}}"); 

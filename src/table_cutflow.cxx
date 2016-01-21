@@ -37,7 +37,10 @@ int main(){
 
 
   //// Defining samples, i.e. columns in the table
+  string hostname = execute("echo $HOSTNAME");
   TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
+  if(Contains(hostname, "cms")) folder = "/net/cms2"+folder;
+
   vector<TString> s_tt;
   s_tt.push_back(folder+"*_TTJets*Lept*");
   s_tt.push_back(folder+"*_TTJets_HT*");
@@ -84,17 +87,17 @@ int main(){
   //////////// Standard cutflow ////////////
   // Pushing first table and adding rows
   tables.push_back(tfeats("1", "an"));
-  // tables.back().add("No selection", "1");
-  // tables.back().add("$1\\ell$", "nleps==1");
-  // tables.back().add("$H_T>500$ GeV", "ht>500&&nleps==1");
+  tables.back().add("No selection", "1");
+  tables.back().add("$1\\ell$", "nleps==1");
+  tables.back().add("$H_T>500$ GeV", "ht>500&&nleps==1");
   tables.back().add("MET$>200$ GeV", "met>200&&ht>500&&nleps==1");
   tables.back().add("$N_{\\rm jets}\\geq6$", "njets>=6&&met>200&&ht>500&&nleps==1");
   tables.back().add("$N_{\\rm b}\\geq1$", "nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
   tables.back().add("$M_J>250$ GeV", "mj>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$N_{\\rm b}\\geq2$", "mj>250&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$m_T>140$ GeV", "mt>140&&mj>250&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$M_J>400$ GeV", "mt>140&&mj>400&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$\\mathrm{MET}>400$ GeV", "mt>140&&mj>400&&nbm>=2&&njets>=6&&met>400&&ht>500&&nleps==1");
+  tables.back().add("$m_T>140$ GeV", "mt>140&&mj>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
+  tables.back().add("$M_J>400$ GeV", "mt>140&&mj>400&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
+  tables.back().add("$N_{\\rm b}\\geq2$", "mt>140&&mj>400&&mj>250&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
+  tables.back().add("MET$>400$ GeV", "mt>140&&mj>400&&nbm>=2&&njets>=6&&met>400&&ht>500&&nleps==1");
   tables.back().add("$N_{\\rm jets}\\geq9$", "mt>140&&mj>400&&nbm>=2&&njets>=9&&met>400&&ht>500&&nleps==1");
 
 
@@ -191,7 +194,7 @@ void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yi
   out << "\\\\ \\hline \n ";
   for(size_t icut(0); icut < table.tcuts.size(); icut++){
     if(table.options[icut]=="=") do_uncert = true;
-    if(icut==9) digits = 2;
+    if(icut==table.tcuts.size()-3) digits = 2;
     for(int ind(0); ind < table.options[icut].CountChar('='); ind++) out << " \\hline ";
     out<<table.texnames[icut];
     double bkg(0), ebkg(0);
