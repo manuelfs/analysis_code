@@ -35,7 +35,7 @@ namespace{
   TString title_style("CMSPaper");
   bool do_data(false);
   bool only_tt(false);
-  bool do_metbins(true);
+  bool do_metbins(false);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
@@ -58,8 +58,13 @@ int main(){
   time_t begtime, endtime;
   time(&begtime);
   TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/"; 
-  TString folderdata="";
-  // TString folderdata="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/"; 
+  TString folderdata="/cms2r0/babymaker/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
+  string hostname = execute("echo $HOSTNAME");
+  if(Contains(hostname, "cms") || Contains(hostname, "compute-")) {
+    folder = "/net/cms2"+folder;
+    folderdata = "/net/cms2"+folder;
+  }
+  if(Contains(hostname, "lxplus")) folderdata="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/"; 
 
 
   ////// Creating babies
@@ -282,7 +287,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     TString stylename = "RA4";
     styles style(stylename);
     style.setDefaultStyle();
-    float max_axis(3.2), max_kappa(0.);
+    float max_axis(2.4), max_kappa(0.);
     unsigned nbsize(vx[idata].size());
     for(unsigned inb(0); inb<nbsize; inb++){
       for(unsigned ik(0); ik<vy[idata].size(); ik++){
@@ -324,7 +329,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     leg.SetTextFont(style.nFont); 
     leg.SetNColumns(2);
     TGraphAsymmErrors graph[20];
-    int colors[] = {4,2,kMagenta+2,kGreen+3}, styles[] = {20, 21, 22, 23};
+    int colors[] = {4,2,kGreen+3,kMagenta+2}, styles[] = {20, 21, 22, 23};
     for(unsigned inb(0); inb<nbsize; inb++){
       graph[inb] = TGraphAsymmErrors(vx[idata][inb].size(), &(vx[idata][inb][0]), &(vy[idata][inb][0]), 
                                      &(vexl[idata][inb][0]), &(vexh[idata][inb][0]), &(veyl[idata][inb][0]), &(veyh[idata][inb][0]));
@@ -444,7 +449,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     // find max kappa to set up axis range
     styles style("RA4long"); //style.LabelSize = 0.05;
     style.setDefaultStyle();
-    float max_axis(0.35);
+    float max_axis(0.26);
     size_t nbsize(vx[ini].size());
     TCanvas can;
     TLine line; line.SetLineColor(28); line.SetLineWidth(4); line.SetLineStyle(3);
@@ -493,7 +498,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     leg.SetTextFont(style.nFont); 
     if(nbsize>3) leg.SetNColumns(2);
     TGraphAsymmErrors graph[20];
-    int colors[] = {4,2,kMagenta+2,kGreen+3}, styles[] = {20, 21, 22, 23};
+    int colors[] = {4,2,kGreen+3,kMagenta+2}, styles[] = {20, 21, 22, 23};
     for(size_t inb(0); inb<nbsize; inb++){
       if (imet==1 && inb==2) continue;
       graph[inb] = TGraphAsymmErrors(vx[ini][inb].size(), &(vx[ini][inb][0]), &(vy[ini][inb][0]), 

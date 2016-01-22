@@ -37,9 +37,9 @@ int main(){
 
 
   //// Defining samples, i.e. columns in the table
-  string hostname = execute("echo $HOSTNAME");
   TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
-  if(Contains(hostname, "cms")) folder = "/net/cms2"+folder;
+  string hostname = execute("echo $HOSTNAME");
+  if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  folder = "/net/cms2"+folder;
 
   vector<TString> s_tt;
   s_tt.push_back(folder+"*_TTJets*Lept*");
