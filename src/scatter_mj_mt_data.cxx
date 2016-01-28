@@ -42,9 +42,9 @@ namespace{
   int seed = 1099;
   bool merge_ttbar = true;
   bool compressed = false;
-  bool no_signal = true; 
+  bool no_signal = false; 
   bool full_stats = false;
-  float luminosity = 0.048;
+  float luminosity = 2.15;
 }
 
 //Not sure why I can't get the colors from utilities_macros...
@@ -64,6 +64,7 @@ int main(int argc, char *argv[]){
 
   string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
   baby_basic st_sig(folder+sig_name);
+  // baby_basic st_bkg(folder+"*_WJetsToLNu*");
   baby_basic st_bkg(folder+"*TTJets*Lept*");
   st_bkg.Add(folder+"*TTJets_HT*"); 
   st_bkg.Add(folder+"*_WJetsToLNu*"); 
@@ -78,14 +79,13 @@ int main(int argc, char *argv[]){
   st_bkg.Add(folder+"*_WWTo*"); 
   st_bkg.Add(folder+"*ggZH_HToBB*");
   st_bkg.Add(folder+"*ttHJetTobb*");
-  //baby_basic st_data(folder_data+"*Single*");
-  baby_basic st_data(folder_data+"baby_Run2015D_SingleElectron*root"); // only for 48 ipb
+  baby_basic st_data(folder_data+"*Single*");
 
   double mj_max = 1200.;
   double mt_max = 600.;
 
   TH2D h_sig("h_sig", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
-  TH2D h_bkg("h_bkg", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
+  TH2D h_bkg("h_bkg", ";M_{J} [GeV];m_{T} [GeV];Simulated Events/(800 GeV^{2})", 30, 0., mj_max, 30, 0., mt_max);
   TH2D h_bkg1("h_bkg1", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
   TH2D h_bkg2("h_bkg2", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
   TH2D h_data("h_data", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 2000, 0., mj_max, 2000, 0., mt_max);
@@ -110,8 +110,10 @@ int main(int argc, char *argv[]){
     sig_norm = 100.;
   }
   set<size_t> indices_sig = GetRandomIndices(st_sig, sig_norm, rand3);
-  set<size_t> indices_bkg = GetRandomIndices(st_bkg, ttbar_norm, rand3);
-  set<size_t> indices_data = GetRandomIndices(st_data, 1, rand3);
+  // set<size_t> indices_bkg = GetRandomIndices(st_bkg, ttbar_norm, rand3);
+  // set<size_t> indices_data = GetRandomIndices(st_data, 1, rand3);
+  set<size_t> indices_bkg;
+  set<size_t> indices_data;
 
   Process(st_sig, g_sig, g_sig_full, h_sig, 2, 21, 1, indices_sig, 0, false);
   if(merge_ttbar){
@@ -128,7 +130,7 @@ int main(int argc, char *argv[]){
   //double rho_bkg2 = g_bkg2_full.GetCorrelationFactor();
   //double rho_data = g_data_full.GetCorrelationFactor();
 
-  TLegend l(style.PadLeftMargin+0.34, 1.-style.PadTopMargin-0.13, 1.-style.PadRightMargin, 1.-style.PadTopMargin);
+  TLegend l(1-style.PadRightMargin-0.39, 1.-style.PadTopMargin-0.13, 1.-style.PadRightMargin, 1.-style.PadTopMargin);
   if(merge_ttbar){
     l.SetNColumns(1);
   }else{
@@ -174,9 +176,9 @@ int main(int argc, char *argv[]){
   l3.AddText("R3");
   l4.AddText("R4");
   //lcms.AddText("#font[62]{CMS Simulation}");
-  lcms.AddText("#font[62]{CMS} #scale[0.8]{#font[52]{Preliminary}}");
-  llumi.AddText(Form("L = %.0f pb^{-1} (13 TeV)",luminosity*1000)); // for 48 ipb
-  //llumi.AddText(Form("L = %.1f fb^{-1} (13 TeV)",luminosity));
+  //lcms.AddText("#font[62]{CMS} #scale[0.8]{#font[52]{Preliminary}}");
+  lcms.AddText("#font[62]{CMS}");
+  llumi.AddText(Form("L = %.1f fb^{-1} (13 TeV)",luminosity));
   llumi.SetTextSize(0.043);
 
   SetStyle(l1);
@@ -214,9 +216,9 @@ int main(int argc, char *argv[]){
  */
 
   TCanvas c;
-  //  c.SetRightMargin(0.1);
+  c.SetLogz(1);
   h_bkg.Scale(h_data.Integral()/h_bkg.Integral());
-  h_bkg.SetMinimum(-0.01); 
+  h_bkg.SetMinimum(0.01); 
   h_bkg.Draw("colz"); 
   /*
   if(merge_ttbar){
@@ -294,7 +296,6 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
 
     if(false
        || nleps
-       //|| (nb_bin==1 && st.nbm()<1) //nb>=1
        || (nb_bin==1 && st.nbm()!=1) //nb==1
        || (nb_bin==2 && st.nbm()<2) //nb>=2
        || st.njets()<njets_min
@@ -318,7 +319,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
         AddPoint(g_full, mj, mt); 
         h.Fill(mj, mt, st.weight()*luminosity);
     }
-    if(indices.find(entry) == indices.end()) continue;
+    if(indices.size() >0 && indices.find(entry) == indices.end()) continue;
     AddPoint(g, mj, mt);
     if(color==2) {
       //cout<<entry<<": mj "<<mj<<", mt "<<mt<<endl;

@@ -147,11 +147,11 @@
     LegendSize	    = 0.05 
     TitleSize	    = 0.045 
     LabelSize	    = 0.054    
-    PadRightMargin  = 0.155 
+    PadRightMargin  = 0.18 
     PadTopMargin    = 0.075 
     PadBottomMargin = 0.14 
     xTitleOffset    = 1.1     
     PadLeftMargin   = 0.13 
     yTitleOffset    = 1.1 
-    zTitleOffset    = 0.95 
+    zTitleOffset    = 1.15
 
