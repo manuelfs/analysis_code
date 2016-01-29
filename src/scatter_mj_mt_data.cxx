@@ -39,7 +39,7 @@ namespace{
   int njets_min = 6;
   int njets_max = 0;
   int nb_bin = 2; // 1 = exactly 1 b-tag; 2 = 2 or more b-tags
-  int seed = 1099;
+  int seed = 4091;
   bool merge_ttbar = true;
   bool compressed = false;
   bool no_signal = false; 
@@ -59,8 +59,8 @@ int main(int argc, char *argv[]){
   styles style("2Dtitle");
   style.setDefaultStyle();
 
-  string folder_data="/cms2r0/babymaker/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
-  string folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
+  string folder_data="/net/cms2/cms2r0/babymaker/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
+  string folder="/net/cms2/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
 
   string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
   baby_basic st_sig(folder+sig_name);
@@ -84,11 +84,11 @@ int main(int argc, char *argv[]){
   double mj_max = 1200.;
   double mt_max = 600.;
 
-  TH2D h_sig("h_sig", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
-  TH2D h_bkg("h_bkg", ";M_{J} [GeV];m_{T} [GeV];Simulated Events/(800 GeV^{2})", 30, 0., mj_max, 30, 0., mt_max);
-  TH2D h_bkg1("h_bkg1", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
-  TH2D h_bkg2("h_bkg2", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 20, 0., mj_max, 20, 0., mt_max);
-  TH2D h_data("h_data", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 2000, 0., mj_max, 2000, 0., mt_max);
+  TH2D h_sig("h_sig", ";M_{J} [GeV];m_{T} [GeV];Simulated events", 20, 0., mj_max, 20, 0., mt_max);
+  TH2D h_bkg("h_bkg", ";M_{J} [GeV];m_{T} [GeV];Simulated events/(800 GeV^{2})", 30, 0., mj_max, 30, 0., mt_max);
+  TH2D h_bkg1("h_bkg1", ";M_{J} [GeV];m_{T} [GeV];Simulated events", 20, 0., mj_max, 20, 0., mt_max);
+  TH2D h_bkg2("h_bkg2", ";M_{J} [GeV];m_{T} [GeV];Simulated events", 20, 0., mj_max, 20, 0., mt_max);
+  TH2D h_data("h_data", ";M_{J} [GeV];m_{T} [GeV];Simulated events", 2000, 0., mj_max, 2000, 0., mt_max);
   TGraph g_sig, g_bkg, g_bkg1, g_bkg2, g_data;
   TGraph g_sig_full, g_bkg_full, g_bkg1_full, g_bkg2_full, g_data_full;
   TH2D h("h", ";M_{J} [GeV];m_{T} [GeV];Simulated Events", 1, 0., mj_max, 1, 0., mt_max);
@@ -103,10 +103,10 @@ int main(int argc, char *argv[]){
   l_mt.SetLineStyle(2);
   l_mt.SetLineColor(kBlack);
 
-  double ttbar_norm = 1.;
+  //  double ttbar_norm = 1.;
   double sig_norm = 1.;
   if(full_stats){
-    ttbar_norm = -1.;
+    //ttbar_norm = -1.;
     sig_norm = 100.;
   }
   set<size_t> indices_sig = GetRandomIndices(st_sig, sig_norm, rand3);
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]){
   set<size_t> indices_bkg;
   set<size_t> indices_data;
 
-  Process(st_sig, g_sig, g_sig_full, h_sig, 2, 21, 1, indices_sig, 0, false);
+  Process(st_sig, g_sig, g_sig_full, h_sig, 2, 21, 1.25, indices_sig, 0, false);
   if(merge_ttbar){
     Process(st_bkg, g_bkg, g_bkg_full, h_bkg, 1006, 21, 1, indices_bkg, 0, false);
   }else{
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]){
   //double rho_bkg2 = g_bkg2_full.GetCorrelationFactor();
   //double rho_data = g_data_full.GetCorrelationFactor();
 
-  TLegend l(1-style.PadRightMargin-0.39, 1.-style.PadTopMargin-0.13, 1.-style.PadRightMargin, 1.-style.PadTopMargin);
+  /*TLegend l(1-style.PadRightMargin-0.39, 1.-style.PadTopMargin-0.13, 1.-style.PadRightMargin, 1.-style.PadTopMargin);
   if(merge_ttbar){
     l.SetNColumns(1);
   }else{
@@ -142,20 +142,20 @@ int main(int argc, char *argv[]){
   l.SetLineWidth(2);
   l.SetTextAlign(12);
   l.SetTextSize(0.04);
-  
+  */
   //if(merge_ttbar){
   //  l.AddEntry(&h_bkg, "Backgrounds", "f");
   //}else{
   //  l.AddEntry(&h_bkg1, "t#bar{t} (1l)", "f");
   //   l.AddEntry(&h_bkg2, "t#bar{t} (2l)", "f");
   //}
-  if(!no_signal){
+  /*if(!no_signal){
     //    TLegendEntry *le = l.AddEntry(&g_sig, compressed?"T1tttt(1200,800)":"T1tttt(1500,100)", "p");
     TLegendEntry *le = l.AddEntry(&g_sig, "#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0} (1500,100)", "p");
     le->SetTextColor(kRed);
   }
   l.AddEntry(&h_data, "Data", "p");
-
+  */
   double height = 0.125;
   double width = 0.1;
   TPaveText l1(style.PadLeftMargin+0.16, style.PadBottomMargin,
@@ -166,10 +166,15 @@ int main(int argc, char *argv[]){
                style.PadLeftMargin+0.16+width, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
   TPaveText l4(1.-style.PadRightMargin-width-0.05, 1.-style.PadTopMargin-1.5*height+0.07,
                1.-style.PadRightMargin-0.05, 1.-style.PadTopMargin-0.5*height+0.07, "NDCNB");
-  TPaveText lcms(style.PadLeftMargin+0., 1.-style.PadTopMargin,
-                 style.PadLeftMargin+2.*width, 1.-style.PadTopMargin+0.5*height, "NDCNB");
-  TPaveText llumi(style.PadLeftMargin+0.57, 1.-style.PadTopMargin,
-                  1-style.PadRightMargin, 1.-style.PadTopMargin+0.5*height, "NDCNB");
+  //TPaveText lcms(style.PadLeftMargin+0., 1.-style.PadTopMargin,
+  //             style.PadLeftMargin+2.*width, 1.-style.PadTopMargin+0.5*height, "NDCNB");
+  // TPaveText llumi(style.PadLeftMargin+0.57, 1.-style.PadTopMargin,
+  //              1-style.PadRightMargin, 1.-style.PadTopMargin+0.5*height, "NDCNB");
+  width=0.125;
+  TPaveText lcms(style.PadLeftMargin, 1.-style.PadTopMargin-0.5*height-0.01,
+                 style.PadLeftMargin-0.13+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
+  TPaveText llumi(style.PadLeftMargin+0.43, 1.-style.PadTopMargin-0.5*height-0.01,
+		style.PadLeftMargin+0.43+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
 
   l1.AddText("R1");
   l2.AddText("R2");
@@ -220,6 +225,22 @@ int main(int argc, char *argv[]){
   h_bkg.Scale(h_data.Integral()/h_bkg.Integral());
   h_bkg.SetMinimum(0.01); 
   h_bkg.Draw("colz"); 
+  
+  TLegend l(style.PadLeftMargin, 1.-style.PadTopMargin, 1.-2.1*style.PadRightMargin, 1.0);
+  
+  l.SetNColumns(2);
+  l.SetFillColor(0);
+  l.SetFillStyle(4000);
+  l.SetBorderSize(0);
+  //  l.AddEntry(&g_sig, GetLabel((compressed?"T1tttt(1200,800)":"T1tttt(1500,100)"),rho_sig).c_str(), "p");
+  l.AddEntry(&h_data, "Data", "p"); 
+  TLegendEntry *le = l.AddEntry(&g_sig, "#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}\
+ (1500,100)", "p");                                                                                              
+  le->SetTextColor(kRed);
+  l.SetTextSize(0.037);
+
+
+
   /*
   if(merge_ttbar){
     g_bkg.Draw("psame");

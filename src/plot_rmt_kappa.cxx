@@ -35,7 +35,7 @@ namespace{
   TString title_style("CMSPaper");
   bool do_data(false);
   bool only_tt(false);
-  bool do_metbins(false);
+  bool do_metbins(true);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
@@ -311,7 +311,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
       cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13 TeV");  
     }
 
-    TString ytitle("#kappa^{MC}"); 
+    TString ytitle("#kappa"); 
     if(is_data) ytitle += " (data uncert.)";
     else if (title_style!="CMSPaper") ytitle += " (MC uncert.)";
     histo.SetYTitle(ytitle);

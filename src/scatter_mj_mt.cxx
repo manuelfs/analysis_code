@@ -56,8 +56,8 @@ int main(int argc, char *argv[]){
   styles style("2Dnobar");
   style.setDefaultStyle();
   
-  string folder ="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/skim_1lht500met200/";
-  //  string folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
+  //  string folder ="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/skim_1lht500met200/";
+   string folder="/net/cms2/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
   //string folder = "/cms5r0/ald77/archive/2015_05_25/skim/";
   //folder = "/afs/cern.ch/user/m/manuelf/work/ucsb/2015_05_25/skim/";
   string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
