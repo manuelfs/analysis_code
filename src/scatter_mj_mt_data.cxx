@@ -48,8 +48,8 @@ namespace{
 }
 
 //Not sure why I can't get the colors from utilities_macros...
-TColor c_tt_2l(1006, 86/255.,160/255.,211/255.);
-TColor c_tt_1l(1000, 1/255.,57/255.,166/255.);
+TColor c_tt_2l(2006, 86/255.,160/255.,211/255.);
+TColor c_tt_1l(2000, 1/255.,57/255.,166/255.);
 
 int main(int argc, char *argv[]){
   gErrorIgnoreLevel=6000; // Turns off errors due to missing branches
@@ -59,8 +59,18 @@ int main(int argc, char *argv[]){
   styles style("2Dtitle");
   style.setDefaultStyle();
 
-  string folder_data="/net/cms2/cms2r0/babymaker/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
-  string folder="/net/cms2/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
+  string folder_data="/cms2r0/babymaker/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
+  string folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
+
+  string hostname = execute("echo $HOSTNAME");
+  if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  {
+    folder = "/net/cms2"+folder;
+    folder_data = "/net/cms2"+folder_data;
+  }
+  if(Contains(hostname, "lxplus")){
+    folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/skim_1lht500met200/";
+    folder_data="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
+  }
 
   string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
   baby_basic st_sig(folder+sig_name);
@@ -117,10 +127,10 @@ int main(int argc, char *argv[]){
 
   Process(st_sig, g_sig, g_sig_full, h_sig, 2, 21, 1.25, indices_sig, 0, false);
   if(merge_ttbar){
-    Process(st_bkg, g_bkg, g_bkg_full, h_bkg, 1006, 21, 1, indices_bkg, 0, false);
+    Process(st_bkg, g_bkg, g_bkg_full, h_bkg, 2006, 21, 1, indices_bkg, 0, false);
   }else{
-    Process(st_bkg, g_bkg1, g_bkg1_full, h_bkg1, 1000, 23, 1, indices_bkg, 1, false);
-    Process(st_bkg, g_bkg2, g_bkg2_full, h_bkg2, 1006, 22, 1, indices_bkg, 2, false);
+    Process(st_bkg, g_bkg1, g_bkg1_full, h_bkg1, 2000, 23, 1, indices_bkg, 1, false);
+    Process(st_bkg, g_bkg2, g_bkg2_full, h_bkg2, 2006, 22, 1, indices_bkg, 2, false);
   }
   Process(st_data, g_data, g_data_full, h_data, 2, 20, 1, indices_data, 0, true);
 
@@ -283,6 +293,7 @@ int main(int argc, char *argv[]){
           << ".pdf";
           //<< ".root";
   c.Print(outname.str().c_str());
+  cout<<endl<<" open "<<outname.str().c_str()<<endl<<endl;
 }
 
 set<size_t> GetRandomIndices(baby_basic &st, double norm, TRandom3 &rand3){
@@ -301,7 +312,7 @@ set<size_t> GetRandomIndices(baby_basic &st, double norm, TRandom3 &rand3){
 }
 
 void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
-             int color, int marker, int size,
+             int color, int marker, double size,
              const set<size_t> &indices, int nleps, bool isData){
   g = TGraph(0);
   g_full = TGraph(0);

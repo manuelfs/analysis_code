@@ -193,6 +193,7 @@ int main(int argc, char *argv[]){
 	  << (full_stats ? "_shapes" : "_lumi") << luminosity
 	  << ".pdf";
   c.Print(outname.str().c_str());
+  cout<<endl<<" open "<<outname.str().c_str()<<endl<<endl;
 }
 
 set<size_t> GetRandomIndices(baby_basic &st, double norm, TRandom3 &rand3){

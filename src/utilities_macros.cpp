@@ -992,49 +992,32 @@ long getYieldErr(TChain& tree, TString cut, double& yield, double& uncertainty){
   return entries;
 }
 
+double intGaus(double mean, double sigma, double minX, double maxX){
+  return (TMath::Erf((maxX-mean)/sigma/sqrt(2.))-TMath::Erf((minX-mean)/sigma/sqrt(2.)))/2.;
+}
+
 namespace  ra4 {
-  TColor ucsb_blue(1000, 1/255.,57/255.,166/255.);
-  TColor ucsb_gold(1001, 255/255.,200/255.,47/255);
-  TColor penn_red(1002, 149/255.,0/255.,26/255.);
-  TColor uf_orange(1003, 255/255.,74/255.,0/255.);
-  TColor uo_green(1004, 0/255.,79/255.,39/255.);
-  TColor tcu_purple(1005, 52/255.,42/255.,123/255.);
-  TColor tar_heel_blue(1006, 86/255.,160/255.,211/255.);
-  TColor sig_teal(1007, 96/255.,159/255.,128/255.);
-  TColor sig_gold(1008, 215/255.,162/255.,50/255.);
-  TColor seal_brown(1010, 89/255.,38/255.,11/255.);
+  TColor ucsb_blue(2000, 1/255.,57/255.,166/255.);
+  TColor ucsb_gold(2001, 255/255.,200/255.,47/255);
+  TColor penn_red(2002, 149/255.,0/255.,26/255.);
+  TColor uf_orange(2003, 255/255.,74/255.,0/255.);
+  TColor uo_green(2004, 0/255.,79/255.,39/255.);
+  TColor tcu_purple(2005, 52/255.,42/255.,123/255.);
+  TColor tar_heel_blue(2006, 86/255.,160/255.,211/255.);
+  TColor sig_teal(2007, 96/255.,159/255.,128/255.);
+  TColor sig_gold(2008, 215/255.,162/255.,50/255.);
+  TColor seal_brown(2010, 89/255.,38/255.,11/255.);
 }
 
 namespace dps{
-  //option 1
-  // TColor light_blue(1011, 200/255.,230/255.,255/255.);
-  // TColor med_blue(1012, 100/255.,150/255.,255/255.);
-  // TColor yellow(1013, 255/255.,255/255.,135/255.);
-  // TColor green(1014, 130/255.,255/255.,120/255.);
-  // TColor red(1015, 255/255.,140/255.,140/255.);
-  // TColor violet(1016, 170/255.,130/255.,255/255.);
-  // TColor tan(1017, 255/255.,240/255.,210/255.);
+  TColor light_blue(2011, 153/255.,220/255.,255/255.);
+  TColor med_blue(2012, 1/255.,148/255.,218/255.);
+  TColor red(2015, 250/255.,96/255.,1/255.);
+  TColor skype_green(2018,9/255.,186/255.,1/255.);
+  // TColor purple(2019, 172/255.,46/255.,135/255.);
+  TColor purple(2019, 183/255.,66/255.,176/255.);
+  TColor ucsb_gold(2020, 255/255.,200/255.,47/255);
 
-  //option 2
-  // TColor light_blue(1011, 173/255.,230/255.,255/255.);
-  // TColor med_blue(1012, 1/255.,148/255.,218/255.);
-  // TColor red(1015, 250/255.,96/255.,1/255.);
-  // TColor skype_green(1018,9/255.,186/255.,1/255.);
-  // TColor purple(1019, 183/255.,66/255.,176/255.);
-  // TColor ucsb_gold(1020, 254/255.,234/255.,51/255);
-
-  TColor light_blue(1011, 153/255.,220/255.,255/255.);
-  TColor med_blue(1012, 1/255.,148/255.,218/255.);
-  TColor red(1015, 250/255.,96/255.,1/255.);
-  TColor skype_green(1018,9/255.,186/255.,1/255.);
-  // TColor purple(1019, 172/255.,46/255.,135/255.);
-  TColor purple(1019, 183/255.,66/255.,176/255.);
-  TColor ucsb_gold(1020, 255/255.,200/255.,47/255);
-
-}
-
-double intGaus(double mean, double sigma, double minX, double maxX){
-  return (TMath::Erf((maxX-mean)/sigma/sqrt(2.))-TMath::Erf((minX-mean)/sigma/sqrt(2.)))/2.;
 }
 
 

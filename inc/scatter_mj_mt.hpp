@@ -19,7 +19,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full,
 	     const std::set<size_t> & indices, int nleps = 0);
 
 void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
-	     int color, int marker, int size,
+	     int color, int marker, double size,
 	     const std::set<size_t> & indices, int nleps = 0, bool isData=true);
 
 std::string GetLabel(const std::string &str, double rho);
