@@ -68,8 +68,12 @@ int main(int argc, char *argv[]){
   string prs = infile.Data();
   int mglu = stoi(prs.substr(prs.find("ino-")+4,prs.find("_mLSP")-prs.find("ino-")-4));
   int mlsp = stoi(prs.substr(prs.find("LSP-")+4,prs.find("_Tune")-prs.find("LSP-")-4));
-  string outfile = prs.substr(0, prs.find("_TuneCUETP"));
   cout<<"Working on: mGluino = "<<mglu<<" mLSP = "<<mlsp<<endl;
+  string glu_lsp("mGluino-"+to_string(mglu)+"_mLSP-"+to_string(mlsp));
+  string model = "T1tttt";
+  if(Contains(prs, "T5tttt")) model = "T5tttt";
+  if(Contains(prs, "T2tt")) model = "T2tt";
+  if(Contains(prs, "T6ttWW")) model = "T6ttWW";
 
   vector<sysdef> v_sys;
   // order as they will appear in latex table
@@ -176,7 +180,7 @@ int main(int argc, char *argv[]){
 
 
   //calculate uncertainties and write results to three files
-  TString outpath = outfolder+"/"+TString(outfile).ReplaceAll("baby_","sys_") + ".txt"; 
+  TString outpath = outfolder+"/sys_SMS-"+TString(model)+"_"+glu_lsp+ ".txt"; 
   cout<<"Writing to "<<outpath<<endl;
   ofstream fsys(outpath);
   fillTtbarSys(fsys);
@@ -355,15 +359,15 @@ void fillTtbarSys(ofstream &fsys){
 
   fsys<<"SYSTEMATIC dilep_closure"<<endl;
   fsys<<" PROCESSES ttbar"<<endl;
-  fsys<<"  r2_lowmet_lownj_1b    0.366"<<endl;
-  fsys<<"  r2_lowmet_lownj_1b    0.366"<<endl;
-  fsys<<"  r2_highmet_lownj_1b   0.366"<<endl;
-  fsys<<"  r2_lowmet_highnj_1b   0.895"<<endl;
-  fsys<<"  r2_highmet_highnj_1b  0.895"<<endl;
-  fsys<<"  r2_lowmet_lownj_2b    0.366"<<endl;
-  fsys<<"  r2_lowmet_lownj_3b    0.366"<<endl;
-  fsys<<"  r2_highmet_lownj_2b   0.366"<<endl;
-  fsys<<"  r2_lowmet_highnj_2b   0.895"<<endl;
-  fsys<<"  r2_lowmet_highnj_3b   0.895"<<endl;
-  fsys<<"  r2_highmet_highnj_2b  0.895"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.37"<<endl;
+  fsys<<"  r2_lowmet_lownj_1b    0.37"<<endl;
+  fsys<<"  r2_highmet_lownj_1b   0.37"<<endl;
+  fsys<<"  r2_lowmet_highnj_1b   0.88"<<endl;
+  fsys<<"  r2_highmet_highnj_1b  0.88"<<endl;
+  fsys<<"  r2_lowmet_lownj_2b    0.37"<<endl;
+  fsys<<"  r2_lowmet_lownj_3b    0.37"<<endl;
+  fsys<<"  r2_highmet_lownj_2b   0.37"<<endl;
+  fsys<<"  r2_lowmet_highnj_2b   0.88"<<endl;
+  fsys<<"  r2_lowmet_highnj_3b   0.88"<<endl;
+  fsys<<"  r2_highmet_highnj_2b  0.88"<<endl;
 }
