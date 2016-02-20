@@ -69,6 +69,7 @@ int main(){
 
   ////// Creating babies
   baby_basic data(folderdata+"*root");
+  // baby_basic bkg(folder+"*TTJets_Tu*"); // Use this one to test style quickly
   baby_basic bkg(folder+"*TTJets*Lept*");
   bkg.Add(folder+"*TTJets*HT*");
   if(!only_tt){
@@ -158,7 +159,7 @@ int main(){
   else cout<<"Kappa is blinded in data, or needs the MET bins"<<endl;
 
   time(&endtime); 
-  cout<<"Plots took "<<difftime(endtime, begtime)<<" seconds"<<endl;  
+  cout<<"Plots took "<<difftime(endtime, begtime)<<" seconds"<<endl<<endl;  
   
 }
 
@@ -320,8 +321,8 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     line.SetLineColor(1); line.SetLineWidth(2); 
     line.DrawLine(minh+wtot/2., 0, minh+wtot/2, max_axis);
 
-    double legX(style.PadLeftMargin+0.03), legY(0.902), legSingle = 0.052;
-    double legW = 0.29, legH = legSingle*nbsize;
+    double legX(style.PadLeftMargin+0.05), legY(0.902), legSingle = 0.052;
+    double legW = 0.2, legH = legSingle*nbsize;
     legH = legSingle*((nbsize+1)/2);
     TLegend leg(legX, legY-legH, legX+legW, legY);
     leg.SetTextSize(style.LegendSize); leg.SetFillColor(0); 
@@ -469,7 +470,9 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13 TeV");  
     }
 
-    TString ytitle("R(m_{T})"); 
+    TString ytitle("R(m#lower[-.01]{_{T}})"); 
+    histo.GetXaxis()->CenterTitle(true);
+    histo.GetYaxis()->CenterTitle(true);
     histo.SetYTitle(ytitle);
     histo.SetMaximum(max_axis);
     style.moveYAxisLabel(&histo, 1000, false);
@@ -494,8 +497,8 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     label.DrawLatex(xarrow+0.1, yarrow+max_axis/80., "Baseline");
 
     //--- draw RmT plot
-    double legX(style.PadLeftMargin+0.0), legY(0.88), legSingle = 0.052;
-    double legW = 0.29, legH = legSingle*nbsize;
+    double legX(style.PadLeftMargin+0.02), legY(0.88), legSingle = 0.052;
+    double legW = 0.14, legH = legSingle*nbsize;
     if(nbsize>3) legH = legSingle*((nbsize+1)/2);
     TLegend leg(legX, legY-legH, legX+legW, legY);
     leg.SetTextSize(style.LegendSize); leg.SetFillColor(0); 
@@ -523,10 +526,11 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     }
     leg.Draw();
     label.SetNDC(kTRUE); label.SetTextAlign(22); label.SetTextColor(1);
+    label.SetTextSize(0.06);
     TString cutname;
-    label.DrawLatex(0.37,/*0.03*/0.86,"M_{J} #leq 400 GeV");
-    label.DrawLatex(0.73,/*0.03*/0.86,"M_{J} > 400 GeV");
-    label.DrawLatex(0.93,0.05,"N_{jets}");
+    label.DrawLatex(0.35,/*0.03*/0.83,"M_{J} #leq 400 GeV");
+    label.DrawLatex(0.73,/*0.03*/0.83,"M_{J} > 400 GeV");
+    label.DrawLatex(0.54,0.04,"N_{jets}");
 
 
     TString pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+(imet==0 ? (lowmet+"x"+highmet):highmet)+"_lownj"+basenj+"_mt"+mtcut+"_data.pdf"; 
@@ -537,6 +541,6 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       else pname.ReplaceAll("data","allmc");
     }
     can.SaveAs(pname);
-    cout<<"open "<<pname<<endl;
+    cout<<endl<<"open "<<pname<<endl<<endl;
   }
 }

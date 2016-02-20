@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
   styles style("2Dtitle");
   style.setDefaultStyle();
 
-  string folder_data="/cms2r0/babymaker/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
+  string folder_data="/cms2r0/babymaker/babies/2016_02_04/data/singlelep/combined/skim_1lht500met200/";
   string folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
 
   string hostname = execute("echo $HOSTNAME");

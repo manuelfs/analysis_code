@@ -35,7 +35,7 @@
     PadRightMargin  = 0.047
     PadTopMargin    = 0.075
     PadBottomMargin = 0.14
-    xTitleOffset    = 1.05     
+    xTitleOffset    = 1.0     
     PadLeftMargin   = 0.12
     yTitleOffset    = 0.8
 
@@ -46,7 +46,7 @@
 [RA4long_Digits_3]
     yTitleOffset    = 0.8
 [RA4long_Digits_4]
-    yTitleOffset    = 0.95
+    yTitleOffset    = 0.9
 [RA4long_Digits_5]
     yTitleOffset    = 1.55
 
