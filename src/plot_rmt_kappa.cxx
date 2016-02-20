@@ -35,7 +35,7 @@ namespace{
   TString title_style("CMSPaper");
   bool do_data(false);
   bool only_tt(false);
-  bool do_metbins(true);
+  bool do_metbins(false);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
@@ -281,7 +281,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
   for(unsigned inj(0); inj<m3_njbin_ind.size(); inj++)
     for(unsigned imet(0); imet<cutmap["met"].size(); imet++)
       histo.GetXaxis()->SetBinLabel(1+imet+inj*cutmap["met"].size(), cuts2title(cutmap["met"][imet].cuts_));
-
+    
   for(unsigned idata(ini); idata<=fin; idata++){
     bool is_data((idata%2)==1);
     TString stylename = "RA4";
@@ -443,9 +443,13 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     TH1D histo("histo",cuts2title(hist_ttl),cutmap["nj"].size()*cutmap["mj"].size(), minh, maxh);
     if (title_style=="CMSPaper") histo.SetTitle("");
     for(size_t imj(0); imj<cutmap["mj"].size(); imj++)
-      for(size_t inj(0); inj<cutmap["nj"].size(); inj++)
-        histo.GetXaxis()->SetBinLabel(1+inj+imj*cutmap["nj"].size(), cuts2title(cutmap["nj"][inj].cuts_));
-
+      for(size_t inj(0); inj<cutmap["nj"].size(); inj++){
+        //histo.GetXaxis()->SetBinLabel(1+inj+imj*cutmap["nj"].size(), cuts2title(cutmap["nj"][inj].cuts_));
+        TString nj_label = cuts2title(cutmap["nj"][inj].cuts_); 
+        nj_label.ReplaceAll("n_{j}","");
+        nj_label.ReplaceAll(" = ","");
+        histo.GetXaxis()->SetBinLabel(1+inj+imj*cutmap["nj"].size(), nj_label);
+      }
     // find max kappa to set up axis range
     styles style("RA4long"); //style.LabelSize = 0.05;
     style.setDefaultStyle();
@@ -453,6 +457,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     size_t nbsize(vx[ini].size());
     TCanvas can;
     TLine line; line.SetLineColor(28); line.SetLineWidth(4); line.SetLineStyle(3);
+    histo.GetXaxis()->SetLabelSize(histo.GetXaxis()->GetLabelSize()*1.5);
     histo.Draw();
 
     TLatex cmslabel; 
@@ -464,7 +469,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13 TeV");  
     }
 
-    TString ytitle("R_{m_{T}}"); 
+    TString ytitle("R(m_{T})"); 
     histo.SetYTitle(ytitle);
     histo.SetMaximum(max_axis);
     style.moveYAxisLabel(&histo, 1000, false);
@@ -508,17 +513,21 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       if (imet==1 && inb==1){
         graph[inb].SetMarkerStyle(styles[inb+2]); graph[inb].SetMarkerSize(1.4); 
         graph[inb].SetMarkerColor(colors[inb+2]); graph[inb].SetLineColor(colors[inb+2]);
-        leg.AddEntry(&graph[inb],"n_{b} #geq 2", "p");
+        leg.AddEntry(&graph[inb],"N_{b} #geq 2", "p");
       } else {
-        leg.AddEntry(&graph[inb], cuts2title(cutmap["nb"][inb].cuts_), "p");
+        TString nb_label=cuts2title(cutmap["nb"][inb].cuts_);
+        nb_label.ReplaceAll("n_{b}","N_{b}");
+        leg.AddEntry(&graph[inb], nb_label, "p");
       }
       graph[inb].Draw("p same");   
     }
     leg.Draw();
     label.SetNDC(kTRUE); label.SetTextAlign(22); label.SetTextColor(1);
     TString cutname;
-    label.DrawLatex(0.37,0.03,"M_{J} #leq 400");
-    label.DrawLatex(0.73,0.03,"M_{J} > 400");
+    label.DrawLatex(0.37,/*0.03*/0.86,"M_{J} #leq 400 GeV");
+    label.DrawLatex(0.73,/*0.03*/0.86,"M_{J} > 400 GeV");
+    label.DrawLatex(0.93,0.05,"N_{jets}");
+
 
     TString pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+(imet==0 ? (lowmet+"x"+highmet):highmet)+"_lownj"+basenj+"_mt"+mtcut+"_data.pdf"; 
     if (!do_metbins) pname = "plots/rmt_mj"+lowmj+"x"+highmj+"_met"+lowmet+"_lownj"+basenj+"_mt"+mtcut+"_data.pdf"; 
