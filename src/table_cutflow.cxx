@@ -54,7 +54,6 @@ int main(){
   s_other.push_back(folder+"*_WWTo*");
   s_other.push_back(folder+"*ttHJetTobb*");
   s_other.push_back(folder+"*_TTTT*");
-  s_other.push_back(folder+"*_TTGJets*.root");
   s_other.push_back(folder+"*_WZ*.root");
 
   vector<TString> s_qcd;
