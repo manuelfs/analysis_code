@@ -35,7 +35,7 @@ namespace{
   TString title_style("CMSPaper");
   bool do_data(false);
   bool only_tt(false);
-  bool do_metbins(false);
+  bool do_metbins(true);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
@@ -172,7 +172,9 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
   powersk.push_back(1);  //  mt>140   mj>400    R4
 
   float mSigma, pSigma;
-  float minh(0), maxh(cutmap["mj"].size()*cutmap["nj"].size()), wtot(maxh-minh);
+  //float minh(0), maxh(cutmap["met"].size()*cutmap["nj"].size()), wtot(maxh-minh);
+  float minh(0), maxh(4), wtot(maxh-minh);
+
   float wnj(wtot/static_cast<float>(m3_njbin_ind.size()));
   float wmet(wnj/static_cast<float>(cutmap["met"].size()));
   float wnb(wmet/static_cast<float>(cutmap["nb"].size()+3));
@@ -277,11 +279,15 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     } // Loop over met cuts
   } // Loop over nj cuts
 
-  TH1D histo("histo",cuts2title(basecut+"&&ht>"+baseht+"&&met>"+lowmet),m3_njbin_ind.size()*cutmap["met"].size(), minh, maxh);
+  
+  TH1D histo("histo",cuts2title(basecut+"&&ht>"+baseht+"&&met>"+lowmet),4, minh, maxh);
   if (title_style=="CMSPaper") histo.SetTitle("");
   for(unsigned inj(0); inj<m3_njbin_ind.size(); inj++)
-    for(unsigned imet(0); imet<cutmap["met"].size(); imet++)
-      histo.GetXaxis()->SetBinLabel(1+imet+inj*cutmap["met"].size(), cuts2title(cutmap["met"][imet].cuts_));
+    for(unsigned imet(0); imet<cutmap["met"].size(); imet++){
+      TString mettitle = cuts2title(cutmap["met"][imet].cuts_);
+      mettitle.ReplaceAll("MET","E_{T}^{miss}");
+      histo.GetXaxis()->SetBinLabel(1+imet+inj*cutmap["met"].size(), mettitle);
+    }
     
   for(unsigned idata(ini); idata<=fin; idata++){
     bool is_data((idata%2)==1);
@@ -315,14 +321,17 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     TString ytitle("#kappa"); 
     if(is_data) ytitle += " (data uncert.)";
     else if (title_style!="CMSPaper") ytitle += " (MC uncert.)";
+    histo.GetYaxis()->CenterTitle(true);
+    histo.GetYaxis()->SetTitleOffset(1.2);
+    histo.GetYaxis()->SetTitleSize(0.08);
     histo.SetYTitle(ytitle);
     histo.SetMaximum(max_axis);
     style.moveYAxisLabel(&histo, max_axis, false);
     line.SetLineColor(1); line.SetLineWidth(2); 
     line.DrawLine(minh+wtot/2., 0, minh+wtot/2, max_axis);
 
-    double legX(style.PadLeftMargin+0.05), legY(0.902), legSingle = 0.052;
-    double legW = 0.2, legH = legSingle*nbsize;
+    double legX(style.PadLeftMargin+0.03), legY(0.895), legSingle = 0.052;
+    double legW = 0.3, legH = legSingle*nbsize;
     legH = legSingle*((nbsize+1)/2);
     TLegend leg(legX, legY-legH, legX+legW, legY);
     leg.SetTextSize(style.LegendSize); leg.SetFillColor(0); 
@@ -337,9 +346,9 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
       graph[inb].SetMarkerStyle(styles[inb]); graph[inb].SetMarkerSize(1.4); 
       graph[inb].SetMarkerColor(colors[inb]); graph[inb].SetLineColor(colors[inb]);
       graph[inb].Draw("p same");   
-      if (inb==3) leg.AddEntry(&graph[inb], "n_{b} #geq 2", "p");
+      if (inb==3) leg.AddEntry(&graph[inb], "N_{b} #geq 2", "p");
       else {
-        cutmap["nb"][inb].cuts_.ReplaceAll("nbm","n_{b}");
+        cutmap["nb"][inb].cuts_.ReplaceAll("nbm","N_{b}");
         cutmap["nb"][inb].cuts_.ReplaceAll("=="," = ");
         cutmap["nb"][inb].cuts_.ReplaceAll(">="," #geq ");
         leg.AddEntry(&graph[inb], cutmap["nb"][inb].cuts_, "p");
@@ -350,8 +359,8 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     TLatex label; label.SetNDC(kTRUE);label.SetTextAlign(22);
     TString m3_low_nj = cutmap["nj"][m3_njbin_ind[0][0]].cuts_;
     m3_low_nj = m3_low_nj[m3_low_nj.Length()-1];
-    label.DrawLatex(0.37,0.04,m3_low_nj+" #leq n_{j} #leq "+TString::Format("%i",atoi(highnj)-1));
-    label.DrawLatex(0.73,0.04,"n_{j} #geq "+highnj);
+    label.DrawLatex(0.37,0.04,m3_low_nj+" #leq N_{jets} #leq "+TString::Format("%i",atoi(highnj)-1));
+    label.DrawLatex(0.73,0.04,"N_{jets} #geq "+highnj);
 
     // draw a line at 1
     line.SetLineColor(28); line.SetLineWidth(4); line.SetLineStyle(3);
@@ -447,7 +456,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       for(size_t inj(0); inj<cutmap["nj"].size(); inj++){
         //histo.GetXaxis()->SetBinLabel(1+inj+imj*cutmap["nj"].size(), cuts2title(cutmap["nj"][inj].cuts_));
         TString nj_label = cuts2title(cutmap["nj"][inj].cuts_); 
-        nj_label.ReplaceAll("n_{j}","");
+        nj_label.ReplaceAll("N_{jets}","");
         nj_label.ReplaceAll(" = ","");
         histo.GetXaxis()->SetBinLabel(1+inj+imj*cutmap["nj"].size(), nj_label);
       }
@@ -519,7 +528,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
         leg.AddEntry(&graph[inb],"N_{b} #geq 2", "p");
       } else {
         TString nb_label=cuts2title(cutmap["nb"][inb].cuts_);
-        nb_label.ReplaceAll("n_{b}","N_{b}");
+        nb_label.ReplaceAll("N_{b}","N_{b}");
         leg.AddEntry(&graph[inb], nb_label, "p");
       }
       graph[inb].Draw("p same");   
