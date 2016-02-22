@@ -72,8 +72,6 @@ int main(int argc, char *argv[]){
   TH2D h("h", ";M_{J} [GeV];m_{T} [GeV]", 1, 0., mj_max, 1, 0., mt_max);
   
   int line_width = 4;
-  TArrow arrow; arrow.SetLineColor(kGray+2); arrow.SetFillColor(0);
-  arrow.SetArrowSize(0.05); arrow.SetLineWidth(3);
   TLine l_mj(400.,0.,400.,mt_max);
   TLine l_mt(250.,140.,mj_max,140.);
   l_mj.SetLineWidth(line_width);
@@ -125,8 +123,13 @@ int main(int argc, char *argv[]){
 
   double height = 0.125;
   double width = 0.125;
-  TPaveText l1(style.PadLeftMargin+0.2, style.PadBottomMargin,
-	       style.PadLeftMargin+0.2+width, style.PadBottomMargin+height, "NDCNB");
+  TArrow arrow;
+  arrow.SetLineColor(kGray+2); arrow.SetFillColor(kGray+2);
+  arrow.SetArrowSize(0.02); arrow.SetLineWidth(4);
+  //  TPaveText l1(style.PadLeftMargin+0.2, style.PadBottomMargin,
+  //	       style.PadLeftMargin+0.2+width, style.PadBottomMargin+height, "NDCNB");
+  TPaveText l1(style.PadLeftMargin+0.2, 0.,
+	       style.PadLeftMargin+0.2+width, height, "NDCNB");
   TPaveText l2(1.-style.PadRightMargin-width, style.PadBottomMargin,
 	       1.-style.PadRightMargin, style.PadBottomMargin+height, "NDCNB");
   TPaveText l3(style.PadLeftMargin+0.2, 1.-style.PadTopMargin-1.5*height,
@@ -173,7 +176,7 @@ int main(int argc, char *argv[]){
   l_mt.DrawLine(400.,0.,400.,mt_max);
   l_mt.DrawLine(250.,140.,mj_max,140.);
   l_mj.DrawLine(250.,0.,250.,mt_max);
-  //  arrow.DrawArrow(150,30,325,30);
+  arrow.DrawArrow(325, -20, 325, 5);
   l.Draw("same");
   l1.Draw("same");
   l2.Draw("same");
