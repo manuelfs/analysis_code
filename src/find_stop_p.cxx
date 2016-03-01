@@ -17,7 +17,7 @@
 #include "utilities_macros.hpp"
 #include "baby_basic.hpp"
 
-const int nvar = 8;
+const int nvar = 9;
 
 using namespace std;
 
@@ -47,12 +47,12 @@ int main(){
   double legX=0.65, legY=0.17, legW=0.1, legH=legSingle*mlsp.size();
   TLegend leg(legX,legY, legX+legW, legY+legH);
   leg.SetTextSize(0.05); leg.SetFillColor(0); leg.SetBorderSize(0); leg.SetFillStyle(0);
-  bool docuts=false;
+  bool docuts=true;
 
   vector<TString> varnames = {"pstop", "plsp", "ht", "mht", "met", 
-			      "nbm", "njets", "mt"};
+			      "nbm", "njets", "mt", "pbquark"};
   vector<TString> titles = {"stop p_{T} [GeV]", "LSP p_{T} [GeV]", "H_{T} [GeV]", "MHT [GeV]", "MET [GeV]", 
-			    "n_{btags}", "n_{jets}", "m_{T} [GeV]"};
+			    "n_{btags}", "n_{jets}", "m_{T} [GeV]", "b-quark p_{T} [GeV]"};
   for(size_t ilsp=0; ilsp<mlsp.size(); ilsp++){
     vector<float> vmstop;
     vector<float> vy[nvar];
@@ -62,8 +62,8 @@ int main(){
       ntuples = dirlist(foldert2, masses);
       if(ntuples.size()!=1) continue;
 
-      double pstop(0), nstop(0), plsp(0), nlsp(0);
-      double ht(0), met(0), njets(0), nbm(0), mht(0), mt(0);
+      double pstop(0), nstop(0), nbquark(0), plsp(0), nlsp(0);
+      double ht(0), met(0), njets(0), nbm(0), pbquark(0), mht(0), mt(0);
       double ntot(0), nmt(0);
       baby_basic baby(foldert2+ntuples[0]);
       cout<<"Doing "<<foldert2+ntuples[0]<<" with "<<baby.GetEntries()<<" entries"<<endl;
@@ -82,6 +82,10 @@ int main(){
 	  if(abs(baby.mc_id()[imc])==1000006) {
 	    pstop += baby.mc_pt()[imc];
 	    nstop++;
+	  }
+	  if(abs(baby.mc_id()[imc])==5) {
+	    pbquark += baby.mc_pt()[imc];
+	    nbquark++;
 	  }
 	  if(abs(baby.mc_id()[imc])==1000022) {
 	    plsp += baby.mc_pt()[imc];
@@ -105,6 +109,7 @@ int main(){
       vy[5].push_back(nbm/ntot);
       vy[6].push_back(njets/ntot);
       vy[7].push_back(mt/nmt);
+      vy[8].push_back(pbquark/nbquark);
       for(int ivar(0); ivar<nvar; ivar++)
 	if(vy[ivar].back()>maxy[ivar]) maxy[ivar]=vy[ivar].back();
     } // Loop over mstop
@@ -128,8 +133,10 @@ int main(){
   hbase.SetXTitle("m_{stop} [GeV]");
   for(int ivar(0); ivar<nvar; ivar++){
     hbase.SetYTitle("Average "+titles[ivar]);
-    if(varnames[ivar]=="mt") hbase.SetTitle("n_{leps} = 1");
-    else hbase.SetTitle(cutTitle);
+    if(varnames[ivar]=="mt") {
+      if(docuts) hbase.SetTitle("n_{leps} = 1, H_{T} > 500, MHT > 200, n_{jets} #geq 4");
+      else hbase.SetTitle("n_{leps} = 1");
+    } else hbase.SetTitle(cutTitle);
     hbase.GetYaxis()->CenterTitle(true);
     hbase.SetMaximum(maxy[ivar]*1.1);
     style.moveYAxisLabel(&hbase, maxy[ivar]*1.1);

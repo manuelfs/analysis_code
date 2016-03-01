@@ -118,6 +118,7 @@ public:
 
 void calc_chi2_diff(TH1D *histo1, TH1D *histo2, float &chi2, int &ndof, float &pvalue, float *average);
 void calc_chi2(TH1D *histo, float &chi2, int &ndof, float &pvalue, float &average);
+long getYieldW(TChain& tree, TString cut, double& yield, double lumi=1.);
 long getYieldErr(TChain& tree, TString cut, double& yield, double& uncertainty);
 
 std::vector<double> getYields(baby_basic &baby, bcut baseline, std::vector<bcut> bincuts, std::vector<double> &yields, 

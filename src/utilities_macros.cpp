@@ -983,6 +983,14 @@ vector<vector<double> > getYields(baby_basic &baby, bcut baseline, vector<vector
   return entries;
 }
 
+long getYieldW(TChain& tree, TString cut, double& yield, double lumi){
+  double dummyError;
+  cut = "weight*("+cut+")";
+  long entries = getYieldErr(tree, cut, yield, dummyError);
+  yield *= lumi;
+  return entries;
+}
+
 long getYieldErr(TChain& tree, TString cut, double& yield, double& uncertainty){
   const TString hist_name("temp");
   TH1D temp(hist_name, "", 1, -1.0, 1.0);

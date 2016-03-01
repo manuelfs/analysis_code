@@ -72,6 +72,8 @@ int main(int argc, char *argv[]){
   string glu_lsp("mGluino-"+to_string(mglu)+"_mLSP-"+to_string(mlsp));
   string model = "T1tttt";
   if(Contains(prs, "T5tttt")) model = "T5tttt";
+  if(Contains(prs, "T5tttt-Stop")) model = "T5tttt-Stop";
+  if(Contains(prs, "T5tttt-degen")) model = "T5tttt-degen";
   if(Contains(prs, "T2tt")) model = "T2tt";
   if(Contains(prs, "T6ttWW")) model = "T6ttWW";
 
