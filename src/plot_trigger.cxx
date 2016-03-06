@@ -27,10 +27,11 @@
 #include "utilities_macros.hpp"
 
 namespace  {
+  bool do_dps = true;
   bool ra2_l(false);
   bool ra2_sig(false);
   bool do_ra4(false);
-  bool do_ra4an(true);
+  bool do_ra4an(false);
   TString plot_type = ".pdf";
 }
 
@@ -50,6 +51,7 @@ int main(){
 
   styles style("HLTStyle"); style.setDefaultStyle();
   gStyle->SetPadTickY(0);
+  gStyle->SetGridStyle(0);
 
   TString folder("/cms2r0/babymaker/babies/2015_11_20/data/");
 
@@ -60,6 +62,80 @@ int main(){
   TChain c_met("tree"); c_met.Add(folder+"/met/skim_met150/*MET*.root");
   TChain c_el("tree");   c_el.Add(folder+"/singlelep/combined/skim_1vlht500njets4/*SingleElectron*_0_*root");
   TChain c_lep("tree"); c_lep.Add(folder+"/singlelep/combined/skim_1vlht500njets4/*Single*root");
+
+
+  if(do_dps){
+    float lmin(25), lmax(300);
+    int lbins(static_cast<int>((lmax-lmin)/12.5));
+    TString metcut("200");
+
+    // Lepton pT turn-on
+    lmin = 10; lmax = 80; lbins = static_cast<int>((lmax-lmin)/2.5);
+    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "Electron p_{T}",
+    	       "trig[28]&&ht>500&&njets>=4&&met>"+metcut, "trig[8]",
+    	       "MET90, H_{T} > 500, MET > "+metcut, "Ele15_HT350");
+    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "Muon p_{T}",
+    	       "(trig[28])&&ht>500&&njets>=4&&met>"+metcut, "trig[4]",
+    	       "MET90, H_{T} > 500, MET > "+metcut, "Mu15_HT350");
+
+
+
+
+    float htmin(175), htmax(850);
+    int htbins(static_cast<int>((htmax-htmin)/12.5));
+
+    // VVVL
+    htmin = 220; htmax = 850; htbins = static_cast<int>((htmax-htmin)/10);
+    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
+    	       "trig[28]&&nvels==1&&met>200&&njets>=4&&Max$(els_vvvl)", "trig[8]",
+    	       "MET90, MET > 200, n_{j}#geq4, n_{e} = 1", "Ele15_HT350", 325);
+    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
+    	       "trig[28]&&nvmus==1&&Max$(mus_vvvl)&&met>200&&njets>=4", "trig[4]",
+	       "MET90, MET > 200, n_{j}#geq4, n_{#mu} = 1", "Mu15_HT350", 325);
+
+
+    // HT350_MET100
+    htmin = 170; htmax = 770; htbins = static_cast<int>((htmax-htmin)/10);
+    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
+    	       "trig[14]&&nvleps==0&&met>200&&njets>=4", "trig[0]","MET170", "HT350_MET100",350);
+
+
+
+    // HT800
+    htmin = 500; htmax = 1450; htbins = static_cast<int>((htmax-htmin)/25);
+    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
+    	       "trig[28]&&nvleps==0&&met>200&&njets>=4", "trig[12]","MET90", "HT800", 750);
+
+   return 0;
+
+    float metmin(0), metmax(460);
+    int metbins(static_cast<int>((metmax-metmin)/10));
+
+    // MET90: MET
+    PlotTurnOn(&c_el, "met", metbins,metmin,metmax, "E_{T}^{miss}",
+    	       "trig[8]&&nels>=1&&njets>=4&&ht>500", "trig[28]",      
+    	       "Ele15_HT350", "MET90");
+    // MET170: MET
+    PlotTurnOn(&c_el, "met", metbins,metmin,metmax, "E_{T}^{miss}",
+    	       "trig[8]&&nels>=1&&njets>=4&&ht>500", "trig[14]",      
+    	       "Ele15_HT350", "MET170");
+
+
+    // HT350_MET100: MET
+    PlotTurnOn(&c_el, "met", metbins,metmin,metmax, "E_{T}^{miss}",
+    	       "trig[8]&&nels>=1&&njets>=4&&ht>500", "trig[0]",      
+    	       "Ele15_HT350", "HT350_MET100",100);
+    // HT350_MET100: MHT
+    PlotTurnOn(&c_el, "mht", metbins,metmin,metmax, "H_{T}^{miss}",
+    	       "trig[8]&&nels>=1&&njets>=4&&ht>500", "trig[0]",      
+    	       "Ele15_HT350", "HT350_MET100",100);
+
+
+
+
+
+
+  }
 
   if(ra2_sig){
     float metmin(0), metmax(540);
@@ -375,6 +451,7 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   //epsi = "Efficiency";
   // Ploting denominator
   float hscaled(0.3), maxeff(1.42);
+  if(do_dps) maxeff = 1.3;
   float hfactor(hscaled/histo[1]->GetMaximum()), hmax(histo[1]->GetMaximum());
   float axismax(hmax*maxeff/hscaled);
   histo[1]->Scale(hfactor);
@@ -387,6 +464,7 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   histo[1]->GetXaxis()->SetTitle(totxtitle);
   histo[1]->GetYaxis()->SetTitle(epsi+"  ["+ytitle+"]");
   histo[1]->GetYaxis()->SetTitle("Efficiency  ["+ytitle+"]");
+  if(do_dps) histo[1]->GetYaxis()->SetTitle("Efficiency");
   histo[1]->GetYaxis()->SetRangeUser(0,maxeff);
   histo[1]->GetYaxis()->CenterTitle(true);
   histo[1]->Draw();
@@ -432,8 +510,8 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   axis->SetTextColor(kBlue+2); axis->SetLabelColor(kBlue+2);
   axis->SetTextFont(style.nFont); axis->SetLabelFont(style.nFont); 
   axis->SetTitleSize(style.LabelSize); axis->SetLabelSize(style.LabelSize); 
-  if(axismax>=10000) axis->SetTitleOffset(style.yTitleOffset+0.58);
-  else if(axismax>=1000) axis->SetTitleOffset(style.yTitleOffset+0.4);
+  if(axismax>=10000) axis->SetTitleOffset(style.yTitleOffset+0.62);
+  else if(axismax>=1000) axis->SetTitleOffset(style.yTitleOffset+0.44);
   else axis->SetTitleOffset(style.yTitleOffset+0.22);
   axis->SetTitle(ntitle); axis->CenterTitle(true);
   axis->Draw();
@@ -465,10 +543,16 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   label.SetTextAlign(33); //label.SetNDC(); 
   float range(maxx-minx);
   float x2(maxx-0.04*range), y2(maxeff-0.07), ysingle(0.1);
-  label.DrawLatex(x2, y2, "Denom: #font[52]{"+title+"}");
-  label.DrawLatex(x2, y2-ysingle,fitpar);
-  fitpar = "98% of plateau at "+RoundNumber(p98,0)+" "+units;
-  if(dofit) label.DrawLatex(x2, y2-2.3*ysingle,fitpar);
+  if(!do_dps){
+    label.DrawLatex(x2, y2, "Denom: #font[52]{"+title+"}");
+    label.DrawLatex(x2, y2-ysingle,fitpar);
+    fitpar = "98% of plateau at "+RoundNumber(p98,0)+" "+units;
+    if(dofit) label.DrawLatex(x2, y2-2.3*ysingle,fitpar);
+  } else {
+    label.DrawLatex(x2, y2+0.02,fitpar);
+    fitpar = "98% of plateau at "+RoundNumber(p98,0)+" "+units;
+    if(dofit) label.DrawLatex(x2, y2-1.3*ysingle+0.02,fitpar);
+  }
 
   // Drawing CMS preliminary
   label.SetNDC();  label.SetTextAlign(11); label.SetTextSize(0.045); 
@@ -476,8 +560,10 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   else label.DrawLatex(0.13, 0.93, "#font[61]{CMS} #scale[0.8]{#font[52]{Simulation}}");
   // Drawing luminosity
   label.SetTextAlign(31); 
-  if(isData) label.DrawLatex(0.85, 0.93, "2.1 fb^{-1} (13 TeV)");
-  else label.DrawLatex(0.85, 0.93, "Spring15 t#bar{t}");
+  if(isData) {
+    if(!do_dps) label.DrawLatex(0.85, 0.93, "2.2 fb^{-1} (13 TeV)");
+    else label.DrawLatex(0.85, 0.93, "2015, 13 TeV");
+  } else label.DrawLatex(0.85, 0.93, "Spring15 t#bar{t}");
 
   can.SaveAs(pname);
   
