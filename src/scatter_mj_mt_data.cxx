@@ -132,7 +132,7 @@ int main(int argc, char *argv[]){
     Process(st_bkg, g_bkg1, g_bkg1_full, h_bkg1, 2000, 23, 1, indices_bkg, 1, false);
     Process(st_bkg, g_bkg2, g_bkg2_full, h_bkg2, 2006, 22, 1, indices_bkg, 2, false);
   }
-  Process(st_data, g_data, g_data_full, h_data, 2, 20, 1, indices_data, 0, true);
+  Process(st_data, g_data, g_data_full, h_data, 1, 20, 1, indices_data, 0, true);
 
   //double rho_sig = g_sig_full.GetCorrelationFactor();
   //double rho_bkg = g_bkg_full.GetCorrelationFactor();
@@ -267,7 +267,8 @@ int main(int argc, char *argv[]){
     g_sig.Draw("psame");
   }
   h_data.SetMarkerStyle(20);
-  h_data.Draw("scat same");
+  // h_data.Draw("scat same");
+  g_data.Draw("psame");
 
   l_mt.DrawLine(400.,0.,400.,mt_max);
   l_mt.DrawLine(250.,140.,mj_max,140.);
