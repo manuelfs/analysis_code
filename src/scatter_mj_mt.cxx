@@ -64,8 +64,8 @@ int main(int argc, char *argv[]){
   baby_basic st_sig(folder+sig_name);
   baby_basic st_bkg(folder+"*TTJets_Tune*");
 
-  double mj_max = 1000.;
-  double mt_max = 400.;
+  double mj_max = 1200.;
+  double mt_max = 600.;
 
   TGraph g_sig, g_bkg, g_bkg1, g_bkg2;
   TGraph g_sig_full, g_bkg_full, g_bkg1_full, g_bkg2_full;
@@ -240,14 +240,14 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full,
        || ((nleps == 1 && st.ntruleps()>1) || (nleps == 2 && st.ntruleps()<2))
        ) continue;
 
-    double mj = std::min(999.9f, st.mj());
-    double mt = std::min(399.9f, st.mt());
+    double mj = std::min(1199.9f, st.mj());
+    double mt = std::min(599.9f, st.mt());
 
     AddPoint(g_full, mj, mt);
     if(indices.find(entry) == indices.end()) continue;
     AddPoint(g, mj, mt);
     if(color==2) {
-      //cout<<entry<<": mj "<<mj<<", mt "<<mt<<endl;
+      cout<<entry<<": mj "<<mj<<", mt "<<mt<<", nbm "<<st.nbm()<<", njets"<<st.njets()<<", met "<<st.met()<<", nleps "<<st.nleps()<<", ntruleps"<<st.ntruleps()<<" , pass "<<st.pass()<<endl;
       if(mt<=140&&mj>400) n2++;
       if(mt>140&&mj>400) n4++;
     }

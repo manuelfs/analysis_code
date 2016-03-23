@@ -44,7 +44,7 @@ namespace{
   bool compressed = false;
   bool no_signal = false; 
   bool full_stats = false;
-  float luminosity = 2.15;
+  float luminosity = 2.3; //2.15 for previous random seed
 }
 
 //Not sure why I can't get the colors from utilities_macros...
@@ -337,7 +337,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
        || (met_max > 0. && st.met()>met_max)
        || st.ht()<=500.
        || (st.nleps())!=1
-       || !st.pass()
+       || !(st.pass() || color==2)
        ) continue;
     
     if(isData && !((st.trig()[4] ||st.trig()[8]) && st.pass())) continue; 
@@ -352,10 +352,12 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
         AddPoint(g_full, mj, mt); 
         h.Fill(mj, mt, st.weight()*luminosity);
     }
-    if(indices.size() >0 && indices.find(entry) == indices.end()) continue;
+    if(color!=2&& indices.size() >0 && indices.find(entry) == indices.end()) continue;
+    if(color==2 && (entry!=3198 && entry!=9581 && entry!=22320 && entry!=32212 && entry!=33132 && entry != 35314 && entry != 36889)) continue;
+
     AddPoint(g, mj, mt);
     if(color==2) {
-      //cout<<entry<<": mj "<<mj<<", mt "<<mt<<endl;
+      cout<<entry<<": mj "<<mj<<", mt "<<mt<<", nbm"<<st.nbm()<<endl;
       if(mt<=140&&mj>400) n2++;
       if(mt>140&&mj>400) n4++;
     }
