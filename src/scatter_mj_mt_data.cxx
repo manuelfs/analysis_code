@@ -183,8 +183,8 @@ int main(int argc, char *argv[]){
   width=0.125;
   TPaveText lcms(style.PadLeftMargin, 1.-style.PadTopMargin-0.5*height-0.01,
                  style.PadLeftMargin-0.13+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
-  TPaveText llumi(style.PadLeftMargin+0.43, 1.-style.PadTopMargin-0.5*height-0.01,
-		style.PadLeftMargin+0.43+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
+  TPaveText llumi(style.PadLeftMargin+0.45, 1.-style.PadTopMargin-0.5*height-0.01,
+		style.PadLeftMargin+0.45+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
 
   l1.AddText("R1");
   l2.AddText("R2");
@@ -193,7 +193,7 @@ int main(int argc, char *argv[]){
   //lcms.AddText("#font[62]{CMS Simulation}");
   //lcms.AddText("#font[62]{CMS} #scale[0.8]{#font[52]{Preliminary}}");
   lcms.AddText("#font[62]{CMS}");
-  llumi.AddText(Form("L = %.1f fb^{-1} (13 TeV)",luminosity));
+  llumi.AddText(Form("%.1f fb^{-1} (13 TeV)",luminosity));
   llumi.SetTextSize(0.043);
 
   SetStyle(l1);
@@ -247,7 +247,7 @@ int main(int argc, char *argv[]){
   TLegendEntry *le = l.AddEntry(&g_sig, "#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}\
  (1500,100)", "p");                                                                                              
   le->SetTextColor(kRed);
-  l.SetTextSize(0.037);
+  l.SetTextSize(0.045);
 
 
 

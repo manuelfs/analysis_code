@@ -64,8 +64,8 @@ int main(int argc, char *argv[]){
   baby_basic st_sig(folder+sig_name);
   baby_basic st_bkg(folder+"*TTJets_Tune*");
 
-  double mj_max = 1200.;
-  double mt_max = 600.;
+  double mj_max = 1000.;
+  double mt_max = 400.;
 
   TGraph g_sig, g_bkg, g_bkg1, g_bkg2;
   TGraph g_sig_full, g_bkg_full, g_bkg1_full, g_bkg2_full;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]){
   set<size_t> indices_sig = GetRandomIndices(st_sig, sig_norm, rand3);
   set<size_t> indices_bkg = GetRandomIndices(st_bkg, ttbar_norm, rand3);
 
-  Process(st_sig, g_sig, g_sig_full, 2, 20, 1, indices_sig);
+  Process(st_sig, g_sig, g_sig_full, 2, 21, 1, indices_sig);
   if(merge_ttbar){
     Process(st_bkg, g_bkg, g_bkg_full, 1006, 21, 1, indices_bkg);
   }else{
@@ -96,11 +96,14 @@ int main(int argc, char *argv[]){
     Process(st_bkg, g_bkg2, g_bkg2_full, 1006, 22, 1, indices_bkg, 2);
   }
 
-  double rho_sig = g_sig_full.GetCorrelationFactor();
+  //  double rho_sig = g_sig_full.GetCorrelationFactor();
   
   double rho_bkg = g_bkg_full.GetCorrelationFactor();
   double rho_bkg1 = g_bkg1_full.GetCorrelationFactor();
   double rho_bkg2 = g_bkg2_full.GetCorrelationFactor();
+
+
+ 
 
   TLegend l(style.PadLeftMargin, 1.-style.PadTopMargin, 1.-style.PadRightMargin, 1.0);
   if(merge_ttbar){
@@ -108,6 +111,7 @@ int main(int argc, char *argv[]){
   }else{
     l.SetNColumns(3);
   }
+  
   l.SetFillColor(0);
   l.SetFillStyle(4000);
   l.SetBorderSize(0);
@@ -117,10 +121,14 @@ int main(int argc, char *argv[]){
     l.AddEntry(&g_bkg1, GetLabel("t#bar{t} (1l)",rho_bkg1).c_str(), "p");
     l.AddEntry(&g_bkg2, GetLabel("t#bar{t} (2l)",rho_bkg2).c_str(), "p");
   }
-  if(!no_signal){
-    l.AddEntry(&g_sig, GetLabel((compressed?"T1tttt(1200,800)":"T1tttt(1500,100)"),rho_sig).c_str(), "p");
-  }
 
+ 
+  if(!no_signal){
+    l.AddEntry(&g_sig, compressed?"#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}\
+ (1200,800)":"#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}\
+ (1500,100)", "p");
+  }
+ 
   double height = 0.125;
   double width = 0.125;
   TArrow arrow;
@@ -128,8 +136,8 @@ int main(int argc, char *argv[]){
   arrow.SetArrowSize(0.02); arrow.SetLineWidth(4);
   //  TPaveText l1(style.PadLeftMargin+0.2, style.PadBottomMargin,
   //	       style.PadLeftMargin+0.2+width, style.PadBottomMargin+height, "NDCNB");
-  TPaveText l1(style.PadLeftMargin+0.2, 0.,
-	       style.PadLeftMargin+0.2+width, height, "NDCNB");
+  TPaveText l1(style.PadLeftMargin+0.2, -0.015,
+	       style.PadLeftMargin+0.2+width, height-0.015, "NDCNB");
   TPaveText l2(1.-style.PadRightMargin-width, style.PadBottomMargin,
 	       1.-style.PadRightMargin, style.PadBottomMargin+height, "NDCNB");
   TPaveText l3(style.PadLeftMargin+0.2, 1.-style.PadTopMargin-1.5*height,
@@ -141,8 +149,8 @@ int main(int argc, char *argv[]){
   TPaveText lsim(style.PadLeftMargin, 1.-style.PadTopMargin-0.5*2*height-0.01,
   		 style.PadLeftMargin-0.08+2.*width, 1.-style.PadTopMargin-0.5*height-0.01, "NDCNB");
 
-  TPaveText l13(style.PadLeftMargin+0.59, 1.-style.PadTopMargin-0.5*height-0.01,
-		 style.PadLeftMargin+0.59+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
+  TPaveText l13(style.PadLeftMargin+0.62, 1.-style.PadTopMargin-0.5*height-0.01,
+		 style.PadLeftMargin+0.62+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
 
   l1.AddText("R1");
   l2.AddText("R2");
@@ -150,7 +158,7 @@ int main(int argc, char *argv[]){
   l4.AddText("R4");
   lcms.AddText("#font[62]{CMS}");
   lsim.AddText("#scale[0.8]{#font[52]{Simulation}}");
-  l13.AddText("#sqrt{s} = 13 TeV");
+  l13.AddText("13 TeV");
 
   SetStyle(l1);
   SetStyle(l2);
@@ -176,7 +184,7 @@ int main(int argc, char *argv[]){
   l_mt.DrawLine(400.,0.,400.,mt_max);
   l_mt.DrawLine(250.,140.,mj_max,140.);
   l_mj.DrawLine(250.,0.,250.,mt_max);
-  arrow.DrawArrow(325, -20, 325, 5);
+  arrow.DrawArrow(325, -29, 325, -5);
   l.Draw("same");
   l1.Draw("same");
   l2.Draw("same");
@@ -240,8 +248,8 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full,
        || ((nleps == 1 && st.ntruleps()>1) || (nleps == 2 && st.ntruleps()<2))
        ) continue;
 
-    double mj = std::min(1199.9f, st.mj());
-    double mt = std::min(599.9f, st.mt());
+    double mj = std::min(999.9f, st.mj());
+    double mt = std::min(399.9f, st.mt());
 
     AddPoint(g_full, mj, mt);
     if(indices.find(entry) == indices.end()) continue;

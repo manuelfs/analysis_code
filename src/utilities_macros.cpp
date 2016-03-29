@@ -617,7 +617,7 @@ TString cuts2title(TString title){
   title.ReplaceAll("met", "MET"); title.ReplaceAll("ht_hlt", "H_{T}^{HLT}");  
   title.ReplaceAll("ht", "H_{T}");  title.ReplaceAll("mt", "m_{T}"); 
   title.ReplaceAll("ntks_chg==0", " ITV");
-  title.ReplaceAll("nbm","n_{b}"); 
+  title.ReplaceAll("nbm","N_{b}"); 
   title.ReplaceAll("nbl","n_{b,l}");
   title.ReplaceAll("mj", " M_{J}");
   

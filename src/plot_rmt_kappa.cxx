@@ -35,7 +35,7 @@ namespace{
   TString title_style("CMSPaper");
   bool do_data(false);
   bool only_tt(false);
-  bool do_metbins(true);
+  bool do_metbins(false);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
@@ -315,7 +315,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
       cmslabel.SetTextAlign(11);
       cmslabel.DrawLatex(0.18,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
       cmslabel.SetTextAlign(31);
-      cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13 TeV");  
+      cmslabel.DrawLatex(0.94,0.94,"13 TeV");  
     }
 
     TString ytitle("#kappa"); 
@@ -456,7 +456,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       for(size_t inj(0); inj<cutmap["nj"].size(); inj++){
         //histo.GetXaxis()->SetBinLabel(1+inj+imj*cutmap["nj"].size(), cuts2title(cutmap["nj"][inj].cuts_));
         TString nj_label = cuts2title(cutmap["nj"][inj].cuts_); 
-        nj_label.ReplaceAll("N_{jets}","");
+        nj_label.ReplaceAll("n_{j}","");
         nj_label.ReplaceAll(" = ","");
         histo.GetXaxis()->SetBinLabel(1+inj+imj*cutmap["nj"].size(), nj_label);
       }
@@ -476,7 +476,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       cmslabel.SetTextAlign(11);
       cmslabel.DrawLatex(0.13,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
       cmslabel.SetTextAlign(31);
-      cmslabel.DrawLatex(0.94,0.94,"#sqrt{s} = 13 TeV");  
+      cmslabel.DrawLatex(0.94,0.94,"13 TeV");  
     }
 
     TString ytitle("R(m#lower[-.01]{_{T}})"); 
