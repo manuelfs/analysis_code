@@ -491,19 +491,19 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
 
     //--- Green arrows indicating baseline
     int acolor(kOrange+3);
-    float alength((maxh-minh)/8.), yarrow(max_axis/15.), llength(max_axis/1.5);
-    TArrow arrow; arrow.SetLineColor(acolor); arrow.SetLineWidth(1); arrow.SetArrowSize(0.02);
+    float alength((maxh-minh)/4.5), yarrow(max_axis/15.), llength(max_axis/1.5);
+    TArrow arrow; arrow.SetLineColor(acolor); arrow.SetLineWidth(1); arrow.SetArrowSize(0.015);
     TLatex label; label.SetNDC(kFALSE);label.SetTextAlign(11); label.SetTextColor(acolor);
     float binw(histo.GetBinWidth(1));
     line.SetLineColor(acolor); line.SetLineWidth(1); line.SetLineStyle(2);
     float xarrow(minh+binw*2);
     line.DrawLine(xarrow, 0, xarrow, llength);
     arrow.DrawArrow(xarrow, yarrow, xarrow+alength, yarrow);
-    label.DrawLatex(xarrow+0.1, yarrow+max_axis/80., "Baseline");
+    label.DrawLatex(xarrow+0.1, yarrow+max_axis/80., "Baseline selection");
     xarrow = minh+wtot/2+binw*2;
     line.DrawLine(xarrow, 0, xarrow, llength);
     arrow.DrawArrow(xarrow, yarrow, xarrow+alength, yarrow);
-    label.DrawLatex(xarrow+0.1, yarrow+max_axis/80., "Baseline");
+    label.DrawLatex(xarrow+0.1, yarrow+max_axis/80., "Baseline selection");
 
     //--- draw RmT plot
     double legX(style.PadLeftMargin+0.02), legY(0.88), legSingle = 0.052;
