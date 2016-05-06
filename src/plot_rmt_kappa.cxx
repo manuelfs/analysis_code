@@ -35,7 +35,7 @@ namespace{
   TString title_style("CMSPaper");
   bool do_data(false);
   bool only_tt(false);
-  bool do_metbins(false);
+  bool do_metbins(true);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
@@ -313,9 +313,9 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     if (title_style=="CMSPaper"){
       cmslabel.SetNDC(kTRUE);
       cmslabel.SetTextAlign(11);
-      cmslabel.DrawLatex(0.18,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
+      cmslabel.DrawLatex(0.175,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
       cmslabel.SetTextAlign(31);
-      cmslabel.DrawLatex(0.94,0.94,"13 TeV");  
+      cmslabel.DrawLatex(0.953,0.94,"13 TeV");  
     }
 
     TString ytitle("#kappa"); 
@@ -474,9 +474,9 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     if (title_style=="CMSPaper"){
       cmslabel.SetNDC(kTRUE);
       cmslabel.SetTextAlign(11);
-      cmslabel.DrawLatex(0.13,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
+      cmslabel.DrawLatex(0.12,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
       cmslabel.SetTextAlign(31);
-      cmslabel.DrawLatex(0.94,0.94,"13 TeV");  
+      cmslabel.DrawLatex(0.953,0.94,"13 TeV");  
     }
 
     TString ytitle("R(m#lower[-.01]{_{T}})"); 

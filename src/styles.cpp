@@ -177,9 +177,9 @@ void styles::setTitles(TH1 *h, TString xTitle, TString yTitle, TString Left, TSt
     h->SetXTitle(xTitle); h->SetYTitle(yTitle);
     TLatex label; label.SetNDC(kTRUE);
     label.SetTextAlign(11);
-    label.DrawLatex(PadLeftMargin+0.02,1-PadTopMargin+0.02,Left);  
+    label.DrawLatex(PadLeftMargin,1-PadTopMargin+0.02,Left);  
     label.SetTextAlign(31);
-    label.DrawLatex(1-PadRightMargin-0.02,1-PadTopMargin+0.02,Right);  
+    label.DrawLatex(1-PadRightMargin,1-PadTopMargin+0.02,Right);  
   }
 }
 
