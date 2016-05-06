@@ -436,6 +436,24 @@ void fillTtbarSys(ofstream &fsys){
 
     }
 
+    else if (luminosity == "7"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.20"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.48"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.20"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.20"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.48"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.48"<<endl;
+
+
+    }
+
     else if (luminosity == "10"){
       fsys<<"SYSTEMATIC dilep_closure"<<endl;
       fsys<<" PROCESSES ttbar"<<endl;    
@@ -453,6 +471,25 @@ void fillTtbarSys(ofstream &fsys){
 
 
     }
+    
+      else if (luminosity == "15"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.33"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.13"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.33"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.33"<<endl;
+
+
+    }
+
 
     else if (luminosity == "20"){
       fsys<<"SYSTEMATIC dilep_closure"<<endl;
@@ -637,6 +674,8 @@ void fillTtbarSys(ofstream &fsys){
 
     }
 
+   
+
     else if (luminosity == "10"){
       fsys<<"SYSTEMATIC dilep_closure"<<endl;
       fsys<<" PROCESSES ttbar"<<endl;
@@ -665,6 +704,34 @@ void fillTtbarSys(ofstream &fsys){
 
     }
 
+    else if (luminosity == "15"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
+
+
+      fsys<<"  r2_medmet_lownj_1b   0.13"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.33"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.13"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.13"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.33"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.33"<<endl;
+    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.33"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.13"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.33"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.33"<<endl;
+
+    }
+
     else if (luminosity == "5"){
       fsys<<"SYSTEMATIC dilep_closure"<<endl;
       fsys<<" PROCESSES ttbar"<<endl;
@@ -690,6 +757,34 @@ void fillTtbarSys(ofstream &fsys){
       fsys<<"  r2_lowmet_highnj_3b   0.57"<<endl;
       fsys<<"  r2_highmet_highnj_2b  0.57"<<endl;
       fsys<<"  r2_highmet_highnj_3b  0.57"<<endl;
+
+    }
+
+     else if (luminosity == "7"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
+
+
+      fsys<<"  r2_medmet_lownj_1b   0.20"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.48"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.20"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.20"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.48"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.48"<<endl;
+    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.20"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.48"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.20"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.20"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.48"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.48"<<endl;
 
     }
   
