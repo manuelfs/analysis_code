@@ -41,12 +41,12 @@ namespace{
   bool compressed = false;
   bool no_signal = false;
   bool full_stats = false;
-  float luminosity = 2.1;
+  TString luminosity = "2.1";
 }
 
 //Not sure why I can't get the colors from utilities_macros...
-TColor c_tt_2l(1006, 86/255.,160/255.,211/255.);
-TColor c_tt_1l(1000, 1/255.,57/255.,166/255.);
+TColor c_tt_2l(3006, 86/255.,160/255.,211/255.);
+TColor c_tt_1l(3000, 1/255.,57/255.,166/255.);
 
 int main(int argc, char *argv[]){
   gErrorIgnoreLevel=6000; // Turns off errors due to missing branches
@@ -56,10 +56,12 @@ int main(int argc, char *argv[]){
   styles style("2Dnobar");
   style.setDefaultStyle();
   
-  //  string folder ="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/skim_1lht500met200/";
-   string folder="/net/cms2/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
-  //string folder = "/cms5r0/ald77/archive/2015_05_25/skim/";
-  //folder = "/afs/cern.ch/user/m/manuelf/work/ucsb/2015_05_25/skim/";
+  string folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
+  string hostname = execute("echo $HOSTNAME");
+  if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  {
+    folder = "/net/cms2"+folder;
+  }
+
   string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
   baby_basic st_sig(folder+sig_name);
   baby_basic st_bkg(folder+"*TTJets_Tune*");
@@ -92,8 +94,8 @@ int main(int argc, char *argv[]){
   if(merge_ttbar){
     Process(st_bkg, g_bkg, g_bkg_full, 1006, 21, 1, indices_bkg);
   }else{
-    Process(st_bkg, g_bkg1, g_bkg1_full, 1000, 23, 1, indices_bkg, 1);
-    Process(st_bkg, g_bkg2, g_bkg2_full, 1006, 22, 1, indices_bkg, 2);
+    Process(st_bkg, g_bkg1, g_bkg1_full, 3000, 23, 1, indices_bkg, 1);
+    Process(st_bkg, g_bkg2, g_bkg2_full, 3006, 22, 1, indices_bkg, 2);
   }
 
   //  double rho_sig = g_sig_full.GetCorrelationFactor();
@@ -131,6 +133,7 @@ int main(int argc, char *argv[]){
  
   double height = 0.125;
   double width = 0.125;
+  double offset = 0.01;
   TArrow arrow;
   arrow.SetLineColor(kGray+2); arrow.SetFillColor(kGray+2);
   arrow.SetArrowSize(0.02); arrow.SetLineWidth(4);
@@ -144,10 +147,10 @@ int main(int argc, char *argv[]){
 	       style.PadLeftMargin+0.2+width, 1.-style.PadTopMargin-0.5*height, "NDCNB");
   TPaveText l4(1.-style.PadRightMargin-width, 1.-style.PadTopMargin-1.5*height,
 	       1.-style.PadRightMargin, 1.-style.PadTopMargin-0.5*height, "NDCNB");
-  TPaveText lcms(style.PadLeftMargin, 1.-style.PadTopMargin-0.5*height-0.01,
-		 style.PadLeftMargin-0.13+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
-  TPaveText lsim(style.PadLeftMargin, 1.-style.PadTopMargin-0.5*2*height-0.01,
-  		 style.PadLeftMargin-0.08+2.*width, 1.-style.PadTopMargin-0.5*height-0.01, "NDCNB");
+  TPaveText lcms(style.PadLeftMargin+offset, 1.-style.PadTopMargin-0.5*height-0.01,
+		 style.PadLeftMargin+offset-0.13+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
+  TPaveText lsim(style.PadLeftMargin+offset, 1.-style.PadTopMargin-0.5*2*height-0.01,
+  		 style.PadLeftMargin+offset-0.08+2.*width, 1.-style.PadTopMargin-0.5*height-0.01, "NDCNB");
 
   TPaveText l13(style.PadLeftMargin+0.62, 1.-style.PadTopMargin-0.5*height-0.01,
 		 style.PadLeftMargin+0.62+2.*width, 1.-style.PadTopMargin-0.01, "NDCNB");
@@ -194,6 +197,7 @@ int main(int argc, char *argv[]){
   lsim.Draw("same");
   l13.Draw("same");
 
+  luminosity.ReplaceAll(".","_");
   ostringstream outname;
   outname << "plots/scat_mj_mt_met_"
 	  << met_min << '_' << met_max
@@ -214,7 +218,7 @@ set<size_t> GetRandomIndices(baby_basic &st, double norm, TRandom3 &rand3){
   double weight = st.w_lumi();
   int num_points = std::min((norm<=0.
 			     ?num_entries
-			     :TMath::Nint(luminosity*weight*num_entries*norm)),
+			     :TMath::Nint(luminosity.Atof()*weight*num_entries*norm)),
 			    num_entries);
   cout << "Selecting " << num_points << " out of " << num_entries << "..." << endl;
   set<size_t> indices;

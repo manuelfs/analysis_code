@@ -35,7 +35,7 @@ namespace{
   TString title_style("CMSPaper");
   bool do_data(false);
   bool only_tt(false);
-  bool do_metbins(true);
+  bool do_metbins(false);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
@@ -328,6 +328,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     histo.SetMaximum(max_axis);
     style.moveYAxisLabel(&histo, max_axis, false);
     line.SetLineColor(1); line.SetLineWidth(2); 
+    histo.GetXaxis()->SetLabelOffset(0.03);
     line.DrawLine(minh+wtot/2., 0, minh+wtot/2, max_axis);
 
     double legX(style.PadLeftMargin+0.03), legY(0.895), legSingle = 0.052;

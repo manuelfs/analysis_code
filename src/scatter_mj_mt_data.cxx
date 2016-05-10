@@ -234,6 +234,7 @@ int main(int argc, char *argv[]){
   c.SetLogz(1);
   h_bkg.Scale(h_data.Integral()/h_bkg.Integral());
   h_bkg.SetMinimum(0.01); 
+  h_bkg.SetLabelOffset(0.011);
   h_bkg.Draw("colz"); 
   
   TLegend l(style.PadLeftMargin, 1.-style.PadTopMargin, 1.-2.1*style.PadRightMargin, 1.0);
