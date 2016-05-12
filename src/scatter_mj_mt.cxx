@@ -90,12 +90,12 @@ int main(int argc, char *argv[]){
   set<size_t> indices_sig = GetRandomIndices(st_sig, sig_norm, rand3);
   set<size_t> indices_bkg = GetRandomIndices(st_bkg, ttbar_norm, rand3);
 
-  Process(st_sig, g_sig, g_sig_full, 2, 21, 1, indices_sig);
+  Process(st_sig, g_sig, g_sig_full, 2, 21, 1.2, indices_sig);
   if(merge_ttbar){
     Process(st_bkg, g_bkg, g_bkg_full, 1006, 21, 1, indices_bkg);
   }else{
-    Process(st_bkg, g_bkg1, g_bkg1_full, 3000, 23, 1, indices_bkg, 1);
-    Process(st_bkg, g_bkg2, g_bkg2_full, 3006, 22, 1, indices_bkg, 2);
+    Process(st_bkg, g_bkg1, g_bkg1_full, 3000, 23, 1.3, indices_bkg, 1);
+    Process(st_bkg, g_bkg2, g_bkg2_full, 3006, 22, 1.3, indices_bkg, 2);
   }
 
   //  double rho_sig = g_sig_full.GetCorrelationFactor();
@@ -229,7 +229,7 @@ set<size_t> GetRandomIndices(baby_basic &st, double norm, TRandom3 &rand3){
 }
 
 void Process(baby_basic &st, TGraph &g, TGraph &g_full,
-	     int color, int marker, int size,
+	     int color, int marker, double size,
 	     const set<size_t> &indices, int nleps){
   g = TGraph(0);
   g_full = TGraph(0);

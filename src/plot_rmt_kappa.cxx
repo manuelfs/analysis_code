@@ -328,7 +328,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     histo.SetMaximum(max_axis);
     style.moveYAxisLabel(&histo, max_axis, false);
     line.SetLineColor(1); line.SetLineWidth(2); 
-    histo.GetXaxis()->SetLabelOffset(0.03);
+    histo.GetXaxis()->SetLabelOffset(0.007);
     line.DrawLine(minh+wtot/2., 0, minh+wtot/2, max_axis);
 
     double legX(style.PadLeftMargin+0.03), legY(0.895), legSingle = 0.052;
@@ -344,7 +344,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     for(unsigned inb(0); inb<nbsize; inb++){
       graph[inb] = TGraphAsymmErrors(vx[idata][inb].size(), &(vx[idata][inb][0]), &(vy[idata][inb][0]), 
                                      &(vexl[idata][inb][0]), &(vexh[idata][inb][0]), &(veyl[idata][inb][0]), &(veyh[idata][inb][0]));
-      graph[inb].SetMarkerStyle(styles[inb]); graph[inb].SetMarkerSize(1.4); 
+      graph[inb].SetMarkerStyle(styles[inb]); graph[inb].SetMarkerSize(1.65);  graph[inb].SetLineWidth(2);
       graph[inb].SetMarkerColor(colors[inb]); graph[inb].SetLineColor(colors[inb]);
       graph[inb].Draw("p same");   
       if (inb==3) leg.AddEntry(&graph[inb], "N_{b} #geq 2", "p");
@@ -469,6 +469,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     TCanvas can;
     TLine line; line.SetLineColor(28); line.SetLineWidth(4); line.SetLineStyle(3);
     histo.GetXaxis()->SetLabelSize(histo.GetXaxis()->GetLabelSize()*1.5);
+    histo.GetXaxis()->SetLabelOffset(0.007);
     histo.Draw();
 
     TLatex cmslabel; 
@@ -521,11 +522,11 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
       if (imet==1 && inb==2) continue;
       graph[inb] = TGraphAsymmErrors(vx[ini][inb].size(), &(vx[ini][inb][0]), &(vy[ini][inb][0]), 
                                      &(vexl[ini][inb][0]), &(vexh[ini][inb][0]), &(veyl[ini][inb][0]), &(veyh[ini][inb][0]));
-      graph[inb].SetMarkerStyle(styles[inb]); graph[inb].SetMarkerSize(1.4); 
-      graph[inb].SetMarkerColor(colors[inb]); graph[inb].SetLineColor(colors[inb]);
+      graph[inb].SetMarkerStyle(styles[inb]); graph[inb].SetMarkerSize(1.65); 
+      graph[inb].SetMarkerColor(colors[inb]); graph[inb].SetLineColor(colors[inb]); graph[inb].SetLineWidth(2);
       if (imet==1 && inb==1){
-        graph[inb].SetMarkerStyle(styles[inb+2]); graph[inb].SetMarkerSize(1.4); 
-        graph[inb].SetMarkerColor(colors[inb+2]); graph[inb].SetLineColor(colors[inb+2]);
+        graph[inb].SetMarkerStyle(styles[inb+2]); graph[inb].SetMarkerSize(1.65); 
+        graph[inb].SetMarkerColor(colors[inb+2]); graph[inb].SetLineColor(colors[inb+2]); graph[inb].SetLineWidth(2);
         leg.AddEntry(&graph[inb],"N_{b} #geq 2", "p");
       } else {
         TString nb_label=cuts2title(cutmap["nb"][inb].cuts_);
