@@ -43,7 +43,8 @@ Double_t errorFun(Double_t *x, Double_t *par) {
 }
 
 void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, TString xtitle, 
-		TString den, TString num, TString title="", TString ytitle="", float minfit=-1., bool isData=true, bool addOverflow=true);
+		TString den, TString num, TString title="", TString ytitle="", 
+		float minfit=-1., float scale = 1., bool isData=true, bool addOverflow=false);
 TString Efficiency(TChain *data, TString den, TString num);
 TString Efficiency(TChain *data, TString den, TString num, float &effic, float &errup, float &errdown);
 
@@ -65,24 +66,19 @@ int main(){
 
 
   if(do_dps){
-    float lmin(25), lmax(300);
-    int lbins(static_cast<int>((lmax-lmin)/12.5));
-    TString metcut("200");
-
-    // Lepton pT turn-on
-    lmin = 10; lmax = 80; lbins = static_cast<int>((lmax-lmin)/2.5);
-    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "Electron p_{T}",
-    	       "trig[28]&&ht>500&&njets>=4&&met>"+metcut, "trig[8]",
-    	       "MET90, H_{T} > 500, MET > "+metcut, "Ele15_HT350");
-    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "Muon p_{T}",
-    	       "(trig[28])&&ht>500&&njets>=4&&met>"+metcut, "trig[4]",
-    	       "MET90, H_{T} > 500, MET > "+metcut, "Mu15_HT350");
-
-
-
-
     float htmin(175), htmax(850);
     int htbins(static_cast<int>((htmax-htmin)/12.5));
+
+    // HT350_MET100
+    htmin = 170; htmax = 770; htbins = static_cast<int>((htmax-htmin)/10);
+    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
+    	       "trig[14]&&nvleps==0&&met>200&&njets>=4", "trig[0]","MET170", "HT350_MET100",350);
+
+
+    // HT800
+    htmin = 500; htmax = 1450; htbins = static_cast<int>((htmax-htmin)/25);
+    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
+    	       "trig[28]&&nvleps==0&&met>200&&njets>=4", "trig[12]","MET90", "HT800", 750);
 
     // VVVL
     htmin = 220; htmax = 850; htbins = static_cast<int>((htmax-htmin)/10);
@@ -94,19 +90,7 @@ int main(){
 	       "MET90, MET > 200, n_{j}#geq4, n_{#mu} = 1", "Mu15_HT350", 325);
 
 
-    // HT350_MET100
-    htmin = 170; htmax = 770; htbins = static_cast<int>((htmax-htmin)/10);
-    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[14]&&nvleps==0&&met>200&&njets>=4", "trig[0]","MET170", "HT350_MET100",350);
 
-
-
-    // HT800
-    htmin = 500; htmax = 1450; htbins = static_cast<int>((htmax-htmin)/25);
-    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&nvleps==0&&met>200&&njets>=4", "trig[12]","MET90", "HT800", 750);
-
-   return 0;
 
     float metmin(0), metmax(460);
     int metbins(static_cast<int>((metmax-metmin)/10));
@@ -129,6 +113,22 @@ int main(){
     PlotTurnOn(&c_el, "mht", metbins,metmin,metmax, "H_{T}^{miss}",
     	       "trig[8]&&nels>=1&&njets>=4&&ht>500", "trig[0]",      
     	       "Ele15_HT350", "HT350_MET100",100);
+
+
+   float lmin(25), lmax(300);
+    int lbins(static_cast<int>((lmax-lmin)/12.5));
+    TString metcut("200");
+
+    // Lepton pT turn-on
+    lmin = 10; lmax = 80; lbins = static_cast<int>((lmax-lmin)/2.5);
+    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "Electron p_{T}",
+    	       "trig[28]&&ht>500&&njets>=4&&met>"+metcut, "trig[8]",
+    	       "MET90, H_{T} > 500, MET > "+metcut, "Ele15_HT350");
+    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "Muon p_{T}",
+    	       "(trig[28])&&ht>500&&njets>=4&&met>"+metcut, "trig[4]",
+    	       "MET90, H_{T} > 500, MET > "+metcut, "Mu15_HT350");
+
+
 
 
 
@@ -418,7 +418,8 @@ int main(){
 }
 
 void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, TString xtitle, 
-		TString den, TString num, TString title, TString ytitle, float minfit, bool isData, bool addOverflow){
+		TString den, TString num, TString title, TString ytitle, float minfit, float scale, 
+		bool isData, bool addOverflow){
   styles style("HLTStyle"); gStyle->SetPadTickY(0);
   bool dofit(minfit>=-1);
   TCanvas can;
@@ -450,7 +451,7 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   TString epsi("#scale[1.3]{#font[122]{e}}");
   //epsi = "Efficiency";
   // Ploting denominator
-  float hscaled(0.3), maxeff(1.42);
+  float hscaled(0.3*scale), maxeff(1.42);
   if(do_dps) maxeff = 1.3;
   float hfactor(hscaled/histo[1]->GetMaximum()), hmax(histo[1]->GetMaximum());
   float axismax(hmax*maxeff/hscaled);
@@ -549,9 +550,10 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
     fitpar = "98% of plateau at "+RoundNumber(p98,0)+" "+units;
     if(dofit) label.DrawLatex(x2, y2-2.3*ysingle,fitpar);
   } else {
-    label.DrawLatex(x2, y2+0.02,fitpar);
-    fitpar = "98% of plateau at "+RoundNumber(p98,0)+" "+units;
-    if(dofit) label.DrawLatex(x2, y2-1.3*ysingle+0.02,fitpar);
+    label.DrawLatex(x2, y2+0.01, "Trigger: #font[52]{"+ytitle+"}");
+    label.DrawLatex(x2, y2-ysingle+0.01,fitpar);
+    // fitpar = "98% of plateau at "+RoundNumber(p98,0)+" "+units;
+    // if(dofit) label.DrawLatex(x2, y2-1.3*ysingle+0.02,fitpar);
   }
 
   // Drawing CMS preliminary
@@ -566,7 +568,11 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   } else label.DrawLatex(0.85, 0.93, "Spring15 t#bar{t}");
 
   can.SaveAs(pname);
-  
+  if(do_dps) {
+    pname.ReplaceAll(plot_type, ".png");
+    can.SaveAs(pname);
+  }
+
   for(unsigned his(0); his<2; his++)
     histo[his]->Delete();
   fitCurve->Delete();
@@ -579,7 +585,7 @@ TString Efficiency(TChain *data, TString den, TString num){
 
 TString Efficiency(TChain *data, TString den, TString num, float &effic, float &errup, float &errdown){
   TH1D* histo[2];
-  TString hname, totCut, pname;
+  TString hname, totCut;
   //  den = "("+den+")&&json&&pass&&pass_jets_ra2";
   den = "("+den+")&&pass";
 
