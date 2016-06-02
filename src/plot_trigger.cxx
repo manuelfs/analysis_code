@@ -33,6 +33,7 @@ namespace  {
   bool ra2_sig(false);
   bool do_ra4(false);
   bool do_ra4an(false);
+  bool do_zht(false);
   TString plot_type = ".pdf";
 }
 
@@ -55,9 +56,14 @@ int main(){
   gStyle->SetPadTickY(0);
   gStyle->SetGridStyle(3);
 
-  TString folder("/cms2r0/babymaker/babies/2015_11_20/data/");
-  //TString folder16("/cms2r0/babymaker/babies/2016_05_16/data/skim_run/");
-  TString folder16("/cms2r0/babymaker/babies/2016_05_20/data/");
+  TString bfolder("");
+  string hostname = execute("echo $HOSTNAME");
+  if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  
+    bfolder = "/net/cms2"; // In laptops, you can't create a /net folder
+
+  TString folder(bfolder+"/cms2r0/babymaker/babies/2015_11_20/data/");
+  //TString folder16(bfolder+"/cms2r0/babymaker/babies/2016_05_16/data/skim_run/");
+  TString folder16(bfolder+"/cms2r0/babymaker/babies/2016_05_31/data/");
 
   TChain c_had("tree"); c_had.Add(folder+"/hadronic/combined/skim_1vlht500/*.root");
   TChain c_had2l("tree"); c_had2l.Add(folder+"/hadronic/combined/skim_mll60/*.root");
@@ -67,239 +73,318 @@ int main(){
   TChain c_el("tree");   c_el.Add(folder+"/singlelep/combined/skim_1vlht500njets4/*SingleElectron*_0_*root");
   TChain c_lep("tree"); c_lep.Add(folder+"/singlelep/combined/skim_1vlht500njets4/*Single*root");
 
-  TChain c_met16("tree"); c_met16.Add(folder16+"/merged_met150/*MET*.root");
+  TChain c_met16("tree"); c_met16.Add(folder16+"/met/merged_met150/*MET*.root");
   //TChain c_met16("tree"); c_met16.Add("/cms2r0/babymaker/babies/2016_05_16/data/skim_run//*MET*.root");
-  TChain c_el16("tree");  c_el16.Add(folder16+"/merged_el1nj2/*SingleElectron*root");
-  TChain c_mu16("tree");  c_mu16.Add(folder16+"/merged_mu1nj2/*SingleMuon*root");
+  TChain c_el16("tree");  c_el16.Add(folder16+"/singleel/merged_el1nj2/*SingleElectron*root");
+  TChain c_mu16("tree");  c_mu16.Add(folder16+"/singlemu/merged_mu1nj2/*SingleMuon*root");
 
 
   if(do_16){
+    float minx(0), maxx(460);
+    int nbins(static_cast<int>((maxx-minx)/10));
 
-    TString baseline = "(trig[28])&&ht>400&&njets>=2&&met>150";
-
-    cout<<"Isomu, eta < 1"<<endl;
-    baseline = "((trig[28]&&njets>=2&&met>150)&&Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&abs(mus_eta)<1))>30)";
-    Efficiency(&c_met, baseline+"", "trig[17]");
-    Efficiency(&c_met16, baseline+"&&run<273425", "trig[19]");
-    Efficiency(&c_met16, baseline+"&&run>=273425", "trig[19]");
-
-
-    cout<<endl<<"VVVL, eta < 1"<<endl;
-    Efficiency(&c_met, baseline+"&&onht>350", "trig[4]");
-    Efficiency(&c_met16, baseline+"&&onht>350&&run<273425", "trig[4]");
-    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273425", "trig[4]");
-
-    cout<<endl<<endl<<"Isomu, 1 < eta < 1.4"<<endl;
-    baseline = "((trig[28]&&njets>=2&&met>150)&&Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&(abs(mus_eta)>=1&&abs(mus_eta)<=1.4)))>30)";
-    Efficiency(&c_met, baseline+"", "trig[17]");
-    Efficiency(&c_met16, baseline+"&&run<273425", "trig[19]");
-    Efficiency(&c_met16, baseline+"&&run>=273425", "trig[19]");
-
-
-    cout<<endl<<"VVVL, 1 < eta < 1.4"<<endl;
-    Efficiency(&c_met, baseline+"&&onht>350", "trig[4]");
-    Efficiency(&c_met16, baseline+"&&onht>350&&run<273425", "trig[4]");
-    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273425", "trig[4]");
-
-    cout<<endl<<endl<<"Isomu, eta > 1.4"<<endl;
-    baseline = "((trig[28]&&njets>=2&&met>150)&&Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&abs(mus_eta)>1.4))>30)";
-    Efficiency(&c_met, baseline+"", "trig[17]");
-    Efficiency(&c_met16, baseline+"&&run<273425", "trig[19]");
-    Efficiency(&c_met16, baseline+"&&run>=273425", "trig[19]");
-
-
-    cout<<endl<<"VVVL, eta > 1.4"<<endl;
-    Efficiency(&c_met, baseline+"&&onht>350", "trig[4]");
-    Efficiency(&c_met16, baseline+"&&onht>350&&run<273425", "trig[4]");
-    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273425", "trig[4]");
-
-    return 0;
-
-    float metmin(0), metmax(460);
-    int metbins(static_cast<int>((metmax-metmin)/10));
-
-    // MET110: MET
-    PlotTurnOn(&c_mu16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[19]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&abs(mus_eta)<1.1", "trig[14]",  
-    	       "IsoMu24, N_{#mu,25} #geq 1, |#eta_{#mu}| < 1.1, N_{jet} #geq 2", "MET110_MHT110",100);
-    PlotTurnOn(&c_mu16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[19]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&abs(mus_eta)<1.1", "trig[15]",  
-    	       "IsoMu24, N_{#mu,25} #geq 1, |#eta_{#mu}| < 1.1, N_{jet} #geq 2", "METNoMu110_MHTNoMu110",100);
-    PlotTurnOn(&c_mu16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[19]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2", "trig[14]",  
-    	       "IsoMu24, N_{#mu,25} #geq 1, N_{jet} #geq 2", "MET110_MHT110",100);
-    PlotTurnOn(&c_mu16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[19]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2", "trig[15]",  
-    	       "IsoMu24, N_{#mu,25} #geq 1, N_{jet} #geq 2", "METNoMu110_MHTNoMu110",100);
-
-    PlotTurnOn(&c_el16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=2", "trig[14]",      
-    	       "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 2", "MET110_MHT110");
-    PlotTurnOn(&c_el16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=2", "trig[15]",      
-    	       "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 2", "METNoMu110_MHTNoMu110");
-
-    // MET90,100: MET
-    PlotTurnOn(&c_el, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=4&&ht>500", "trig[28]",      
-    	       "2.3fbEle23_Loose, N_{e,25}#geq1, N_{jet}#geq4, H_{T}>500", "METNoMu90_MHTNoMu90");
-    PlotTurnOn(&c_el16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=2", "trig[28]",      
-    	       "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 2", "MET90_MHT90");
-    PlotTurnOn(&c_el16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=2", "trig[13]",      
-    	       "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 2", "MET100_MHT100");
-
-    // HT350_MET100: MET
-    PlotTurnOn(&c_el, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[8]&&nels>=1&&njets>=4&&ht>500", "trig[0]",      
-    	       "2.3fbEle15_HT350, N_{e}^{20}#geq1, N_{jet}#geq4, H_{T}>500", "HT350_MET100",100);
-    PlotTurnOn(&c_el16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[8]&&nels>=1&&njets>=2&&ht>400", "trig[0]",      
-    	       "Ele15_HT350, N_{e}^{20}#geq1, N_{jet}#geq2, H_{T}>400", "HT300_MET100",100);
-
-    // Lep15_HT350_MET50: MET
-    PlotTurnOn(&c_el, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[8]&&nels>=1&&njets>=4&&ht>500", "trig[5]",      
-    	       "2.3fbEle15_HT350, N_{e}^{20}#geq1, N_{jet}#geq4, H_{T}>500", "Ele15_HT350_MET50");
-    PlotTurnOn(&c_el16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[8]&&nels>=1&&njets>=2&&ht>400", "trig[5]",      
-    	       "Ele15_HT350, N_{e}^{20}#geq1, N_{jet}#geq2, H_{T}>400", "Ele15_HT350_MET50");
-
-    PlotTurnOn(&c_lep, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[4]&&nmus>=1&&njets>=4&&ht>500", "trig[1]",      
-    	       "2.3fbMu15_HT350, N_{#mu}^{20}#geq1, N_{jet}#geq4, H_{T}>500", "Mu15_HT350_MET50");
-    PlotTurnOn(&c_mu16, "met", metbins,metmin,metmax, "E_{T}^{miss}",
-    	       "trig[4]&&nmus>=1&&njets>=2&&ht>400", "trig[1]",      
-    	       "Mu15_HT350, N_{#mu}^{20}#geq1, N_{jet}#geq2, H_{T}>400", "Mu15_HT350_MET50");
-
-
-    float htmin(175), htmax(850);
-    int htbins(static_cast<int>((htmax-htmin)/12.5));
-
-    // HT800: HT
-    htmin = 500; htmax = 1450; htbins = static_cast<int>((htmax-htmin)/25);
-    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&met>200&&njets>=2&&nvleps==0", "trig[12]",
-	       "2.3fbMET90, N_{e,10}=0, N_{jet}#geq2, MET>200", "HT800", 750,1,true,false);
-    PlotTurnOn(&c_met16, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&nvleps==0&&met>200&&njets>=2", "trig[12]",
-	       "MET90, N_{e,10}=0, N_{jet}#geq2, MET>200", "HT800", 750,1,true,false);
-
-    // HT350_MET100: HT
-    htmin = 160; htmax = 760; htbins = static_cast<int>((htmax-htmin)/10);
-    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&met>200&&njets>=2&&nvleps==0&&onmet>100", "trig[0]",
-	       "2.3fbMET90, N_{e,10}=0, N_{jet}#geq2, MET>200", "HT350_MET100",360,1,true,false);
-    PlotTurnOn(&c_met16, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&nvleps==0&&met>200&&njets>=2", "trig[0]",
-	       "MET90, N_{e,10}=0, N_{jet}#geq2, MET>200", "HT300_MET100",280,1,true,false);
-
-    // VVVL: HT600
-    htmin = 320; htmax = 1060; htbins = static_cast<int>((htmax-htmin)/20);
-    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&met>150&&njets>=2&&Max$(els_vvvl)&&nvels>=1", "trig[6]",
-    	       "2.3fbMET90, N_{e}#geq1, N_{jet}#geq2, MET>150", "Ele15_HT600", 450,1,true,false);
-    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&Max$(mus_vvvl)&&met>150&&njets>=2&&nvmus>=1", "trig[2]",
-	       "2.3fbMET90, N_{#mu}#geq1, N_{jet}#geq2, MET>150", "Mu15_HT600", 450,1,true,false);
-
-    PlotTurnOn(&c_met16, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&nvels>=1&&met>150&&njets>=2&&Max$(els_vvvl)", "trig[6]",
-    	       "MET90, N_{e}#geq1, N_{jet}#geq2, MET>150", "Ele15_HT600", 450,1,true,false);
-    PlotTurnOn(&c_met16, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&nvmus>=1&&Max$(mus_vvvl)&&met>150&&njets>=2", "trig[2]",
-	       "MET90, N_{#mu}#geq1, N_{jet}#geq2, MET>150", "Mu15_HT600", 450,1,true,false);
-
-
-    // VVVL: HT350
-    htmin = 160; htmax = 760; htbins = static_cast<int>((htmax-htmin)/10);
-    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&met>150&&njets>=2&&Max$(els_vvvl)&&nvels>=1", "trig[8]",
-    	       "2.3fbMET90, N_{e}#geq1, N_{jet}#geq2, MET>150", "Ele15_HT350", 250,1,true,false);
-    PlotTurnOn(&c_met, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&Max$(mus_vvvl)&&met>150&&njets>=2&&nvmus>=1", "trig[4]",
-	       "2.3fbMET90, N_{#mu}#geq1, N_{jet}#geq2, MET>150", "Mu15_HT350", 250,1,true,false);
-
-    PlotTurnOn(&c_met16, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&nvels>=1&&met>150&&njets>=2&&Max$(els_vvvl)", "trig[8]",
-    	       "MET90, N_{e}#geq1, N_{jet}#geq2, MET>150", "Ele15_HT350", 250,1,true,false);
-    PlotTurnOn(&c_met16, "ht", htbins,htmin,htmax, "H_{T}",
-    	       "trig[28]&&nvmus>=1&&Max$(mus_vvvl)&&met>150&&njets>=2", "trig[4]",
-	       "MET90, N_{#mu}#geq1, N_{jet}#geq2, MET>150", "Mu15_HT350", 250,1,true,false);
-
-    float lmin(25), lmax(300);
-    int lbins(static_cast<int>((lmax-lmin)/12.5));
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////    Lepton pT    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     TString metcut("150");
+    // Muon, VVVL, fine binning
+    minx = 10; maxx = 75; nbins = static_cast<int>((maxx-minx)/2.5);
+    PlotTurnOn(&c_met16, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", nbins,minx,maxx, "Muon p_{T}",
+    	       "trig[28]&&onht>350&&ht>350&&njets>=2&&met>"+metcut, "trig[4]",
+    	       "MET90, H_{T}>350, N_{jet}#geq2, MET>"+metcut, "Mu15_HT350",-1,1,true,false);
+    // Electron, VVVL, fine binning
+    PlotTurnOn(&c_met16, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", nbins,minx,maxx, "Electron p_{T}",
+    	       "trig[28]&&onht>350&&ht>350&&njets>=2&&met>"+metcut, "trig[8]",
+    	       "MET90, H_{T}>350, N_{jet}#geq2, MET>"+metcut, "Ele15_HT350",-1,1,true,false);
 
-    // Lepton turn-on
-    lmin = -2.5; lmax = 2.5; lbins = static_cast<int>((lmax-lmin)/0.1);
+
+    // Lepton eta
+    minx = -2.5; maxx = 2.5; nbins = static_cast<int>((maxx-minx)/0.1);
     TString maxMu = "&&mus_pt==Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))&&Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))>30";
-    PlotTurnOn(&c_met16, "mus_eta", lbins,lmin,lmax, "Muon #eta",
+    PlotTurnOn(&c_met16, "mus_eta", nbins,minx,maxx, "Muon #eta",
     	       "trig[28]"+maxMu+"&&njets>=2&&run<273425&&met>"+metcut, "trig[19]",
     	       "94pbMET90, N_{jet}#geq2, MET>"+metcut, "IsoMu24, run < 273425", -2.5);
-    PlotTurnOn(&c_met16, "mus_eta", lbins,lmin,lmax, "Muon #eta",
+    PlotTurnOn(&c_met16, "mus_eta", nbins,minx,maxx, "Muon #eta",
     	       "trig[28]"+maxMu+"&&njets>=2&&run>=273425&&met>"+metcut, "trig[19]",
-    	       "122pbMET90, N_{jet}#geq2, MET>"+metcut, "IsoMu24, run #geq 273425", -2.5);
-    PlotTurnOn(&c_met, "mus_eta", lbins,lmin,lmax, "Muon #eta",
+    	       "495pbMET90, N_{jet}#geq2, MET>"+metcut, "IsoMu24, run #geq 273425", -2.5);
+    PlotTurnOn(&c_met, "mus_eta", nbins,minx,maxx, "Muon #eta",
     	       "trig[28]"+maxMu+"&&njets>=2&&met>"+metcut, 
 	       "trig[17]", "2.3fbMET90, N_{jet}#geq2, MET>"+metcut, "IsoMu20", -2.5);
 
 
 
-    lmin = 10; lmax = 200; lbins = static_cast<int>((lmax-lmin)/10);
+    minx = 10; maxx = 200; nbins = static_cast<int>((maxx-minx)/10);
     // Muon, IsoMu
-    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "Muon p_{T}",
+    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", nbins,minx,maxx, "Muon p_{T}",
     	       "trig[28]&&njets>=2&&met>"+metcut, "trig[17]",
     	       "2.3fbMET90, N_{jet}#geq2, MET>"+metcut, "IsoMu20", -30);
-    PlotTurnOn(&c_met16, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "Muon p_{T}",
+    PlotTurnOn(&c_met16, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", nbins,minx,maxx, "Muon p_{T}",
     	       "trig[28]&&njets>=2&&run<273425&&met>"+metcut, "trig[19]",
     	       "94pbMET90, N_{jet}#geq2, MET>"+metcut, "IsoMu24, run < 273425", -30);
-    PlotTurnOn(&c_met16, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "Muon p_{T}",
+    PlotTurnOn(&c_met16, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", nbins,minx,maxx, "Muon p_{T}",
     	       "trig[28]&&njets>=2&&run>=273425&&met>"+metcut, "trig[19]",
-    	       "122pbMET90, N_{jet}#geq2, MET>"+metcut, "IsoMu24, run #geq 273425", -30);
+    	       "495pbMET90, N_{jet}#geq2, MET>"+metcut, "IsoMu24, run #geq 273425", -30);
 
 
     // Muon, VVVL
-    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "Muon p_{T}",
+    PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", nbins,minx,maxx, "Muon p_{T}",
     	       "trig[28]&&onht>350&&njets>=2&&met>"+metcut, "trig[4]",
     	       "2.3fbMET90, H_{T}>400, N_{jet}#geq2, MET>"+metcut, "Mu15_HT350", -30);
-    PlotTurnOn(&c_met16, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "Muon p_{T}",
+    PlotTurnOn(&c_met16, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", nbins,minx,maxx, "Muon p_{T}",
     	       "trig[28]&&onht>350&&njets>=2&&run<273425&&met>"+metcut, "trig[4]",
     	       "94pbMET90, H_{T}>400, N_{jet}#geq2, MET>"+metcut, "Mu15_HT350, run < 273425", -30);
-    PlotTurnOn(&c_met16, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", lbins,lmin,lmax, "Muon p_{T}",
+    PlotTurnOn(&c_met16, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2))", nbins,minx,maxx, "Muon p_{T}",
     	       "trig[28]&&onht>350&&njets>=2&&run>=273425&&met>"+metcut, "trig[4]",
-    	       "122pbMET90, H_{T}>400, N_{jet}#geq2, MET>"+metcut, "Mu15_HT350, run #geq 273425", -30);
+    	       "495pbMET90, H_{T}>400, N_{jet}#geq2, MET>"+metcut, "Mu15_HT350, run #geq 273425", -30);
 
     // Electron, Ele23
-    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "Electron p_{T}",
+    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", nbins,minx,maxx, "Electron p_{T}",
     	       "trig[28]&&njets>=2&&met>"+metcut, "trig[23]",
     	       "2.3fbMET90, N_{jet}#geq2, MET>"+metcut, "Ele23_WPLoose", -30);
-    PlotTurnOn(&c_met16, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "Electron p_{T}",
+    PlotTurnOn(&c_met16, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", nbins,minx,maxx, "Electron p_{T}",
     	       "trig[28]&&njets>=2&&met>"+metcut, "trig[29]",
     	       "MET90, N_{jet}#geq2, MET>"+metcut, "Ele23_WPLoose", -30);
 
     // Electron, Ele23 HT400
-     PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "Electron p_{T}",
+     PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", nbins,minx,maxx, "Electron p_{T}",
     	       "trig[28]&&ht>400&&njets>=2&&met>"+metcut, "trig[23]",
     	       "2.3fbMET90, H_{T}>400, N_{jet}#geq2, MET>"+metcut, "Ele23_WPLoose", -30);
-    PlotTurnOn(&c_met16, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "Electron p_{T}",
+    PlotTurnOn(&c_met16, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", nbins,minx,maxx, "Electron p_{T}",
     	       "trig[28]&&ht>400&&njets>=2&&met>"+metcut, "trig[29]",
     	       "MET90, H_{T}>400, N_{jet}#geq2, MET>"+metcut, "Ele23_WPLoose", -30);
 
 
     // Electron, VVVL
-    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "Electron p_{T}",
+    PlotTurnOn(&c_met, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", nbins,minx,maxx, "Electron p_{T}",
     	       "trig[28]&&njets>=2&&onht>350&&met>"+metcut, "trig[8]",
     	       "2.3fbMET90, H_{T}>500, N_{jet}#geq4, MET>"+metcut, "Ele15_HT350", -30);
 
-    PlotTurnOn(&c_met16, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", lbins,lmin,lmax, "Electron p_{T}",
+    PlotTurnOn(&c_met16, "Max$(els_pt*(els_sigid&&els_miniso<0.1))", nbins,minx,maxx, "Electron p_{T}",
     	       "trig[28]&&onht>350&&ht>400&&njets>=2&&met>"+metcut, "trig[8]",
     	       "MET90, H_{T}>400, N_{jet}#geq2, MET>"+metcut, "Ele15_HT350", -30);
 
 
 
 
+    TString baseline = "(trig[28])&&ht>400&&njets>=2&&met>150";
+
+    cout<<"Isomu, eta < 0.8"<<endl;
+    baseline = "((trig[28]&&njets>=2&&met>150)&&Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&abs(mus_eta)<0.8))>30)";
+    Efficiency(&c_met, baseline+"", "trig[17]");
+
+    Efficiency(&c_met16, baseline+"&&run<273425", "trig[19]");
+    Efficiency(&c_met16, baseline+"&&run>=273425&&run<273492", "trig[19]");
+    Efficiency(&c_met16, baseline+"&&run>=273492&&run<273554", "trig[19]");
+    Efficiency(&c_met16, baseline+"&&run>=273554", "trig[19]");
+
+
+    cout<<endl<<"VVVL, eta < 0.8"<<endl;
+    Efficiency(&c_met, baseline+"&&onht>350", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run<273425", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273425&&run<273492", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273492&&run<273554", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273554", "trig[4]");
+
+    cout<<endl<<endl<<"Isomu, 0.8 < eta < 1.4"<<endl;
+    baseline = "((trig[28]&&njets>=2&&met>150)&&Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&(abs(mus_eta)>=0.8&&abs(mus_eta)<=1.4)))>30)";
+    Efficiency(&c_met, baseline+"", "trig[17]");
+    Efficiency(&c_met16, baseline+"&&run<273425", "trig[19]");
+    Efficiency(&c_met16, baseline+"&&run>=273425&&run<273492", "trig[19]");
+    Efficiency(&c_met16, baseline+"&&run>=273492&&run<273554", "trig[19]");
+    Efficiency(&c_met16, baseline+"&&run>=273554", "trig[19]");
+
+
+    cout<<endl<<"VVVL, 0.8 < eta < 1.4"<<endl;
+    Efficiency(&c_met, baseline+"&&onht>350", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run<273425", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273425&&run<273492", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273492&&run<273554", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273554", "trig[4]");
+
+    cout<<endl<<endl<<"Isomu, eta > 1.4"<<endl;
+    baseline = "((trig[28]&&njets>=2&&met>150)&&Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&abs(mus_eta)>1.4))>30)";
+    Efficiency(&c_met, baseline+"", "trig[17]");
+    Efficiency(&c_met16, baseline+"&&run<273425", "trig[19]");
+    Efficiency(&c_met16, baseline+"&&run>=273425&&run<273492", "trig[19]");
+    Efficiency(&c_met16, baseline+"&&run>=273492&&run<273554", "trig[19]");
+    Efficiency(&c_met16, baseline+"&&run>=273554", "trig[19]");
+
+
+    cout<<endl<<"VVVL, eta > 1.4"<<endl;
+    Efficiency(&c_met, baseline+"&&onht>350", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run<273425", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273425&&run<273492", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273492&&run<273554", "trig[4]");
+    Efficiency(&c_met16, baseline+"&&onht>350&&run>=273554", "trig[4]");
+
+    return 0;
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////      MET        ////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    minx = 500; maxx = 1450; nbins = static_cast<int>((maxx-minx)/25);
+    // MET110 or METNoMu110
+    PlotTurnOn(&c_el16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=2", "(trig[14]||trig[15])",      
+    	       "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 2", "MET110 || METNoMu110");
+    PlotTurnOn(&c_mu16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[19]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2", "(trig[14]||trig[15])",  
+    	       "IsoMu24, N_{#mu,25} #geq 1, N_{jet} #geq 2", "MET110 || METNoMu110",100);
+
+    // MET110: MET Muons
+    PlotTurnOn(&c_mu16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[19]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2", "trig[14]",  
+    	       "IsoMu24, N_{#mu,25} #geq 1, N_{jet} #geq 2", "MET110_MHT110",100);
+    PlotTurnOn(&c_mu16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[19]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2", "trig[15]",  
+    	       "IsoMu24, N_{#mu,25} #geq 1, N_{jet} #geq 2", "METNoMu110_MHTNoMu110",100);
+    PlotTurnOn(&c_mu16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[19]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&abs(mus_eta)<1.1", "trig[14]",  
+    	       "IsoMu24, N_{#mu,25} #geq 1, |#eta_{#mu}| < 1.1, N_{jet} #geq 2", "MET110_MHT110",100);
+    PlotTurnOn(&c_mu16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[19]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&abs(mus_eta)<1.1", "trig[15]",  
+    	       "IsoMu24, N_{#mu,25} #geq 1, |#eta_{#mu}| < 1.1, N_{jet} #geq 2", "METNoMu110_MHTNoMu110",100);
+
+    PlotTurnOn(&c_el16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=2", "trig[14]",      
+    	       "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 2", "MET110_MHT110");
+    PlotTurnOn(&c_el16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=2", "trig[15]",      
+    	       "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 2", "METNoMu110_MHTNoMu110");
+
+    // Lep15_HT350_MET50: MET
+    PlotTurnOn(&c_lep, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[4]&&nmus>=1&&njets>=4&&ht>500", "trig[1]",      
+    	       "2.3fbMu15_HT350, N_{#mu}^{20}#geq1, N_{jet}#geq4, H_{T}>500", "Mu15_HT350_MET50");
+    PlotTurnOn(&c_mu16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[4]&&nmus>=1&&njets>=2&&ht>400", "trig[1]",      
+    	       "Mu15_HT350, N_{#mu}^{20}#geq1, N_{jet}#geq2, H_{T}>400", "Mu15_HT350_MET50");
+
+    PlotTurnOn(&c_el, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[8]&&nels>=1&&njets>=4&&ht>500", "trig[5]",      
+    	       "2.3fbEle15_HT350, N_{e}^{20}#geq1, N_{jet}#geq4, H_{T}>500", "Ele15_HT350_MET50");
+    PlotTurnOn(&c_el16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[8]&&nels>=1&&njets>=2&&ht>400", "trig[5]",      
+    	       "Ele15_HT350, N_{e}^{20}#geq1, N_{jet}#geq2, H_{T}>400", "Ele15_HT350_MET50");
+
+    // MET90,100: MET
+    PlotTurnOn(&c_el, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=4&&ht>500", "trig[28]",      
+    	       "2.3fbEle23_Loose, N_{e,25}#geq1, N_{jet}#geq4, H_{T}>500", "METNoMu90_MHTNoMu90");
+    PlotTurnOn(&c_el16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=2", "trig[28]",      
+    	       "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 2", "MET90_MHT90");
+    PlotTurnOn(&c_el16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=2", "trig[13]",      
+    	       "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 2", "MET100_MHT100");
+
+    // HT350_MET100: MET
+    PlotTurnOn(&c_el, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[8]&&nels>=1&&njets>=4&&ht>500", "trig[0]",      
+    	       "2.3fbEle15_HT350, N_{e}^{20}#geq1, N_{jet}#geq4, H_{T}>500", "HT350_MET100",100);
+    PlotTurnOn(&c_el16, "met", nbins,minx,maxx, "E_{T}^{miss}",
+    	       "trig[8]&&nels>=1&&njets>=2&&ht>400", "trig[0]",      
+    	       "Ele15_HT350, N_{e}^{20}#geq1, N_{jet}#geq2, H_{T}>400", "HT300_MET100",100);
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////      HT         ////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // HT800: HT
+    minx = 500; maxx = 1450; nbins = static_cast<int>((maxx-minx)/25);
+    PlotTurnOn(&c_met, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&met>200&&njets>=2&&nvleps==0", "trig[12]",
+	       "2.3fbMET90, N_{e,10}=0, N_{jet}#geq2, MET>200", "HT800", 750,1,true,false);
+    PlotTurnOn(&c_met16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&nvleps==0&&met>200&&njets>=2", "trig[12]",
+	       "MET90, N_{e,10}=0, N_{jet}#geq2, MET>200", "HT800", 750,1,true,false);
+
+    // HT350_MET100: HT
+    minx = 160; maxx = 760; nbins = static_cast<int>((maxx-minx)/10);
+    PlotTurnOn(&c_met, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&met>200&&njets>=2&&nvleps==0&&onmet>100", "trig[0]",
+	       "2.3fbMET90, N_{e,10}=0, N_{jet}#geq2, MET>200", "HT350_MET100",360,1,true,false);
+    PlotTurnOn(&c_met16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&nvleps==0&&met>200&&njets>=2", "trig[0]",
+	       "MET90, N_{e,10}=0, N_{jet}#geq2, MET>200", "HT300_MET100",280,1,true,false);
+
+    // VVVL: HT600
+    minx = 320; maxx = 1060; nbins = static_cast<int>((maxx-minx)/20);
+    PlotTurnOn(&c_met, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&met>150&&njets>=2&&Max$(els_vvvl)&&nvels>=1", "trig[6]",
+    	       "2.3fbMET90, N_{e}#geq1, N_{jet}#geq2, MET>150", "Ele15_HT600", 450,1,true,false);
+    PlotTurnOn(&c_met, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&Max$(mus_vvvl)&&met>150&&njets>=2&&nvmus>=1", "trig[2]",
+	       "2.3fbMET90, N_{#mu}#geq1, N_{jet}#geq2, MET>150", "Mu15_HT600", 450,1,true,false);
+
+    PlotTurnOn(&c_met16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&nvels>=1&&met>150&&njets>=2&&Max$(els_vvvl)", "trig[6]",
+    	       "MET90, N_{e}#geq1, N_{jet}#geq2, MET>150", "Ele15_HT600", 450,1,true,false);
+    PlotTurnOn(&c_met16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&nvmus>=1&&Max$(mus_vvvl)&&met>150&&njets>=2", "trig[2]",
+	       "MET90, N_{#mu}#geq1, N_{jet}#geq2, MET>150", "Mu15_HT600", 450,1,true,false);
+
+
+    // VVVL: HT350
+    minx = 160; maxx = 760; nbins = static_cast<int>((maxx-minx)/10);
+    PlotTurnOn(&c_met, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&met>150&&njets>=2&&Max$(els_vvvl)&&nvels>=1", "trig[8]",
+    	       "2.3fbMET90, N_{e}#geq1, N_{jet}#geq2, MET>150", "Ele15_HT350", 250,1,true,false);
+    PlotTurnOn(&c_met, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&Max$(mus_vvvl)&&met>150&&njets>=2&&nvmus>=1", "trig[4]",
+	       "2.3fbMET90, N_{#mu}#geq1, N_{jet}#geq2, MET>150", "Mu15_HT350", 250,1,true,false);
+
+    PlotTurnOn(&c_met16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&nvels>=1&&met>150&&njets>=2&&Max$(els_vvvl)", "trig[8]",
+    	       "MET90, N_{e}#geq1, N_{jet}#geq2, MET>150", "Ele15_HT350", 250,1,true,false);
+    PlotTurnOn(&c_met16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[28]&&nvmus>=1&&Max$(mus_vvvl)&&met>150&&njets>=2", "trig[4]",
+	       "MET90, N_{#mu}#geq1, N_{jet}#geq2, MET>150", "Mu15_HT350", 250,1,true,false);
+
+
+  }
+  
+  // Requires unskimmed ntuples
+  if(do_zht){
+    float minx(0), maxx(460);
+    int nbins(static_cast<int>((maxx-minx)/10));
+
+    minx = 0; maxx = 950; nbins = static_cast<int>((maxx-minx)/50);
+    PlotTurnOn(&c_mu16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[19]&&nmus>=1&&mumu_pt>200", "trig[2]",
+    	       "IsoMu24, N_{#mu}=2, p_{T}(Z)>200", "Mu15_HT600", 250,1,true,true);
+    PlotTurnOn(&c_el16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[29]&&nels>=1&&elel_pt>200", "trig[6]",
+    	       "Ele23, N_{e}=2, p_{T}(Z)>200", "Ele15_HT600", 250,1,true,true);
+    minx = 0; maxx = 775; nbins = static_cast<int>((maxx-minx)/25);
+    PlotTurnOn(&c_mu16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[19]&&nmus>=1&&mumu_pt>200", "trig[4]",
+    	       "IsoMu24, N_{#mu}=2, p_{T}(Z)>200", "Mu15_HT350", -200,1,true,true);
+    PlotTurnOn(&c_el16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[29]&&nels>=1&&elel_pt>200", "trig[8]",
+    	       "Ele23, N_{e}=2, p_{T}(Z)>200", "Ele15_HT350", -200,1,true,true);
+
+    return 0;
+
+    minx = 0; maxx = 950; nbins = static_cast<int>((maxx-minx)/50);
+    PlotTurnOn(&c_mu16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[19]&&nvmus>=1&&Max$(mus_vvvl)&&mumuv_pt>200", "trig[2]",
+    	       "IsoMu24, N_{#mu}=2, p_{T}(Z)>200", "Mu15_HT600", 250,1,true,true);
+    PlotTurnOn(&c_el16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[29]&&nvels>=1&&Max$(els_vvvl)&&elelv_pt>200", "trig[6]",
+    	       "Ele23, N_{e}=2, p_{T}(Z)>200", "Ele15_HT600", 250,1,true,true);
+    minx = 0; maxx = 775; nbins = static_cast<int>((maxx-minx)/25);
+    PlotTurnOn(&c_mu16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[19]&&nvmus>=1&&Max$(mus_vvvl)&&mumuv_pt>200", "trig[4]",
+    	       "IsoMu24, N_{#mu}=2, p_{T}(Z)>200", "Mu15_HT350", -200,1,true,true);
+    PlotTurnOn(&c_el16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "trig[29]&&nvels>=1&&Max$(els_vvvl)&&elelv_pt>200", "trig[8]",
+    	       "Ele23, N_{e}=2, p_{T}(Z)>200", "Ele15_HT350", -200,1,true,true);
+    PlotTurnOn(&c_met16, "ht", nbins,minx,maxx, "H_{T}",
+    	       "nvels>=1&&Max$(els_vvvl)&&elelv_pt>200", "trig[8]",
+    	       "MET, N_{e} = 2, p_{T}(Z) > 200", "Ele15_HT350", -200,1,true,false);
 
   }
 
@@ -788,7 +873,7 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   label.SetTextAlign(33); //label.SetNDC(); 
   float range(maxx-minx);
   float x2(maxx-0.04*range), y2(maxeff-0.07), ysingle(0.1);
-  TString lumi = "216 pb^{-1}";
+  TString lumi = "589 pb^{-1}";
   if(title.Contains("fb")){
     lumi = title; lumi.Remove(lumi.First("fb"), lumi.Length()); lumi = lumi + " fb^{-1}";
     title.Remove(0, title.First("fb")+2);
