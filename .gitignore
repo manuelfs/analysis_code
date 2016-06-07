@@ -1,7 +1,6 @@
 baby_*.*pp
 plots/*
 run/*.exe
-archive
 txt/data_card*
 
 # Compiled Object files
@@ -38,7 +37,6 @@ bin/*
 *.txt
 gmon.out
 out
-archive
 .nfs*
 .#-emacs*
 .DS_Store
