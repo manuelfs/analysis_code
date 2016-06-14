@@ -242,6 +242,15 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="mj"){
     cutType_ = kFloat;
     bf_ = &baby_base::mj;
+  }else if(var=="mj08"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::mj08;
+  }else if(var=="mj14"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::mj14;
+  }else if(var=="mj16"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::mj16;
   }else if(var=="nleps"){
     cutType_ = kInt;
     bi_ = &baby_base::nleps;
@@ -254,6 +263,9 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="nvmus"){
     cutType_ = kInt;
     bi_ = &baby_base::nvmus;
+  }else if(var=="nveto"){
+    cutType_ = kInt;
+    bi_ = &baby_base::nveto;
   }else if(var=="nmus"){
     cutType_ = kInt;
     bi_ = &baby_base::nmus;
