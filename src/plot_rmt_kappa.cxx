@@ -80,13 +80,19 @@ int main(){
     bkg.Add(folder+"*_TTWJets*.root");
     bkg.Add(folder+"*_TTZTo*.root");
     bkg.Add(folder+"*_ST_*.root");
-    bkg.Add(folder+"*DYJetsToLL*.root");
     bkg.Add(folder+"*QCD_HT*.root");
-    bkg.Add(folder+"*_WWTo*.root");
+
+    bkg.Add(folder+"*DYJetsToLL*.root");
+    bkg.Add(folder+"*_ZJet*.root");
+    bkg.Add(folder+"*ggZH_HToBB*.root");
+    bkg.Add(folder+"*ttHJetTobb*.root");
     bkg.Add(folder+"*_TTGJets*.root");
     bkg.Add(folder+"*_TTTT*.root");
-    bkg.Add(folder+"*_WZ*.root");
-    bkg.Add(folder+"*ttHJetTobb*.root");
+    bkg.Add(folder+"*_WH_HToBB*.root");
+    bkg.Add(folder+"*_ZH_HToBB*.root");
+    bkg.Add(folder+"*_WWTo*.root");
+    bkg.Add(folder+"*_WZTo*.root");
+    bkg.Add(folder+"*_ZZ_*.root");
   }
 
   ////// Defining cuts
