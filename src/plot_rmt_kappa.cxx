@@ -34,7 +34,8 @@ namespace{
   bool verbose(false);
   TString title_style("CMSPaper");
   bool do_data(false);
-  bool only_tt(true);
+  bool only_tt(false);
+  bool only_other(true);
   bool do_metbins(true);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
@@ -69,10 +70,12 @@ int main(){
 
   ////// Creating babies
   baby_basic data(folderdata+"*root");
-  // baby_basic bkg(folder+"*TTJets_Tu*"); // Use this one to test style quickly
-  baby_basic bkg(folder+"*TTJets*Lept*");
-  bkg.Add(folder+"*TTJets*HT*");
-  if(!only_tt){
+  baby_basic bkg("");
+  if(!only_other){
+    bkg.Add(folder+"*TTJets*Lept*");
+    bkg.Add(folder+"*TTJets*HT*");
+  }
+  if(!only_tt || only_other){
     bkg.Add(folder+"*_WJetsToLNu*.root");
     bkg.Add(folder+"*_TTWJets*.root");
     bkg.Add(folder+"*_TTZTo*.root");
@@ -352,6 +355,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     if(is_data) pname += "_data";
     else {
       if(only_tt) pname += "_tt";
+      else if(only_other) pname += "_other";
       else  pname += "_allmc";
     }
     pname += "_mt"+mtcut+".pdf";
@@ -517,6 +521,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
 
     if(!do_data) {
       if(only_tt) pname.ReplaceAll("data","tt");
+      else if(only_other) pname.ReplaceAll("data","other");
       else pname.ReplaceAll("data","allmc");
     }
     can.SaveAs(pname);
