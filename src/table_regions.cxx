@@ -211,13 +211,13 @@ int main(){
     vector<bcut> samcuts;
     //// Adding specific sample cut to bin cuts
     for(size_t bin(0); bin < bincuts.size(); bin++)
-      samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam].cut, "weight/eff_trig"));
+      samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam].cut, "weight"));
     for(size_t sam2(sam+1); sam2 < Samples.size(); sam2++){
       //// If 2 samples are the same, the bincuts are concatened so that the yields are found in one go
       if(Samples[sam].file == Samples[sam2].file) {
 	repeat_sam[sam2] = sam;
 	for(size_t bin(0); bin < bincuts.size(); bin++)
-	  samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut, "weight/eff_trig"));	
+	  samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut, "weight"));	
       }
     } // Loop over future samples
     if(repeat_sam[sam]==-1){
