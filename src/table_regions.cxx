@@ -23,7 +23,7 @@
 
 using namespace std;
 namespace {
-  TString luminosity = "2.1";
+  TString luminosity = "5";
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
@@ -35,123 +35,162 @@ int main(){
   time(&begtime);
 
   //// Defining samples, i.e. columns in the table
-  TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
-  vector<TString> s_tt;
-  s_tt.push_back(folder+"*_TTJets*Lept*");
-  s_tt.push_back(folder+"*_TTJets_HT*");
+  TString folder="/net/cms2/cms2r0/babymaker/babies/2016_06_09/mc/skim_baseline/";
+  TString folder_data="/net/cms2/cms2r0/babymaker/babies/2016_04_29/data/merged_1lht500met200/";
+
   vector<TString> s_t1t;
   s_t1t.push_back(folder+"*T1tttt*1500_*");
   vector<TString> s_t1tc;
   s_t1tc.push_back(folder+"*T1tttt*1200_*");
-  vector<TString> s_other;
-  s_other.push_back(folder+"*DYJetsToLL*");
-  s_other.push_back(folder+"*_QCD_HT*");
-  s_other.push_back(folder+"*_ZJet*");
-  s_other.push_back(folder+"*_WWTo*");
-  s_other.push_back(folder+"*ggZH_HToBB*");
-  s_other.push_back(folder+"*_WJetsToLNu*");
-  s_other.push_back(folder+"*_TTWJets*");
-  s_other.push_back(folder+"*_TTZTo*");
-  s_other.push_back(folder+"*ttHJetTobb*");
-  s_other.push_back(folder+"*_TTG*");
-  s_other.push_back(folder+"*_TTTT*");
-  s_other.push_back(folder+"*_WWTo*");
-  s_other.push_back(folder+"*_WZTo*");
+  
+  vector<TString> s_tt;
+  s_tt.push_back(folder+"*_TTJets*Lept*");
+  s_tt.push_back(folder+"*_TTJets*HT*");
   vector<TString> s_wjets;
-  s_wjets.push_back(folder+"*_WJetsToLNu*");
-  vector<TString> s_ttv;
-  s_ttv.push_back(folder+"*_TTWJets*");
-  s_ttv.push_back(folder+"*_TTZTo*");
-  s_ttv.push_back(folder+"*ttHJetTobb*");
+  s_wjets.push_back(folder+"*WJetsToLNu*");
   vector<TString> s_single;
   s_single.push_back(folder+"*_ST_*");
+  vector<TString> s_ttv;
+  s_ttv.push_back(folder+"*TTW*");
+  s_ttv.push_back(folder+"*TTZ*");
+  vector<TString> s_other;
+  s_other.push_back(folder+"*QCD_HT*");
+  s_other.push_back(folder+"*DYJetsToLL*.root");
+  s_other.push_back(folder+"*_ZJet*.root");
+  s_other.push_back(folder+"*ggZH_HToBB*.root");
+  s_other.push_back(folder+"*ttHJetTobb*.root");
+  s_other.push_back(folder+"*_TTGJets*.root");
+  s_other.push_back(folder+"*_TTTT*.root");
+  s_other.push_back(folder+"*_WH_HToBB*.root");
+  s_other.push_back(folder+"*_ZH_HToBB*.root");
+  s_other.push_back(folder+"*_WWTo*.root");
+  s_other.push_back(folder+"*_WZTo*.root");
+  s_other.push_back(folder+"*_ZZ_*.root");
+  
  
   vector<sfeats> Samples; 
   Samples.push_back(sfeats(s_other, "Other", 1001));
-  //Samples.push_back(sfeats(s_ttv, "$t\\bar{t}V$", 1002));
+  Samples.push_back(sfeats(s_ttv, "$t\\bar{t}V$", 1002));
   Samples.push_back(sfeats(s_single, "Single $t$", 1005));
-  //Samples.push_back(sfeats(s_wjets, "W+jets", 1004));
+  Samples.push_back(sfeats(s_wjets, "W+jets", 1004));
   Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ (1$\\ell$)", 1000,1, "ntruleps<=1&&stitch"));
   Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ ($2\\ell$)", 1006,1,"ntruleps>=2&&stitch"));
   Samples.push_back(sfeats(s_t1t, "T1tttt NC", 2));
   Samples.push_back(sfeats(s_t1tc, "T1tttt C", 2,2));
 
+
   //// tables has a vector of the tables you want to print
   vector<tfeats> tables;
-  TString baseline_s("mj>250"); // I don't add ht>500&&met>200 because it's in the skim already
+  TString baseline_s("mj14>250&&nveto==0&&stitch&&pass"); // I don't add ht>500&&met>200 because it's in the skim already
   TString indent("\\hspace{4 mm} ");
 
   //////////// Low MET, nleps == 1 ////////////
   // Pushing first table and adding rows
-  tables.push_back(tfeats("met<=400&&njets>=6&&nbm>=1&&nleps==1", "lowmet"));
-  tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "mt<=140&&mj<=400",  "-");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj<=400&&nbm==1&&njets<=8");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj<=400&&nbm==1&&njets>=9");
-  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt<=140&&mj<=400&&nbm==2&&njets<=8");
-  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt<=140&&mj<=400&&nbm==2&&njets>=9");
-  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt<=140&&mj<=400&&nbm>=3&&njets<=8");
-  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt<=140&&mj<=400&&nbm>=3&&njets>=9");
-  tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "mt<=140&&mj>400",  "-=");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj>400&&nbm==1&&njets<=8");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj>400&&nbm==1&&njets>=9");
-  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt<=140&&mj>400&&nbm==2&&njets<=8");
-  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt<=140&&mj>400&&nbm==2&&njets>=9");
-  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt<=140&&mj>400&&nbm>=3&&njets<=8");
-  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt<=140&&mj>400&&nbm>=3&&njets>=9");
-  tables.back().add("R3: $m_T > 140$, $M_J \\leq 400$", "mt>140&&mj<=400",  "-=");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj<=400&&nbm==1&&njets<=8");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj<=400&&nbm==1&&njets>=9");
-  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt>140&&mj<=400&&nbm==2&&njets<=8");
-  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt>140&&mj<=400&&nbm==2&&njets>=9");
-  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt>140&&mj<=400&&nbm>=3&&njets<=8");
-  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj<=400&&nbm>=3&&njets>=9");
-  tables.back().add("R4: $m_T>140$, $M_J > 400$",	"mt>140&&mj>400",  "-=");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj>400&&nbm==1&&njets<=8");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj>400&&nbm==1&&njets>=9");
-  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt>140&&mj>400&&nbm==2&&njets<=8");
-  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt>140&&mj>400&&nbm==2&&njets>=9");
-  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt>140&&mj>400&&nbm>=3&&njets<=8");
-  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj>400&&nbm>=3&&njets>=9");
+  tables.push_back(tfeats("met<=350&&njets>=6&&nbm>=1&&nleps==1", "lowmet"));
+  tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "mt<=140&&mj14<=400",  "-");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj14<=400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj14<=400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt<=140&&mj14<=400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt<=140&&mj14<=400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt<=140&&mj14<=400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt<=140&&mj14<=400&&nbm>=3&&njets>=9");
+  tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "mt<=140&&mj14>400",  "-=");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj14>400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj14>400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt<=140&&mj14>400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt<=140&&mj14>400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt<=140&&mj14>400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt<=140&&mj14>400&&nbm>=3&&njets>=9");
+  tables.back().add("R3: $m_T > 140$, $M_J \\leq 400$", "mt>140&&mj14<=400",  "-=");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj14<=400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj14<=400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt>140&&mj14<=400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt>140&&mj14<=400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt>140&&mj14<=400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj14<=400&&nbm>=3&&njets>=9");
+  tables.back().add("R4: $m_T>140$, $M_J > 400$",	"mt>140&&mj14>400",  "-=");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj14>400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj14>400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt>140&&mj14>400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt>140&&mj14>400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt>140&&mj14>400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj14>400&&nbm>=3&&njets>=9");
+
+  //////////// Med MET, nleps == 1 ////////////
+  tables.push_back(tfeats("met>350&&met<=500&&njets>=6&&nbm>=1&&nleps==1", "medmet"));
+  tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "mt<=140&&mj14<=400",  "-");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj14<=400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj14<=400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt<=140&&mj14<=400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt<=140&&mj14<=400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt<=140&&mj14<=400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt<=140&&mj14<=400&&nbm>=3&&njets>=9");
+  tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "mt<=140&&mj14>400",  "-=");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj14>400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj14>400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt<=140&&mj14>400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt<=140&&mj14>400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt<=140&&mj14>400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt<=140&&mj14>400&&nbm>=3&&njets>=9");
+  tables.back().add("R3: $m_T > 140$, $M_J \\leq 400$", "mt>140&&mj14<=400",  "-=");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj14<=400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj14<=400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt>140&&mj14<=400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt>140&&mj14<=400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt>140&&mj14<=400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj14<=400&&nbm>=3&&njets>=9");
+  tables.back().add("R4: $m_T>140$, $M_J > 400$",	"mt>140&&mj14>400",  "-=");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj14>400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj14>400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt>140&&mj14>400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt>140&&mj14>400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt>140&&mj14>400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj14>400&&nbm>=3&&njets>=9");
 
   //////////// High MET, nleps == 1 ////////////
-  tables.push_back(tfeats("met>400&&njets>=6&&nbm>=1&&nleps==1", "highmet"));
-  tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "mt<=140&&mj<=400",  "-");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj<=400&&nbm==1&&njets<=8");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj<=400&&nbm==1&&njets>=9");
-  tables.back().add(indent+"$n_b\\geq 2, n_j\\leq 8$",  "mt<=140&&mj<=400&&nbm>=2&&njets<=8");
-  tables.back().add(indent+"$n_b\\geq 2, n_j\\geq 9$",  "mt<=140&&mj<=400&&nbm>=2&&njets>=9");
-  tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "mt<=140&&mj>400",  "-=");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj>400&&nbm==1&&njets<=8");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj>400&&nbm==1&&njets>=9");
-  tables.back().add(indent+"$n_b\\geq 2, n_j\\leq 8$",  "mt<=140&&mj>400&&nbm>=2&&njets<=8");
-  tables.back().add(indent+"$n_b\\geq 2, n_j\\geq 9$",  "mt<=140&&mj>400&&nbm>=2&&njets>=9");
-  tables.back().add("R3: $m_T > 140$, $M_J \\leq 400$", "mt>140&&mj<=400",  "-=");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj<=400&&nbm==1&&njets<=8");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj<=400&&nbm==1&&njets>=9");
-  tables.back().add(indent+"$n_b\\geq 2, n_j\\leq 8$",  "mt>140&&mj<=400&&nbm>=2&&njets<=8");
-  tables.back().add(indent+"$n_b\\geq 2, n_j\\geq 9$",  "mt>140&&mj<=400&&nbm>=2&&njets>=9");
-  tables.back().add("R4: $m_T>140$, $M_J > 400$",	"mt>140&&mj>400",  "-=");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj>400&&nbm==1&&njets<=8");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj>400&&nbm==1&&njets>=9");
-  tables.back().add(indent+"$n_b\\geq 2, n_j\\leq 8$",  "mt>140&&mj>400&&nbm>=2&&njets<=8");
-  tables.back().add(indent+"$n_b\\geq 2, n_j\\geq 9$",  "mt>140&&mj>400&&nbm>=2&&njets>=9");
+  tables.push_back(tfeats("met>500&&njets>=6&&nbm>=1&&nleps==1", "highmet"));
+  tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "mt<=140&&mj14<=400",  "-");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj14<=400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj14<=400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt<=140&&mj14<=400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt<=140&&mj14<=400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt<=140&&mj14<=400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt<=140&&mj14<=400&&nbm>=3&&njets>=9");
+  tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "mt<=140&&mj14>400",  "-=");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt<=140&&mj14>400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt<=140&&mj14>400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt<=140&&mj14>400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt<=140&&mj14>400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt<=140&&mj14>400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt<=140&&mj14>400&&nbm>=3&&njets>=9");
+  tables.back().add("R3: $m_T > 140$, $M_J \\leq 400$", "mt>140&&mj14<=400",  "-=");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj14<=400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj14<=400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt>140&&mj14<=400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt>140&&mj14<=400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt>140&&mj14<=400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj14<=400&&nbm>=3&&njets>=9");
+  tables.back().add("R4: $m_T>140$, $M_J > 400$",	"mt>140&&mj14>400",  "-=");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	"mt>140&&mj14>400&&nbm==1&&njets<=8");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	"mt>140&&mj14>400&&nbm==1&&njets>=9");
+  tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	"mt>140&&mj14>400&&nbm==2&&njets<=8");
+  tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	"mt>140&&mj14>400&&nbm==2&&njets>=9");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "mt>140&&mj14>400&&nbm>=3&&njets<=8");
+  tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj14>400&&nbm>=3&&njets>=9");
+
 
   /////////////// nleps == 2 ///////////////
   tables.push_back(tfeats("met<=400&&njets>=5&&nbm<=2&&nleps==2", "dilepton"));
-  tables.back().add("D3: $M_J \\leq 400$",		"mj<=400",  "-=");
-  tables.back().add(indent+"$n_b=0, n_j\\leq 7$",	"mj<=400&&nbm==0&&njets<=7");
-  tables.back().add(indent+"$n_b=0, n_j\\geq 8$",	"mj<=400&&nbm==0&&njets>=8");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 7$",	"mj<=400&&nbm==1&&njets<=7");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 8$",	"mj<=400&&nbm==1&&njets>=8");
-  tables.back().add(indent+"$n_b= 2, n_j\\leq 7$",	"mj<=400&&nbm==2&&njets<=7");
-  tables.back().add(indent+"$n_b= 2, n_j\\geq 8$",	"mj<=400&&nbm==2&&njets>=8");
-  tables.back().add("D4: $M_J > 400$",			"mj>400",  "-=");
-  tables.back().add(indent+"$n_b=0, n_j\\leq 7$",	"mj>400&&nbm==0&&njets<=7");
-  tables.back().add(indent+"$n_b=0, n_j\\geq 8$",	"mj>400&&nbm==0&&njets>=8");
-  tables.back().add(indent+"$n_b=1, n_j\\leq 7$",	"mj>400&&nbm==1&&njets<=7");
-  tables.back().add(indent+"$n_b=1, n_j\\geq 8$",	"mj>400&&nbm==1&&njets>=8");
-  tables.back().add(indent+"$n_b= 2, n_j\\leq 7$",	"mj>400&&nbm==2&&njets<=7");
-  tables.back().add(indent+"$n_b= 2, n_j\\geq 8$",	"mj>400&&nbm==2&&njets>=8");
+  tables.back().add("D3: $M_J \\leq 400$",		"mj14<=400",  "-=");
+  tables.back().add(indent+"$n_b=0, n_j\\leq 7$",	"mj14<=400&&nbm==0&&njets<=7");
+  tables.back().add(indent+"$n_b=0, n_j\\geq 8$",	"mj14<=400&&nbm==0&&njets>=8");
+  tables.back().add(indent+"$n_b=1, n_j\\leq 7$",	"mj14<=400&&nbm==1&&njets<=7");
+  tables.back().add(indent+"$n_b=1, n_j\\geq 8$",	"mj14<=400&&nbm==1&&njets>=8");
+  tables.back().add(indent+"$n_b= 2, n_j\\leq 7$",	"mj14<=400&&nbm==2&&njets<=7");
+  tables.back().add(indent+"$n_b= 2, n_j\\geq 8$",	"mj14<=400&&nbm==2&&njets>=8");
+  tables.back().add("D4: $M_J > 400$",			"mj14>400",  "-=");
+  tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 7$",	"mj14>400&&nbm<=2&&njets<=7");
+  tables.back().add(indent+"$n_b\\leq2, n_j\\geq 8$",	"mj14>400&&nbm<=2&&njets>=8");
 
 
   /////////////////////////////  No more changes needed down here to add tables ///////////////////////
@@ -172,13 +211,13 @@ int main(){
     vector<bcut> samcuts;
     //// Adding specific sample cut to bin cuts
     for(size_t bin(0); bin < bincuts.size(); bin++)
-      samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam].cut, "weight"));
+      samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam].cut, "weight/eff_trig"));
     for(size_t sam2(sam+1); sam2 < Samples.size(); sam2++){
       //// If 2 samples are the same, the bincuts are concatened so that the yields are found in one go
       if(Samples[sam].file == Samples[sam2].file) {
 	repeat_sam[sam2] = sam;
 	for(size_t bin(0); bin < bincuts.size(); bin++)
-	  samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut, "weight"));	
+	  samcuts.push_back(bcut(bincuts[bin].cuts_+"&&"+Samples[sam2].cut, "weight/eff_trig"));	
       }
     } // Loop over future samples
     if(repeat_sam[sam]==-1){
@@ -211,8 +250,8 @@ int main(){
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
 		size_t ini) {
-  int nsig(0), digits(1);
-  for(unsigned sam(0); sam < Samples.size(); sam++) if(Samples[sam].isSig) nsig++;
+  int nsig(2), digits(1);
+  //  for(unsigned sam(0); sam < Samples.size(); sam++) if(Samples[sam].isSig) nsig++;
 
   TString outname = "txt/table_regions_"+table.tag+".tex";
   ofstream out(outname);
