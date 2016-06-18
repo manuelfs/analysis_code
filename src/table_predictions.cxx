@@ -18,8 +18,9 @@
 using namespace std;
 
 namespace{
-  double lumi(1.264);
+  double lumi(2.3);
   bool do_other(false);
+  bool sum_njnb(false);
   float syst = 1.;
 }
 
@@ -28,8 +29,8 @@ int main(){
 
   time_t begtime, endtime;
   time(&begtime);
-  TString folder="/cms2r0/babymaker/babies/2015_10_19/mc/skim_1lht500met200/";
-  TString folderdata="/cms2r0/babymaker/babies/2015_11_05/data/singlelep/combined/skim_1lht500met200/";
+  TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/merged_abcdnj4/";
+  TString folderdata="/cms2r0/babymaker/babies/2016_02_04/data/singlelep/combined/skim_abcdnj4/";
 
   ////// Creating babies
   baby_basic data(folderdata+"*root");
@@ -39,26 +40,32 @@ int main(){
   baby_basic *extra(&tt);
   if(do_other) extra = &other;
   else extra->Add(folder+"*_WJetsToLNu*");
-  extra->Add(folder+"*_TTWJets*.root");
-  extra->Add(folder+"*_TTZTo*.root");
-  extra->Add(folder+"*_ST_*.root");
-  extra->Add(folder+"*DYJetsToLL*.root");
-  extra->Add(folder+"*QCD_HT*.root");
-  extra->Add(folder+"*_WWTo*.root");
-  extra->Add(folder+"*_TTGJets*.root");
-  extra->Add(folder+"*_TTTT*.root");
-  extra->Add(folder+"*_WZ*.root");
-  extra->Add(folder+"*ttHJetTobb*.root");
+  extra->Add(folder+"*DYJetsToLL*");
+  extra->Add(folder+"*_QCD_HT*");
+  extra->Add(folder+"*_ZJet*");
+  extra->Add(folder+"*_WWTo*");
+  extra->Add(folder+"*ggZH_HToBB*");
+  extra->Add(folder+"*_TTWJets*");
+  extra->Add(folder+"*_TTZTo*");
+  extra->Add(folder+"*ttHJetTobb*");
+  extra->Add(folder+"*_TTG*");
+  extra->Add(folder+"*_TTTT*");
+  extra->Add(folder+"*_WZTo*");
+  extra->Add(folder+"*_ST_*");
 
   ////// Defining cuts
-  bcut baseline("nleps==1&&mj>250&&njets>=6&&nbm>=1&&stitch&&pass");
+  bcut baseline("nleps==1&&mj>250&&njets>=4&&nbm>=1&&stitch&&pass");
+  //bcut baseline("njets>=6"); // Everything else in skim
 
-  vector<TString> njbcuts = {"njets<=8&&nbm==1", "njets>=9&&nbm==1", 
-			     "njets<=8&&nbm==2", "njets>=9&&nbm==2", 
-			     "njets<=8&&nbm>=3", "njets>=9&&nbm>=3", 
-			     "njets<=8&&nbm==1", "njets>=9&&nbm==1", 
-			     "njets<=8&&nbm>=2", "njets>=9&&nbm>=2"}; 
- 
+  // vector<TString> njbcuts = {"njets<=8&&nbm==1", "njets>=9&&nbm==1", 
+  // 			     "njets<=8&&nbm==2", "njets>=9&&nbm==2", 
+  // 			     "njets<=8&&nbm>=3", "njets>=9&&nbm>=3", 
+  // 			     "njets<=8&&nbm==1", "njets>=9&&nbm==1", 
+  // 			     "njets<=8&&nbm>=2", "njets>=9&&nbm>=2"}; 
+  vector<TString> njbcuts = {"njets>=4&&njets<=5&&nbm>=1", "njets==5&&nbm>=1", 
+			     "njets==4&&nbm==2", "njets==5&&nbm==2", 
+			     "njets==4&&nbm>=3", "njets==5&&nbm>=3"}; 
+  njbcuts.resize(6);
   vector<TString> metcuts = {"met<=400", "met>400"};
   size_t ilowmet(6);
 
@@ -69,7 +76,8 @@ int main(){
   for(size_t ind(0); ind<njbcuts.size(); ind++){
     for(size_t obs(0); obs < abcdcuts.size(); obs++){
       TString totcut(abcdcuts[obs]+"&&"+metcuts[ind>=ilowmet]);
-      if(obs%2 == 1) totcut += ("&&"+njbcuts[ind]);
+      if(obs%2 == 1 || !sum_njnb) totcut += ("&&"+njbcuts[ind]);
+      
       bincuts.push_back(bcut(totcut));
     } // Loop over observables going into kappa
   } // Loop over signal bins
@@ -173,10 +181,21 @@ int main(){
     out << "& & Bkg.~Pred. &Bkg.~Pred.   \\\\ \n";
     out << "Bin & MC & toys (stat) & toys (stat+sys) & Obs. \\\\ \\hline\\hline\n";
     out << " \\multicolumn{5}{c}{$200<\\text{MET}\\leq 400$}  \\\\ \\hline\n";
-    out << "R1: all $n_j,n_b$ & "<<mcyield[0] <<" & $"<<datayield[0] 
-	<< " \\pm " << sqrt(datayield[0]) <<"$ & $"<<datayield[0] 
-	<< " \\pm " << sqrt(datayield[0]) <<"$ & "
-	<< setprecision(0) <<datayield[0]<<setprecision(digits)<<" \\\\"<<endl;
+    if(sum_njnb){
+      size_t index(0);
+      out << "R1: all $n_j,n_b$ & "<<mcyield[index] <<" & $"<<datayield[index] 
+	  << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
+	  << " \\pm " << sqrt(datayield[index]) <<"$ & "
+	  << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
+    } else {
+      for(size_t ind(0); ind<ilowmet; ind++){
+	size_t index(nabcd*ind+0);
+	out << "R1: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<datayield[index] 
+	    << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
+	    << " \\pm " << sqrt(datayield[index]) <<"$ & "
+	    << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
+      }
+    }
     for(size_t ind(0); ind<ilowmet; ind++){
       size_t index(nabcd*ind+1);
       out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<datayield[index] 
@@ -184,10 +203,21 @@ int main(){
 	 << " \\pm " << sqrt(datayield[index]) <<"$ & "
 	 << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
     }
-    out << "R3: all $n_j,n_b$ & "<<mcyield[2] <<" & $"<<datayield[2] 
-	<< " \\pm " << sqrt(datayield[2]) <<"$ & $"<<datayield[2] 
-	<< " \\pm " << sqrt(datayield[2]) <<"$ & "
-	<< setprecision(0) << datayield[2] << setprecision(digits)<<" \\\\"<<endl;
+    if(sum_njnb){
+      size_t index(2);
+      out << "R3: all $n_j,n_b$ & "<<mcyield[index] <<" & $"<<datayield[index] 
+	  << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
+	  << " \\pm " << sqrt(datayield[index]) <<"$ & "
+	  << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
+    } else {
+      for(size_t ind(0); ind<ilowmet; ind++){
+	size_t index(nabcd*ind+2);
+	out << "R3: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<datayield[index] 
+	    << " \\pm " << sqrt(datayield[index]) <<"$ & $"<<datayield[index] 
+	    << " \\pm " << sqrt(datayield[index]) <<"$ & "
+	    << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
+      }
+    }
     out << "\\hline"<<endl;
     for(size_t ind(0); ind<ilowmet; ind++){
       size_t index(nabcd*ind+3);
@@ -219,8 +249,8 @@ int main(){
       out<<"R4: "<<cuts2tex(njbcuts[ind])<<" & "<<mcyield[index] <<" & $"<<preds[ind][0] 
 	 << "^{+" << preds[ind][1] <<"}_{-" << preds[ind][2] 
 	 <<"}$ & $"<<preds[ind][3] << "^{+" << preds[ind][4] 
-	 <<"}_{-" << preds[ind][5] <<"}$ & "<<datayield[index]
-	 << setprecision(0) <<setprecision(digits)<<" \\\\"<<endl;
+	 <<"}_{-" << preds[ind][5] <<"}$ & "<< setprecision(0)<<datayield[index]
+	 <<setprecision(digits)<<" \\\\"<<endl;
     }
   } else {
     out << "\n\\begin{tabular}[tbp!]{ l rrr |";

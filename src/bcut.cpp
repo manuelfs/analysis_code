@@ -272,6 +272,9 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="ntruleps"){
     cutType_ = kInt;
     bi_ = &baby_base::ntruleps;
+  }else if(var=="ntrutaush"){
+    cutType_ = kInt;
+    bi_ = &baby_base::ntrutaush;
   }else if(var=="njets"){
     cutType_ = kInt;
     bi_ = &baby_base::njets;
@@ -333,11 +336,11 @@ void onecut::assignBranch(TString var, TString val){
       cutType_ = kvFloat;
       bvf_ = &baby_base::sys_mt;
     }else {
-      cout<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl;
+      cout<<endl<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl<<endl;
       exit(0);
     }
   }else {
-    cout<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl;
+    cout<<endl<<"Branch \""<<var<<" not defined. Add it to onecut::assignBranch in bcut.cpp"<<endl<<endl;
     exit(0);
   } 
 
