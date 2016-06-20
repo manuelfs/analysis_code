@@ -42,6 +42,10 @@ int main(int argc, char *argv[]){
 
   TString foldermc(bfolder+"/cms2r0/babymaker/babies/2016_06_14/mc/merged_standard/");
   TString folderdata(bfolder+"/cms2r0/babymaker/babies/2016_06_14/data/skim_standard/");
+  if(method.Contains("met150")){
+    foldermc = bfolder+"/cms2r0/babymaker/babies/2016_06_14/mc/merged_1lht500met150nj5/";
+    folderdata = bfolder+"/cms2r0/babymaker/babies/2016_06_14/data/merged_1lht500met150nj5/";
+  }
 
   ////// Creating babies
   baby_basic data(folderdata+"*root");
@@ -51,16 +55,22 @@ int main(int argc, char *argv[]){
   baby_basic *extra(&tt);
   if(do_other) extra = &other;
   else extra->Add(foldermc+"*_WJetsToLNu*");
-  extra->Add(foldermc+"*_TTWJets*.root");
-  extra->Add(foldermc+"*_TTZTo*.root");
   extra->Add(foldermc+"*_ST_*.root");
+  extra->Add(foldermc+"*TTW*.root");
+  extra->Add(foldermc+"*TTZ*.root");
   extra->Add(foldermc+"*DYJetsToLL*.root");
   extra->Add(foldermc+"*QCD_HT*.root");
-  extra->Add(foldermc+"*_WWTo*.root");
+
+  extra->Add(foldermc+"*_ZJet*.root");
+  extra->Add(foldermc+"*_ttHJetTobb*.root");
   extra->Add(foldermc+"*_TTGJets*.root");
   extra->Add(foldermc+"*_TTTT*.root");
+  extra->Add(foldermc+"*_WH_HToBB*.root");
+  extra->Add(foldermc+"*_ZH_HToBB*.root");
+
+  extra->Add(foldermc+"*_WWTo*.root");
   extra->Add(foldermc+"*_WZ*.root");
-  extra->Add(foldermc+"*ttHJetTobb*.root");
+  extra->Add(foldermc+"*_ZZ_*.root");
 
   ////// Defining cuts
   TString base_s = "mj14>250&&njets>=5&&stitch&&pass&&nonblind";
@@ -68,9 +78,13 @@ int main(int argc, char *argv[]){
   vector<TString> njbcuts = {"njets>=6&&njets<=8", "njets>=9", "njets>=6&&njets<=8", "njets>=9"}; 
   vector<TString> njbcuts_2l = {"njets>=5&&njets<=7", "njets>=8", "njets>=5&&njets<=7", "njets>=8"}; 
   vector<TString> njbcuts_veto = {"njets>=6&&njets<=8", "njets>=9", "njets>=6&&njets<=8", "njets>=9"}; 
-  vector<TString> njbcuts_5j = {"nbm==1&&njets==5", "nbm==2&&njets==5", "nbm==1&&njets==5", "nbm==2&&njets==5"}; 
+  vector<TString> njbcuts_5j = {"nbm==1&&njets==5", "nbm>=2&&njets==5", "nbm==1&&njets==5", "nbm>=2&&njets==5"}; 
+  vector<TString> njbcuts_m1lmet150nb12 = {"nbm==1&&njets>=6&&njets<=8", "nbm>=2&&njets>=6&&njets<=8", 
+				       "nbm==1&&njets>=9", "nbm>=2&&njets>=9"}; 
+  vector<TString> njbcuts_m1lmet150 = {"njets>=6&&njets<=8", "njets>=9"}; 
+  vector<TString> njbcuts_m2lmet150 = {"njets>=5&&njets<=7", "njets>=8"}; 
 
-  size_t ilowmet(2);
+  size_t ilowmet(2); // njbcuts index up to which metcuts[0] is applied
   vector<TString> metcuts = {"met<=350", "met>350&&met<=500"};
 
   vector<TString> abcdcuts_normal = {"mt<=140&&mj14<=400", 
@@ -88,28 +102,43 @@ int main(int argc, char *argv[]){
 
 
   vector<TString> abcdcuts, njbcuts_himt;
-  TString region_s = "R", method_s;
+  TString region_s = "R", method_s, base_all = "mj14>250&&pass&&nonblind&&stitch&&";
 
   if(method=="m2l") {
-    base_s = "mj14>250&&njets>=5&&stitch&&pass&&nonblind";
+    base_s = base_all+"njets>=5";
     njbcuts_himt = njbcuts_2l;
     abcdcuts = abcdcuts_2l;
     region_s = "D";
     method_s = "$2\\ell$";
     unblind = true;
   } else if(method=="mveto") {
-    base_s = "mj14>250&&njets>=6&&stitch&&pass&&nonblind&&nleps==1";
+    base_s = base_all+"njets>=6&&nbm>=1&&nleps==1";
     njbcuts_himt = njbcuts_veto;
     abcdcuts = abcdcuts_veto;
     region_s = "D";
     method_s = "$N_{\\rm veto}=1$";
     unblind = true;
   } else if(method=="m5j") {
-    base_s = "mj14>250&&njets==5&&stitch&&pass&&nonblind&&nleps==1&&nveto==0";
+    base_s = base_all+"njets==5&&nleps==1&&nveto==0";
     njbcuts = njbcuts_5j;
     njbcuts_himt = njbcuts_5j;
     abcdcuts = abcdcuts_normal;
     method_s = "$N_{\\rm jets}=5$";
+  } else if(method=="m1lmet150") {
+    base_s = base_all+"njets>=6&&nbm>=1&&nleps==1&&nveto==0";
+    njbcuts = njbcuts_m1lmet150nb12;
+    njbcuts_himt = njbcuts_m1lmet150nb12;
+    // njbcuts = njbcuts_m1lmet150;
+    // njbcuts_himt = njbcuts_m1lmet150;
+    abcdcuts = abcdcuts_normal;
+    method_s = "$1\\ell$, MET150";
+    ilowmet = njbcuts.size();
+  } else if(method=="m2lmet150") {
+    base_s = base_all+"njets>=5";
+    njbcuts = njbcuts_m1lmet150;
+    njbcuts_himt = njbcuts_m2lmet150;
+    abcdcuts = abcdcuts_2l;
+    method_s = "$2\\ell$, MET150";
   }else {
     cout<<"Method "<<method<<" not available. Exiting"<<endl<<endl; 
     return 0;
@@ -238,7 +267,8 @@ int main(int argc, char *argv[]){
   if(!do_other){
     out << "\n\\begin{tabular}[tbp!]{ l rrrr}\\hline\\hline\n";
     out << method_s<<" & $\\kappa$ & MC  & Pred. & Obs. \\\\ \\hline\\hline\n";
-    out << " \\multicolumn{5}{c}{$200<\\text{MET}\\leq 350$}  \\\\ \\hline\n";
+    if(method.Contains("met150")) out << " \\multicolumn{5}{c}{$150<\\text{MET}\\leq 200$}  \\\\ \\hline\n";
+    else out << " \\multicolumn{5}{c}{$200<\\text{MET}\\leq 350$}  \\\\ \\hline\n";
     out << "R1: all $n_j,n_b$ & -- & "<<mcyield[0] <<" & -- & "
 	<< setprecision(0) <<datayield[0]<<setprecision(digits)<<" \\\\"<<endl;
     for(size_t ind(0); ind<ilowmet; ind++){
@@ -258,25 +288,27 @@ int main(int argc, char *argv[]){
       if(unblind) out << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
       else out << blind_s<<" \\\\"<<endl;
     }
-    out << "\\hline\\hline\n \\multicolumn{5}{c}{$350<\\text{MET}\\leq 500$}  \\\\ \\hline\n";
-    out << "R1: all $n_j,n_b$ & -- & "<<mcyield[nabcd*ilowmet] <<" & -- & "
-	<< setprecision(0) <<datayield[nabcd*ilowmet]<<setprecision(digits)<<" \\\\"<<endl;
-    for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
-      size_t index(nabcd*ind+1);
-      out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & -- & "<<mcyield[index] <<" & -- & "
-	 << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
-    }
-    out << region_s<<"3: all $n_j,n_b$ & -- & "<<mcyield[nabcd*ilowmet+2] <<" & -- & "
-	<< setprecision(0) <<datayield[nabcd*ilowmet+2]<<setprecision(digits)<<" \\\\"<<endl;
-    out << "\\hline"<<endl;
-    for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
-      size_t index(nabcd*ind+3);
-      out<<region_s<<"4: "<<cuts2tex(njbcuts[ind])<<" & $"<<preds[ind][6] 
-	 << "^{+" << preds[ind][7] <<"}_{-" << preds[ind][8] 
-	 <<"}$ & "<<mcyield[index] <<" & $"<<preds[ind][0] << "^{+" << preds[ind][1] 
-	 <<"}_{-" << preds[ind][2] <<"}$ & ";
-      if(unblind) out<< setprecision(0) <<datayield[index] <<setprecision(digits)<<" \\\\"<<endl;
-      else out<< blind_s<<" \\\\"<<endl;
+    if(ilowmet<njbcuts.size()){
+      out << "\\hline\\hline\n \\multicolumn{5}{c}{$350<\\text{MET}\\leq 500$}  \\\\ \\hline\n";
+      out << "R1: all $n_j,n_b$ & -- & "<<mcyield[nabcd*ilowmet] <<" & -- & "
+	  << setprecision(0) <<datayield[nabcd*ilowmet]<<setprecision(digits)<<" \\\\"<<endl;
+      for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
+	size_t index(nabcd*ind+1);
+	out<<"R2: "<<cuts2tex(njbcuts[ind])<<" & -- & "<<mcyield[index] <<" & -- & "
+	   << setprecision(0) <<datayield[index]<<setprecision(digits)<<" \\\\"<<endl;
+      }
+      out << region_s<<"3: all $n_j,n_b$ & -- & "<<mcyield[nabcd*ilowmet+2] <<" & -- & "
+	  << setprecision(0) <<datayield[nabcd*ilowmet+2]<<setprecision(digits)<<" \\\\"<<endl;
+      out << "\\hline"<<endl;
+      for(size_t ind(ilowmet); ind<njbcuts.size(); ind++){
+	size_t index(nabcd*ind+3);
+	out<<region_s<<"4: "<<cuts2tex(njbcuts[ind])<<" & $"<<preds[ind][6] 
+	   << "^{+" << preds[ind][7] <<"}_{-" << preds[ind][8] 
+	   <<"}$ & "<<mcyield[index] <<" & $"<<preds[ind][0] << "^{+" << preds[ind][1] 
+	   <<"}_{-" << preds[ind][2] <<"}$ & ";
+	if(unblind) out<< setprecision(0) <<datayield[index] <<setprecision(digits)<<" \\\\"<<endl;
+	else out<< blind_s<<" \\\\"<<endl;
+      }
     }
   } else {
     out << "\n\\begin{tabular}[tbp!]{ l rrr |";
