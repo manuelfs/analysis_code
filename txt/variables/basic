@@ -231,6 +231,8 @@ bool pass_nohf;
 ################  Fat Jets   ##################
 int nfjets
 float mj
+float mj14
+float mj16
 std::vector<float> fjets_pt
 std::vector<float> fjets_eta
 std::vector<float> fjets_phi
