@@ -545,8 +545,8 @@ TString cuts2tex(TString cuts){
   cuts.ReplaceAll("mumuv_pt", "p^{\\mu\\mu}_T"); 
   cuts.ReplaceAll("ht_ra2", "H_T"); cuts.ReplaceAll("ht_clean", "H_T"); cuts.ReplaceAll("ht", "H_T"); 
   cuts.ReplaceAll("mj", "M_J"); cuts.ReplaceAll("met", "\\mathrm{MET}");  
-  cuts.ReplaceAll("njets_ra2", "n_j");  cuts.ReplaceAll("njets_clean", "n_j");  cuts.ReplaceAll("njets", "n_j");  
-  cuts.ReplaceAll("nbm", "n_b");  cuts.ReplaceAll("nleps", "n_{\\ell}"); 
+  cuts.ReplaceAll("njets_ra2", "n_j");  cuts.ReplaceAll("njets_clean", "n_j");  cuts.ReplaceAll("njets", "N_j");  
+  cuts.ReplaceAll("nbm", "N_b");  cuts.ReplaceAll("nleps", "n_{\\ell}"); 
   cuts.ReplaceAll("nvels", "n_e"); cuts.ReplaceAll("nels", "n_e");  
   cuts.ReplaceAll("nvmus", "n_\\mu"); cuts.ReplaceAll("nmus", "n_\\mu");  
   cuts.ReplaceAll(">=", "\\geq ");  cuts.ReplaceAll("<=", " \\leq "); cuts.ReplaceAll("==", " = ");
@@ -619,6 +619,7 @@ TString cuts2title(TString title){
   title.ReplaceAll("ntks_chg==0", " ITV");
   title.ReplaceAll("nbm","N_{b}"); 
   title.ReplaceAll("nbl","n_{b,l}");
+  title.ReplaceAll("mj14", " M_{J}");
   title.ReplaceAll("mj", " M_{J}");
   
   title.ReplaceAll("el_tks_mt", "Track m_{T}"); title.ReplaceAll("mu_tks_mt", "Track m_{T}"); title.ReplaceAll("had_tks_mt", "Track m_{T}");
