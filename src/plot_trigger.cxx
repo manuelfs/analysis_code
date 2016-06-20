@@ -55,10 +55,14 @@ int main(){
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  
     bfolder = "/net/cms2"; // In laptops, you can't create a /net folder
 
-  TString folder(bfolder+"/cms2r0/babymaker/babies/2016_06_14/data/unskimmed/");
+  TString folder(bfolder+"/cms2r0/babymaker/babies/2016_06_14/data/");
 
-  TChain c_mu("tree");  c_mu.Add(folder+"/skim_nm1nj2/*root");
-  TChain c_el("tree");  c_el.Add(folder+"/skim_ne1nj2/*root");
+  TChain c_ht900("tree"); c_ht900.Add(folder+"/skim_ht900/*.root");
+  TChain c_hadll("tree"); c_hadll.Add(folder+"/merged_ht250nj3llm60/*.root");
+  TChain c_met("tree"); c_met.Add(folder+"/unskimmed/skim_met150/*.root");
+  TChain c_mu("tree");  c_mu.Add(folder+"/unskimmed/skim_nm1nj2/*root");
+  TChain c_el("tree");  c_el.Add(folder+"/unskimmed/skim_ne1nj2/*root");
+  TChain c_ll("tree");  c_ll.Add(folder+"/merged_llpt200llm60/*root");
 
 
   float minx(0), maxx(460);
@@ -69,50 +73,264 @@ int main(){
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////  MET/MHT, muon/electron  //////////////////////////////////////////
+  //////////////////////////////////  MET/MHT, electron  /////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  dphi = "abs(abs(abs(met_phi-mus_phi)-3.14159)-3.14159)";
-  mindp = "Min$("+dphi+")";
-  maxdp = "Max$("+dphi+")";
-  baseline = "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&met>250&&";
+  minx = 0; maxx = 800; nbins = static_cast<int>((maxx-minx)/20);
+  // MET100, MET110, MET120: Fake MHT
+  PlotTurnOn(&c_ht900, "met", nbins,minx,maxx, "E_{T}^{miss}",
+	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0&&met/met_calo<2", 
+	     "((trig[13]||trig[33]))", "HT800, H_{T}>900, N_{lep}=0, N_{jet}#geq3, PF/calo<2", "MHT100 || MHTNoMu100");
+  PlotTurnOn(&c_ht900, "met", nbins,minx,maxx, "E_{T}^{miss}",
+	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0", 
+	     "((trig[13]||trig[33]))", "HT800, H_{T} > 900, N_{lep} = 0, N_{jet} #geq 3", "MHT100 || MHTNoMu100");
+  PlotTurnOn(&c_ht900, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0", 
+	     "((trig[13]||trig[33]))", "HT800, H_{T} > 900, N_{lep} = 0, N_{jet} #geq 3", "MHT100 || MHTNoMu100");
 
-  // MET100, METNoMu100: MET dphi
-  minx = 0; maxx = 520; nbins = static_cast<int>((maxx-minx)/40);
-  PlotTurnOn(&c_mu, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&Min$("+dphi+")>2.8", "(trig[13]||trig[33])",  
-	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, #Delta#phi_{min}>2.8", "MET100 || METNoMu100",-250);
-  PlotTurnOn(&c_mu, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&Max$("+dphi+")<0.3", "(trig[13]||trig[33])",  
-	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, #Delta#phi_{max}<0.3", "MET100 || METNoMu100",-250);
+  baseline = "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0";
+  cout<<endl<<"=========  MHT100 fake MHT =========="<<endl;
+  Efficiency(&c_ht900, baseline+"&&mht>250&&mht<=300", "(trig[13]||trig[33])");
+  Efficiency(&c_ht900, baseline+"&&mht>300",           "(trig[13]||trig[33])");
+  return 0;
 
 
-  minx = 0; maxx = 520; nbins = static_cast<int>((maxx-minx)/10);
-  // MET100, MET110, MET120: MET
-  PlotTurnOn(&c_mu, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2", "(trig[13]||trig[33])",  
-	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2", "MET100 || METNoMu100",100);
+  // MET100: MET
   PlotTurnOn(&c_el, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=3&&nvmus==0", 
-	     "(trig[13]||trig[33])", "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 3", "MET100 || METNoMu100");
+	     "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=3&&nvmus==0", "((trig[13]||trig[33]))",      
+	     "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 3", "MET100 || METNoMu100");
+  // MET100, MET110, MET120: MHT
+  PlotTurnOn(&c_el, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=3&&mht/met<5&&nvmus==0", 
+	     "((trig[13]||trig[33]))", "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 3", "MHT100 || MHTNoMu100");
+  PlotTurnOn(&c_el, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=3&&mht/met<5&&nvmus==0", 
+	     "((trig[14]||trig[15]))", "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 3", "MHT110 || MHTNoMu110");
+  PlotTurnOn(&c_el, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=3&&mht/met<5&&nvmus==0", 
+	     "(trig[30])||trig[31]", "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 3", "MHT120 || MHTNoMu120");
 
+  baseline = "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=3&&mht/met<5&&nvmus==0";
+  cout<<endl<<"=========  MHT100  =========="<<endl;
+  Efficiency(&c_el, baseline+"&&mht>200&&mht<=250", "(trig[13]||trig[33])");
+  Efficiency(&c_el, baseline+"&&mht>250&&mht<=300", "(trig[13]||trig[33])");
+  Efficiency(&c_el, baseline+"&&mht>300&&mht<=500", "(trig[13]||trig[33])");
+  Efficiency(&c_el, baseline+"&&mht>500",           "(trig[13]||trig[33])");
+  Efficiency(&c_el, baseline+"&&mht>300",           "(trig[13]||trig[33])");
 
-  cout<<endl<<"=========  MET100  =========="<<endl;
-  Efficiency(&c_mu, baseline+maxdp+"<0.3", "trig[13]");
-  Efficiency(&c_mu, baseline+maxdp+">=0.3&&"+mindp+"<=2.8", "trig[13]");
-  Efficiency(&c_mu, baseline+mindp+">2.8", "trig[13]");
+  // cout<<endl<<"=========  MHT110  =========="<<endl;
+  // Efficiency(&c_el, baseline+"&&mht>200&&mht<=250", "trig[14]");
+  // Efficiency(&c_el, baseline+"&&mht>250&&mht<=300", "trig[14]");
+  // Efficiency(&c_el, baseline+"&&mht>300&&mht<=500", "trig[14]");
+  // Efficiency(&c_el, baseline+"&&mht>500",           "trig[14]");
 
-  cout<<endl<<"=========  METNoMu100  =========="<<endl;
-  Efficiency(&c_mu, baseline+maxdp+"<0.3", "trig[33]");
-  Efficiency(&c_mu, baseline+maxdp+">=0.3&&"+mindp+"<=2.8", "trig[33]");
-  Efficiency(&c_mu, baseline+mindp+">2.8", "trig[33]");
-
-  cout<<endl<<"=========  MET100 OR METNoMu100  =========="<<endl;
-  Efficiency(&c_mu, baseline+maxdp+"<0.3", "(trig[13]||trig[33])");
-  Efficiency(&c_mu, baseline+maxdp+">=0.3&&"+mindp+"<=2.8", "(trig[13]||trig[33])");
-  Efficiency(&c_mu, baseline+mindp+">2.8", "(trig[13]||trig[33])");
+  cout<<endl<<"=========  MHT120  =========="<<endl;
+  Efficiency(&c_el, baseline+"&&mht>200&&mht<=250", "(trig[30]||trig[31])");
+  Efficiency(&c_el, baseline+"&&mht>250&&mht<=300", "(trig[30]||trig[31])");
+  Efficiency(&c_el, baseline+"&&mht>300&&mht<=500", "(trig[30]||trig[31])");
+  Efficiency(&c_el, baseline+"&&mht>500",           "(trig[30]||trig[31])");
+  Efficiency(&c_el, baseline+"&&mht>300",           "(trig[30]||trig[31])");
 
   cout<<endl<<endl;
 
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////  MET/MHT, muon  /////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  dphi = "abs(abs(abs(mht_phi-mus_phi)-3.14159)-3.14159)";
+  mindp = "Min$("+dphi+")";
+  maxdp = "Max$("+dphi+")";
+  // MET110, METNoMu110: MHT dphi
+  minx = 0; maxx = 3.2; nbins = static_cast<int>((maxx-minx)/0.2);
+  PlotTurnOn(&c_mu, mindp, nbins,minx,maxx, "#Delta#phi(H_{T}^{miss},#mu)",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&mht>250", "(trig[33])",  
+	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, H_{T}^{miss}>250", "MHTNoMu100",0);
+  PlotTurnOn(&c_mu, mindp, nbins,minx,maxx, "#Delta#phi(H_{T}^{miss},#mu)",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&mht>250", "(trig[13]||trig[33])",  
+	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, H_{T}^{miss}>250", "MHT100 || MHTNoMu100",0);
+  PlotTurnOn(&c_mu, mindp, nbins,minx,maxx, "#Delta#phi(H_{T}^{miss},#mu)",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&mht>250", "(trig[13])",  
+	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, H_{T}^{miss}>250", "MHT100",0);
+
+  minx = 0; maxx = 520; nbins = static_cast<int>((maxx-minx)/20);
+  PlotTurnOn(&c_mu, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&Max$("+dphi+")<0.3", "(trig[13])",  
+	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, #Delta#phi_{max}<0.3", "MHT100",-250);
+  PlotTurnOn(&c_mu, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&Max$("+dphi+")<0.3", "(trig[33])",  
+	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, #Delta#phi_{max}<0.3", "MHTNoMu100",-250);
+  PlotTurnOn(&c_mu, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&Min$("+dphi+")>2.7", "(trig[13])",  
+	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, #Delta#phi_{min}>2.7", "MHT100",-250);
+  PlotTurnOn(&c_mu, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&Min$("+dphi+")>2.7", "(trig[33])",  
+	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, #Delta#phi_{min}>2.7", "MHTNoMu100",-250);
+
+  PlotTurnOn(&c_mu, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&Max$("+dphi+")<0.3", 
+	     "(trig[13]||trig[33])",  
+	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, #Delta#phi_{max}<0.3", "MHT100 || MHTNoMu100",-250);
+  PlotTurnOn(&c_mu, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&Min$("+dphi+")>2.7", 
+	     "(trig[13]||trig[33])",  
+	     "IsoMu22, N_{#mu}#geq1, N_{jet}#geq2, #Delta#phi_{min}>2.7", "MHT100 || MHTNoMu100",-250);
+
+
+  baseline = "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=2&&mht/met<5&&mht>250&&";
+  cout<<endl<<"=========  MHT110  =========="<<endl;
+  Efficiency(&c_mu, baseline+maxdp+"<0.3", "trig[14]");
+  Efficiency(&c_mu, baseline+maxdp+">=0.3&&"+mindp+"<=2.7", "trig[14]");
+  Efficiency(&c_mu, baseline+mindp+">2.7", "trig[14]");
+
+  cout<<endl<<"=========  MHTNoMu110  =========="<<endl;
+  Efficiency(&c_mu, baseline+maxdp+"<0.3", "trig[15]");
+  Efficiency(&c_mu, baseline+maxdp+">=0.3&&"+mindp+"<=2.7", "trig[15]");
+  Efficiency(&c_mu, baseline+mindp+">2.7", "trig[15]");
+
+  cout<<endl<<"=========  MHT110 OR MHTNoMu110  =========="<<endl;
+  Efficiency(&c_mu, baseline+maxdp+"<0.3", "(trig[14]||trig[15])");
+  Efficiency(&c_mu, baseline+maxdp+">=0.3&&"+mindp+"<=2.7", "(trig[14]||trig[15])");
+  Efficiency(&c_mu, baseline+mindp+">2.7", "(trig[14]||trig[15])");
+
+  cout<<endl<<endl;
+
+
+
+  // MET110, METNoMu110: MHT
+  minx = 0; maxx = 520; nbins = static_cast<int>((maxx-minx)/10);
+  PlotTurnOn(&c_mu, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=3&&mht/met<5", "(trig[14])",  
+	     "IsoMu22, N_{#mu,25} #geq 1, N_{jet} #geq 3", "MET110",100);
+  PlotTurnOn(&c_mu, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=3&&mht/met<5", "(trig[15])",  
+	     "IsoMu22, N_{#mu,25} #geq 1, N_{jet} #geq 3", "METNoMu110",110);
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////  HT, dilepton   ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  minx = 0; maxx = 950; nbins = static_cast<int>((maxx-minx)/50);
+  PlotTurnOn(&c_ll, "ht", nbins,minx,maxx, "H_{T}",
+	     "trig[32]&&nmus>=1&&mumu_pt>200", "trig[2]",
+	     "IsoMu22, N_{#mu}=2, p_{T}(Z)>200", "Mu15_HT600", 250,1,true,true);
+  PlotTurnOn(&c_ll, "ht", nbins,minx,maxx, "H_{T}",
+	     "trig[29]&&nels>=1&&elel_pt>200", "trig[6]",
+	     "Ele23, N_{e}=2, p_{T}(Z)>200", "Ele15_HT600", 250,1,true,true);
+  minx = 0; maxx = 775; nbins = static_cast<int>((maxx-minx)/25);
+  PlotTurnOn(&c_ll, "ht", nbins,minx,maxx, "H_{T}",
+	     "trig[32]&&nmus>=1&&mumu_pt>200", "trig[4]",
+	     "IsoMu22, N_{#mu}=2, p_{T}(Z)>200", "Mu15_HT350", -200,1,true,true);
+  PlotTurnOn(&c_ll, "ht", nbins,minx,maxx, "H_{T}",
+	     "trig[29]&&nels>=1&&elel_pt>200", "trig[8]",
+	     "Ele23, N_{e}=2, p_{T}(Z)>200", "Ele15_HT350", -200,1,true,true);
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////    Dilepton ID    //////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  baseline = "(trig[28]||trig[33]||trig[11]||trig[12])&&ht>250&&mumuv_pt>200&&mumuv_m>60&&njets>=3";
+
+  cout<<endl<<"=========  HT: VVVL, IsoMu22, Mu50  =========="<<endl;
+  Efficiency(&c_hadll, baseline, "trig[4]");
+  Efficiency(&c_hadll, baseline, "trig[32]");
+  Efficiency(&c_hadll, baseline, "trig[21]");
+
+  baseline = "(trig[28]||trig[33]||trig[11]||trig[12])&&ht>250&&elelv_pt>200&&elelv_m>60&&njets>=3";
+  cout<<endl<<"=========  HT: VVVL, Ele25, Ele27  =========="<<endl;
+  Efficiency(&c_hadll, baseline, "trig[8]");
+  Efficiency(&c_hadll, baseline, "trig[23]");
+  Efficiency(&c_hadll, baseline, "trig[22]");
+
+  baseline = "(trig[28]||trig[15])&&ht>250&&ht<900&&met>150&&mumuv_pt>200&&mumuv_m>60&&njets>=3";
+
+  cout<<endl<<"=========  MET: VVVL, IsoMu22, Mu50  =========="<<endl;
+  Efficiency(&c_met, baseline, "trig[4]");
+  Efficiency(&c_met, baseline, "trig[32]");
+  Efficiency(&c_met, baseline, "trig[21]");
+
+  baseline = "(trig[28]||trig[15])&&ht>250&&ht<900&&met>150&&elelv_pt>200&&elelv_m>60&&njets>=3";
+  cout<<endl<<"=========  MET: VVVVL, Ele25, Ele27  =========="<<endl;
+  Efficiency(&c_met, baseline, "trig[8]");
+  Efficiency(&c_met, baseline, "trig[23]");
+  Efficiency(&c_met, baseline, "trig[22]");
+
+  baseline = "trig[12]&&ht>900&&mumuv_pt>200&&mumuv_m>60&&njets>=3";
+
+  cout<<endl<<"=========  HT: VVVL, IsoMu22, Mu50  =========="<<endl;
+  Efficiency(&c_hadll, baseline, "trig[4]");
+  Efficiency(&c_hadll, baseline, "trig[32]");
+  Efficiency(&c_hadll, baseline, "trig[21]");
+
+  baseline = "trig[12]&&ht>900&&elelv_pt>200&&elelv_m>60&&njets>=3";
+  cout<<endl<<"=========  HT: VVVL, Ele25, Ele27  =========="<<endl;
+  Efficiency(&c_hadll, baseline, "trig[8]");
+  Efficiency(&c_hadll, baseline, "trig[23]");
+  Efficiency(&c_hadll, baseline, "trig[22]");
+
+  cout<<endl<<endl;
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////    Lepton pT    ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  baseline = "(trig[28]&&onht>350&&ht>350&&njets>=2&&met>150)&&pass&&Max$(els_pt*(els_miniso<0.1&&abs(els_eta)<2))>";
+  cout<<endl<<"=========  VVVL, Ele25, Ele27  =========="<<endl;
+  Efficiency(&c_met, baseline+"20", "trig[8]");
+  Efficiency(&c_met, baseline+"35", "trig[23]");
+  Efficiency(&c_met, baseline+"35", "trig[22]");
+
+  cout<<endl<<endl;
+
+
+  baseline = "(trig[28]&&onht>350&&ht>350&&njets>=2&&run>=274094&&met>150)&&Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&abs(mus_eta)<0.8))>";
+
+  cout<<endl<<"=========  VVVL, IsoMu22, Mu50 for run>=274094  =========="<<endl;
+  Efficiency(&c_met, baseline+"20", "trig[4]");
+  Efficiency(&c_met, baseline+"25", "trig[32]");
+  Efficiency(&c_met, baseline+"55", "trig[21]");
+
+  baseline = "(trig[28]&&onht>350&&ht>350&&njets>=2&&run<274094&&met>150)&&Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&abs(mus_eta)<0.8))>";
+
+  cout<<endl<<"=========  VVVL, IsoMu22, Mu50 for run<274094  =========="<<endl;
+  Efficiency(&c_met, baseline+"20", "trig[4]");
+  Efficiency(&c_met, baseline+"25", "trig[32]");
+  Efficiency(&c_met, baseline+"55", "trig[21]");
+
+  cout<<endl<<endl;
+
+  // Muon, VVVL, fine binning
+  minx = 10; maxx = 75; nbins = static_cast<int>((maxx-minx)/2.5);
+  PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&abs(mus_eta)<0.8))", nbins,minx,maxx, "Medium muon p_{T}",
+	     "trig[28]&&onht>350&&ht>350&&njets>=2&&run>=274094&&met>"+metcut, "trig[4]",
+	     "1.5fbMET90, H_{T}>350, N_{jet}#geq2, MET>"+metcut, "Mu15_HT350",-1,1,true,false);
+  PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&abs(mus_eta)<0.8))", nbins,minx,maxx, "Medium muon p_{T}",
+	     "trig[28]&&ht>350&&njets>=2&&run>=274094&&met>"+metcut, "trig[32]",
+	     "1.5fbMET90, H_{T}>350, N_{jet}#geq2, MET>"+metcut, "IsoMu22",-1,1,true,false);
+  PlotTurnOn(&c_met, "Max$(mus_pt*(mus_sigid&&mus_miniso<0.2&&abs(mus_eta)<0.8))", nbins,minx,maxx, "Medium muon p_{T}",
+	     "trig[28]&&ht>350&&njets>=2&&run>=274094&&met>"+metcut, "trig[21]",
+	     "1.5fbMET90, H_{T}>350, N_{jet}#geq2, MET>"+metcut, "Mu50",-1,1,true,false);
+
+  // Electron, VVVL, fine binning
+  PlotTurnOn(&c_met, "Max$(els_pt*(els_miniso<0.1))", nbins,minx,maxx, "Veto electron p_{T}",
+	     "trig[28]&&onht>350&&ht>350&&njets>=2&&met>"+metcut, "trig[8]",
+	     "MET90, H_{T}>350, N_{jet}#geq2, MET>"+metcut, "Ele15_HT350",-1,1,true,false);
+  PlotTurnOn(&c_met, "Max$(els_pt*(els_miniso<0.1&&abs(els_eta)<2))", nbins,minx,maxx, "Veto electron p_{T}",
+	     "trig[28]&&onht>350&&ht>350&&njets>=2&&met>"+metcut, "trig[23]",
+	     "MET90, H_{T}>350, N_{jet}#geq2, MET>"+metcut, "Ele25_eta2p1_WPTight",-1,1,true,false);
+  PlotTurnOn(&c_met, "Max$(els_pt*(els_miniso<0.1&&abs(els_eta)<2))", nbins,minx,maxx, "Veto electron p_{T}",
+	     "trig[28]&&onht>350&&ht>350&&njets>=2&&met>"+metcut, "trig[22]",
+	     "MET90, H_{T}>350, N_{jet}#geq2, MET>"+metcut, "Ele27_eta2p1_WPLoose",-1,1,true,false);
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////      HT         ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // VVVL: HT350
+  minx = 160; maxx = 760; nbins = static_cast<int>((maxx-minx)/10);
+  PlotTurnOn(&c_met, "ht_ra2", nbins,minx,maxx, "H_{T}",
+	     "trig[28]&&nvmus>=1&&Max$(mus_vvvl)&&met>150&&njets>=2", "trig[4]",
+	     "MET90, N_{#mu}#geq1, N_{jet}#geq2, MET>150", "Mu15_HT350", 330,1,true,false);
+  PlotTurnOn(&c_met, "ht_ra2", nbins,minx,maxx, "H_{T}",
+	     "trig[28]&&nvels>=1&&met>150&&njets>=2&&Max$(els_vvvl)", "trig[8]",
+	     "MET90, N_{e}#geq1, N_{jet}#geq2, MET>150", "Ele15_HT350", 330,1,true,false);
 
 
 
@@ -149,7 +367,7 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   heff.SetMarkerColor(1); heff.SetLineColor(1);
 
   TString units("GeV");
-  if(xtitle.Contains("njets") || xtitle.Contains("eta")) units = "";
+  if(xtitle.Contains("njets") || xtitle.Contains("eta")|| xtitle.Contains("_phi")) units = "";
   TString epsi("#scale[1.3]{#font[122]{e}}");
   //epsi = "Efficiency";
   // Ploting denominator
@@ -226,11 +444,11 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   float var_plateau_f(floor((mu+3*sigma+5)/rgev)*rgev);
   if(!dofit) var_plateau_f = fabs(minfit);
   TString den_plateau(den), var_plateau(RoundNumber(var_plateau_f, 0));
-  // // For eta plots
-  // if(var.Contains("eta")){
-  //   var_plateau_f = minfit;
-  //   var_plateau =RoundNumber(var_plateau_f, 1);
-  // }
+  // For phi plots
+  if(var.Contains("phi")){
+    var_plateau_f = minfit;
+    var_plateau =RoundNumber(var_plateau_f, 1);
+  }
   den_plateau += ("&&"+var+">"+var_plateau);
   Efficiency(data, den_plateau, num, effic, errup, errdown);
 

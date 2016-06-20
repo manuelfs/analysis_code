@@ -933,7 +933,7 @@ vector<double> getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts,
     baby.GetEntry(entry);
     if(do_trig){
       if(!baby.pass()) continue;
-      if(!baby.trig()[4] && !baby.trig()[8]) continue;
+      if(!baby.trig()[4] && !baby.trig()[8] && !baby.trig()[13] && !baby.trig()[33]) continue;
     }
     if(!baseline.pass(&baby)) continue;
     for(size_t ind(0); ind<bincuts.size(); ind++){ 
