@@ -21,6 +21,7 @@ namespace{
   TString method = "m5j";
   double lumi(0.815);
   bool do_other(false);
+  bool full_lumi(false);
   float syst = 0.001;
   TString blind_s = "$\\spadesuit$";
   bool really_unblind = false;
@@ -112,7 +113,14 @@ int main(int argc, char *argv[]){
 
   vector<TString> abcdcuts, njbcuts_himt;
   TString region_s = "R", method_s, base_all = "mj14>250&&pass&&nonblind&&stitch&&";
+  TString lumi_s = "815 pb$^{-1}$";
   bool unblind = false;
+
+  if(full_lumi){
+    base_all = "mj14>250&&pass&&stitch&&";
+    lumi = 2.07;
+    lumi_s = "2.07 fb$^{-1}$";
+  }
 
   if(method=="m2l") {
     base_s = base_all+"njets>=5";
@@ -120,14 +128,14 @@ int main(int argc, char *argv[]){
     abcdcuts = abcdcuts_2l;
     region_s = "D";
     method_s = "$2\\ell$";
-    unblind = true;
+    if(!full_lumi) unblind = true;
   } else if(method=="mveto") {
     base_s = base_all+"njets>=6&&nbm>=1&&nleps==1";
     njbcuts_himt = njbcuts_veto;
     abcdcuts = abcdcuts_veto;
     region_s = "D";
     method_s = "$N_{\\rm veto}=1$";
-    unblind = true;
+    if(!full_lumi) unblind = true;
   } else if(method=="m5j") {
     base_s = base_all+"njets==5&&nbm>=1&&nleps==1&&nveto==0";
     njbcuts = njbcuts_5j;
@@ -303,9 +311,9 @@ int main(int argc, char *argv[]){
 
   } // Loop over signal bins
 
-  cout<<"Print table"<<endl;
   ///// Printing table
-  TString outname = "txt/table_predictions_"+method+".tex";
+  TString outname = "txt/table_predictions_lumi0p815_"+method+".tex";
+  if(full_lumi) outname.ReplaceAll("lumi0p815", "lumi2p07");
   if(do_other) outname.ReplaceAll("predictions", "other_sys");
   ofstream out(outname);
 
@@ -320,7 +328,7 @@ int main(int argc, char *argv[]){
   out << "\\resizebox{\\textwidth}{!}{\n";
   if(!do_other){
     out << "\n\\begin{tabular}[tbp!]{ l rrrr}\\hline\\hline\n";
-    out << method_s<<" & $\\kappa$ & MC  & Pred. & Obs. \\\\ \\hline\\hline\n";
+    out << lumi_s<<": "<<method_s<<" & $\\kappa$ & MC  & Pred. & Obs. \\\\ \\hline\\hline\n";
     if(method.Contains("met150")) out << " \\multicolumn{5}{c}{$150<\\text{MET}\\leq 200$}  \\\\ \\hline\n";
     else if(method.Contains("met500")) out << " \\multicolumn{5}{c}{$\\text{MET}> 500$}  \\\\ \\hline\n";
     else if(method.Contains("met200nb1")) out << " \\multicolumn{5}{c}{$200<\\text{MET}\\leq 350, N_{b}=1$}  \\\\ \\hline\n";
@@ -404,7 +412,7 @@ int main(int argc, char *argv[]){
   out << "\\end{document}\n";
   out.close();
   TString pdfname(outname); 
-  cout<<" pdflatex "<<outname<<endl;
+  cout<<endl<<" pdflatex "<<outname<<endl;
 
 
   time(&endtime); 
@@ -417,12 +425,13 @@ void GetOptions(int argc, char *argv[]){
     static struct option long_options[] = {
       {"method", required_argument, 0, 'm'},
       {"unblind", no_argument, 0, 'u'},
+      {"full_lumi", no_argument, 0, 'f'},
       {0, 0, 0, 0}
     };
 
     char opt = -1;
     int option_index;
-    opt = getopt_long(argc, argv, "m:u", long_options, &option_index);
+    opt = getopt_long(argc, argv, "m:uf", long_options, &option_index);
     if(opt == -1) break;
 
     string optname;
@@ -432,6 +441,9 @@ void GetOptions(int argc, char *argv[]){
       break;
     case 'u':
       really_unblind = true;
+      break;
+    case 'f':
+      full_lumi = true;
       break;
     case 0:
       break;
