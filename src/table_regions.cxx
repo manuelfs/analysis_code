@@ -42,14 +42,13 @@ int main(){
 
   //// Defining samples, i.e. columns in the table
   TString folder=bfolder+"/cms2r0/babymaker/babies/2016_06_09/mc/skim_baseline/";
-  if(do_lowmet) folder = bfolder+"/cms2r0/babymaker/babies/2016_06_14/mc/merged_1lht500met150nj5/";        // for 150<MET<200
+  if(do_lowmet) folder = bfolder+"/cms2r0/babymaker/babies/2016_06_14/mc/merged_1lht500met150nj5/";     // for 150<MET<200
   else folder = bfolder+"/cms2r0/babymaker/babies/2016_06_14/mc/merged_standard/";
+
   vector<TString> s_t1t;
-  //s_t1t.push_back(folder+"*T1tttt*1500_*");
-  s_t1t.push_back(bfolder+"/cms2r0/babymaker/babies/2016_04_29/mc/unskimmed/*T1tttt*1500_*"); // for 150<MET<200
+  s_t1t.push_back(folder+"*T1tttt*1500_*");
   vector<TString> s_t1tc;
-  //s_t1tc.push_back(folder+"*T1tttt*1200_*");
-  s_t1tc.push_back(bfolder+"/cms2r0/babymaker/babies/2016_04_29/mc/unskimmed/*T1tttt*1200_*"); // for 150<MET<200
+  s_t1tc.push_back(folder+"*T1tttt*1200_*");
   
   vector<TString> s_tt;
   s_tt.push_back(folder+"*_TTJets*Lept*");
@@ -130,28 +129,58 @@ int main(){
     tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj14>400&&nbm>=3&&njets>=9");
   
     /////////////// nleps == 2, Very Low MET ///////////////
-    tables.push_back(tfeats("met>150&&met<=200&&njets>=5&&nbm<=2&&nleps==2", "m2lmet150"));
-    tables.back().add("D3: $M_J \\leq 400$",		"mj14<=400",  "-=");
-    tables.back().add(indent+"$n_b=0, n_j\\leq 7$",	"mj14<=400&&nbm==0&&njets<=7");
-    tables.back().add(indent+"$n_b=0, n_j\\geq 8$",	"mj14<=400&&nbm==0&&njets>=8");
-    tables.back().add(indent+"$n_b=1, n_j\\leq 7$",	"mj14<=400&&nbm==1&&njets<=7");
-    tables.back().add(indent+"$n_b=1, n_j\\geq 8$",	"mj14<=400&&nbm==1&&njets>=8");
-    tables.back().add(indent+"$n_b= 2, n_j\\leq 7$",	"mj14<=400&&nbm==2&&njets<=7");
-    tables.back().add(indent+"$n_b= 2, n_j\\geq 8$",	"mj14<=400&&nbm==2&&njets>=8");
-    tables.back().add("D4: $M_J > 400$",			"mj14>400",  "-=");
-    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 7$",  "mj14>400&&nbm<=2&&njets<=7");
-    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 8$",   "mj14>400&&nbm<=2&&njets>=8");
+    tables.push_back(tfeats("met>150&&met<=200&&njets>=5", "m2lmet150"));
+    tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400",  "-");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets>=9");
+    tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets>=9");
+    tables.back().add(indent+"$n_b=0, n_j\\leq 7$",	 "nleps==2&&nbm<=2&&mj14<=400&&nbm==0&&njets<=7");
+    tables.back().add(indent+"$n_b=0, n_j\\geq 8$",	 "nleps==2&&nbm<=2&&mj14<=400&&nbm==0&&njets>=8");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 7$",	 "nleps==2&&nbm<=2&&mj14<=400&&nbm==1&&njets<=7");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 8$",	 "nleps==2&&nbm<=2&&mj14<=400&&nbm==1&&njets>=8");
+    tables.back().add(indent+"$n_b= 2, n_j\\leq 7$",	 "nleps==2&&nbm<=2&&mj14<=400&&nbm==2&&njets<=7");
+    tables.back().add(indent+"$n_b= 2, n_j\\geq 8$",	 "nleps==2&&nbm<=2&&mj14<=400&&nbm==2&&njets>=8");
+    tables.back().add("D3: $M_J \\leq 400$",		 "nleps==2&&nbm<=2&&mj14<=400",  "-=");
+    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 7$", "nleps==2&&nbm<=2&&mj14<=400&&nbm<=2&&njets<=7");
+    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 8$",	 "nleps==2&&nbm<=2&&mj14<=400&&nbm<=2&&njets>=8");
+    tables.back().add("D4: $M_J > 400$",		 "nleps==2&&nbm<=2&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 7$", "nleps==2&&nbm<=2&&mj14>400&&nbm<=2&&njets<=7");
+    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 8$",	 "nleps==2&&nbm<=2&&mj14>400&&nbm<=2&&njets>=8");
   
     /////////////// nleps == 1, nveto = 1 ///////////////               
-    tables.push_back(tfeats("met>150&&met<=200&&njets>=6&&nbm>=1&&nbm<=2&&nleps==1&&nveto==1&&mt>140", "mvetomet150"));
-    tables.back().add("D3: $M_J \\leq 400$",              "mj14<=400",  "-=");
-    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",       "mj14<=400&&nbm==1&&njets<=8");
-    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",       "mj14<=400&&nbm==1&&njets>=9");
-    tables.back().add(indent+"$n_b= 2, n_j\\leq 8$",      "mj14<=400&&nbm==2&&njets<=8");
-    tables.back().add(indent+"$n_b= 2, n_j\\geq 9$",      "mj14<=400&&nbm==2&&njets>=9");
-    tables.back().add("D4: $M_J > 400$",                  "mj14>400",  "-=");
-    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 8$",  "mj14>400&&nbm<=2&&njets<=8");
-    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 9$",   "mj14>400&&nbm<=2&&njets>=9");
+    tables.push_back(tfeats("met>150&&met<=200&&njets>=6&&nbm>=1&&nleps==1", "mvetomet150"));
+    tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400",  "-");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets>=9");
+    tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets>=9");
+    tables.back().add("D3: $M_J \\leq 400$",              "nveto==1&&mt>140&&nbm<=2&&mj14<=400",  "-=");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",       "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",       "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b= 2, n_j\\leq 8$",      "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b= 2, n_j\\geq 9$",      "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==2&&njets>=9");
+    tables.back().add("D4: $M_J > 400$",                  "nveto==1&&mt>140&&nbm<=2&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 8$",  "nveto==1&&mt>140&&nbm<=2&&mj14>400&&nbm<=2&&njets<=8");
+    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 9$",   "nveto==1&&mt>140&&nbm<=2&&mj14>400&&nbm<=2&&njets>=9");
 
   } else { // If not do_lowmet
     //////////// Low MET, nleps == 1 ////////////
@@ -249,52 +278,108 @@ int main(){
     tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "mt>140&&mj14>400&&nbm>=3&&njets>=9");
 
     /////////////// nleps == 2, Low MET ///////////////
-    tables.push_back(tfeats("met<=350&&njets>=5&&nbm<=2&&nleps==2", "dilepton_lowmet"));
-    tables.back().add("D3: $M_J \\leq 400$",		"mj14<=400",  "-=");
-    tables.back().add(indent+"$n_b=0, n_j\\leq 7$",	"mj14<=400&&nbm==0&&njets<=7");
-    tables.back().add(indent+"$n_b=0, n_j\\geq 8$",	"mj14<=400&&nbm==0&&njets>=8");
-    tables.back().add(indent+"$n_b=1, n_j\\leq 7$",	"mj14<=400&&nbm==1&&njets<=7");
-    tables.back().add(indent+"$n_b=1, n_j\\geq 8$",	"mj14<=400&&nbm==1&&njets>=8");
-    tables.back().add(indent+"$n_b= 2, n_j\\leq 7$",	"mj14<=400&&nbm==2&&njets<=7");
-    tables.back().add(indent+"$n_b= 2, n_j\\geq 8$",	"mj14<=400&&nbm==2&&njets>=8");
-    tables.back().add("D4: $M_J > 400$",			"mj14>400",  "-=");
-    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 7$",  "mj14>400&&nbm<=2&&njets<=7");
-    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 8$",   "mj14>400&&nbm<=2&&njets>=8");
+    tables.push_back(tfeats("met<=350&&njets>=5", "dilepton_lowmet"));
+    tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400",  "-");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets>=9");
+    tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets>=9");
+    tables.back().add("D3: $M_J \\leq 400$",		"nleps==2&&nbm<=2&&njets>=5&&mj14<=400",  "-=");
+    tables.back().add(indent+"$n_b=0, n_j\\leq 7$",	"nleps==2&&nbm<=2&&njets>=5&&mj14<=400&&nbm==0&&njets<=7");
+    tables.back().add(indent+"$n_b=0, n_j\\geq 8$",	"nleps==2&&nbm<=2&&njets>=5&&mj14<=400&&nbm==0&&njets>=8");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 7$",	"nleps==2&&nbm<=2&&njets>=5&&mj14<=400&&nbm==1&&njets<=7");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 8$",	"nleps==2&&nbm<=2&&njets>=5&&mj14<=400&&nbm==1&&njets>=8");
+    tables.back().add(indent+"$n_b= 2, n_j\\leq 7$",	"nleps==2&&nbm<=2&&njets>=5&&mj14<=400&&nbm==2&&njets<=7");
+    tables.back().add(indent+"$n_b= 2, n_j\\geq 8$",	"nleps==2&&nbm<=2&&njets>=5&&mj14<=400&&nbm==2&&njets>=8");
+    tables.back().add("D4: $M_J > 400$",		"nleps==2&&nbm<=2&&njets>=5&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 7$","nleps==2&&nbm<=2&&njets>=5&&mj14>400&&nbm<=2&&njets<=7");
+    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 8$",	"nleps==2&&nbm<=2&&njets>=5&&mj14>400&&nbm<=2&&njets>=8");
 
     /////////////// nleps == 2, Med MET ///////////////  
-    tables.push_back(tfeats("met>350&&met<=500&&njets>=5&&nbm<=2&&nleps==2", "dilepton_medmet"));
-    tables.back().add("D3: $M_J \\leq 400$",              "mj14<=400",  "-=");
-    tables.back().add(indent+"$n_b=0, n_j\\leq 7$",       "mj14<=400&&nbm==0&&njets<=7");
-    tables.back().add(indent+"$n_b=0, n_j\\geq 8$",       "mj14<=400&&nbm==0&&njets>=8");
-    tables.back().add(indent+"$n_b=1, n_j\\leq 7$",       "mj14<=400&&nbm==1&&njets<=7");
-    tables.back().add(indent+"$n_b=1, n_j\\geq 8$",       "mj14<=400&&nbm==1&&njets>=8");
-    tables.back().add(indent+"$n_b= 2, n_j\\leq 7$",      "mj14<=400&&nbm==2&&njets<=7");
-    tables.back().add(indent+"$n_b= 2, n_j\\geq 8$",      "mj14<=400&&nbm==2&&njets>=8");
-    tables.back().add("D4: $M_J > 400$",                  "mj14>400",  "-=");
-    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 7$",  "mj14>400&&nbm<=2&&njets<=7");
-    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 8$",   "mj14>400&&nbm<=2&&njets>=8");
+    tables.push_back(tfeats("met>350&&met<=500&&njets>=5", "dilepton_medmet"));
+    tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400",  "-");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets>=9");
+    tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets>=9");
+    tables.back().add("D3: $M_J \\leq 400$",              "nleps==2&&nbm<=2&&mj14<=400",  "-=");
+    tables.back().add(indent+"$n_b=0, n_j\\leq 7$",       "nleps==2&&nbm<=2&&mj14<=400&&nbm==0&&njets<=7");
+    tables.back().add(indent+"$n_b=0, n_j\\geq 8$",       "nleps==2&&nbm<=2&&mj14<=400&&nbm==0&&njets>=8");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 7$",       "nleps==2&&nbm<=2&&mj14<=400&&nbm==1&&njets<=7");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 8$",       "nleps==2&&nbm<=2&&mj14<=400&&nbm==1&&njets>=8");
+    tables.back().add(indent+"$n_b= 2, n_j\\leq 7$",      "nleps==2&&nbm<=2&&mj14<=400&&nbm==2&&njets<=7");
+    tables.back().add(indent+"$n_b= 2, n_j\\geq 8$",      "nleps==2&&nbm<=2&&mj14<=400&&nbm==2&&njets>=8");
+    tables.back().add("D4: $M_J > 400$",                  "nleps==2&&nbm<=2&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 7$",  "nleps==2&&nbm<=2&&mj14>400&&nbm<=2&&njets<=7");
+    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 8$",   "nleps==2&&nbm<=2&&mj14>400&&nbm<=2&&njets>=8");
 
-    /////////////// nleps == 1, nveto = 1 ///////////////                                                                                     
-    tables.push_back(tfeats("met<=350&&njets>=6&&nbm>=1&&nbm<=2&&nleps==1&&nveto==1&&mt>140", "lep_and_veto_lowmet"));
-    tables.back().add("D3: $M_J \\leq 400$",              "mj14<=400",  "-=");
-    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",       "mj14<=400&&nbm==1&&njets<=8");
-    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",       "mj14<=400&&nbm==1&&njets>=9");
-    tables.back().add(indent+"$n_b= 2, n_j\\leq 8$",      "mj14<=400&&nbm==2&&njets<=8");
-    tables.back().add(indent+"$n_b= 2, n_j\\geq 9$",      "mj14<=400&&nbm==2&&njets>=9");
-    tables.back().add("D4: $M_J > 400$",                  "mj14>400",  "-=");
-    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 8$",  "mj14>400&&nbm<=2&&njets<=8");
-    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 9$",   "mj14>400&&nbm<=2&&njets>=9");
+    /////////////// nleps == 1, nveto = 1,  Low MET///////////////                                                           
+    tables.push_back(tfeats("met<=350&&njets>=6&&nbm>=1&&nleps==1", "lep_and_veto_lowmet"));
+    tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400",  "-");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets>=9");
+    tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets>=9");
+    tables.back().add("D3: $M_J \\leq 400$",              "nveto==1&&mt>140&&nbm<=2&&mj14<=400",  "-=");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",       "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",       "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b= 2, n_j\\leq 8$",      "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b= 2, n_j\\geq 9$",      "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==2&&njets>=9");
+    tables.back().add("D4: $M_J > 400$",                  "nveto==1&&mt>140&&nbm<=2&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 8$",  "nveto==1&&mt>140&&nbm<=2&&mj14>400&&nbm<=2&&njets<=8");
+    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 9$",   "nveto==1&&mt>140&&nbm<=2&&mj14>400&&nbm<=2&&njets>=9");
 
-    /////////////// nleps == 1, nveto = 1 ///////////////
-    tables.push_back(tfeats("met>350&&met<=500&&njets>=6&&nbm>=1&&nbm<=2&&nleps==1&&nveto==1&&mt>140", "lep_and_veto_medmet"));
-    tables.back().add("D3: $M_J \\leq 400$",              "mj14<=400",  "-=");
-    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",       "mj14<=400&&nbm==1&&njets<=8");
-    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",       "mj14<=400&&nbm==1&&njets>=9");
-    tables.back().add(indent+"$n_b= 2, n_j\\leq 8$",      "mj14<=400&&nbm==2&&njets<=8");
-    tables.back().add(indent+"$n_b= 2, n_j\\geq 9$",      "mj14<=400&&nbm==2&&njets>=9");
-    tables.back().add("D4: $M_J > 400$",                  "mj14>400",  "-=");
-    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 8$",  "mj14>400&&nbm<=2&&njets<=8");
-    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 9$",   "mj14>400&&nbm<=2&&njets>=9");
+    /////////////// nleps == 1, nveto = 1, Mid MET ///////////////
+    tables.push_back(tfeats("met>350&&met<=500&&njets>=6&&nbm>=1&&nleps==1", "lep_and_veto_medmet"));
+    tables.back().add("R1: $m_T\\leq140$, $M_J\\leq400$", "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400",  "-");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14<=400&&nbm>=3&&njets>=9");
+    tables.back().add("R2: $m_T\\leq 140$, $M_J > 400$",  "nleps==1&&nbm>=1&&njets>=6&&nveto==0&&mt<=140&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b=2, n_j\\leq 8$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b=2, n_j\\geq 9$",	  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm==2&&njets>=9");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\leq 8$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets<=8");
+    tables.back().add(indent+"$n_b\\geq 3, n_j\\geq 9$",  "nleps==1&&njets>=6&&nveto==0&&mt<=140&&mj14>400&&nbm>=3&&njets>=9");
+    tables.back().add("D3: $M_J \\leq 400$",              "nveto==1&&mt>140&&nbm<=2&&mj14<=400",  "-=");
+    tables.back().add(indent+"$n_b=1, n_j\\leq 8$",       "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==1&&njets<=8");
+    tables.back().add(indent+"$n_b=1, n_j\\geq 9$",       "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==1&&njets>=9");
+    tables.back().add(indent+"$n_b= 2, n_j\\leq 8$",      "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==2&&njets<=8");
+    tables.back().add(indent+"$n_b= 2, n_j\\geq 9$",      "nveto==1&&mt>140&&nbm<=2&&mj14<=400&&nbm==2&&njets>=9");
+    tables.back().add("D4: $M_J > 400$",                  "nveto==1&&mt>140&&nbm<=2&&mj14>400",  "-=");
+    tables.back().add(indent+"$n_b\\leq 2, n_j\\leq 8$",  "nveto==1&&mt>140&&nbm<=2&&mj14>400&&nbm<=2&&njets<=8");
+    tables.back().add(indent+"$n_b\\leq2, n_j\\geq 9$",   "nveto==1&&mt>140&&nbm<=2&&mj14>400&&nbm<=2&&njets>=9");
 
   } // If not do_lowmet
 
