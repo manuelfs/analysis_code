@@ -76,9 +76,8 @@ int main(int argc, char *argv[]){
   ////// Defining cuts
   TString base_s = "mj14>250&&njets>=5&&stitch&&pass&&nonblind";
 
-  vector<TString> njbcuts = {"njets>=6&&njets<=8", "njets>=9", "njets>=6&&njets<=8", "njets>=9"}; 
+  vector<TString> njbcuts_std = {"njets>=6&&njets<=8", "njets>=9", "njets>=6&&njets<=8", "njets>=9"}; 
   vector<TString> njbcuts_2l = {"njets>=5&&njets<=7", "njets>=8", "njets>=5&&njets<=7", "njets>=8"}; 
-  vector<TString> njbcuts_veto = {"njets>=6&&njets<=8", "njets>=9", "njets>=6&&njets<=8", "njets>=9"}; 
   vector<TString> njbcuts_5j = {"nbm==1&&njets==5", "nbm>=2&&njets==5", "nbm==1&&njets==5", "nbm>=2&&njets==5"}; 
   vector<TString> njbcuts_m1lmet150nb12 = {"nbm==1&&njets>=6&&njets<=8", "nbm>=2&&njets>=6&&njets<=8", 
 				       "nbm==1&&njets>=9", "nbm>=2&&njets>=9"}; 
@@ -111,7 +110,8 @@ int main(int argc, char *argv[]){
 				 "mj14>400&&nbm<=2&&nleps==2"};
 
 
-  vector<TString> abcdcuts, njbcuts_himt;
+  vector<TString> abcdcuts, njbcuts_himt = njbcuts_std;
+  vector<TString> njbcuts = njbcuts_std;
   TString region_s = "R", method_s, base_all = "mj14>250&&pass&&nonblind&&stitch&&";
   TString lumi_s = "815 pb$^{-1}$";
   bool unblind = false;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]){
     method_s = "$2\\ell$";
   } else if(method=="mveto") {
     base_s = base_all+"njets>=6&&nbm>=1&&nleps==1";
-    njbcuts_himt = njbcuts_veto;
+    njbcuts_himt = njbcuts_std;
     abcdcuts = abcdcuts_veto;
     region_s = "D";
     method_s = "$N_{\\rm veto}=1$";
@@ -149,11 +149,19 @@ int main(int argc, char *argv[]){
     abcdcuts = abcdcuts_std;
     method_s = "$1\\ell$, MET150";
     ilowmet = njbcuts.size();
+  } else if(method=="mvetomet150") {
+    base_s = base_all+"njets>=6&&nbm>=1&&nleps==1";
+    njbcuts = njbcuts_m1lmet150;
+    njbcuts_himt = njbcuts_m1lmet150;
+    abcdcuts = abcdcuts_veto;
+    region_s = "D";
+    method_s = "$N_{\\rm veto}=1$, MET150";
   } else if(method=="m2lmet150") {
     base_s = base_all+"njets>=5";
     njbcuts = njbcuts_m1lmet150;
     njbcuts_himt = njbcuts_m2lmet150;
     abcdcuts = abcdcuts_2l;
+    region_s = "D";
     method_s = "$2\\ell$, MET150";
   } else if(method=="met500") {
     base_s = base_all+"njets>=6&&nbm>=1&&met>500&&nleps==1&&nveto==0";
