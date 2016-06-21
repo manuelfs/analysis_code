@@ -19,11 +19,11 @@ using namespace std;
 
 namespace{
   TString method = "m5j";
-  bool unblind = false;
   double lumi(0.815);
   bool do_other(false);
   float syst = 0.001;
   TString blind_s = "$\\spadesuit$";
+  bool really_unblind = false;
 }
 
 void GetOptions(int argc, char *argv[]);
@@ -56,8 +56,8 @@ int main(int argc, char *argv[]){
   if(do_other) extra = &other;
   else extra->Add(foldermc+"*_WJetsToLNu*");
   extra->Add(foldermc+"*_ST_*.root");
-  extra->Add(foldermc+"*TTW*.root");
-  extra->Add(foldermc+"*TTZ*.root");
+  extra->Add(foldermc+"*_TTW*.root");
+  extra->Add(foldermc+"*_TTZ*.root");
   extra->Add(foldermc+"*DYJetsToLL*.root");
   extra->Add(foldermc+"*QCD_HT*.root");
 
@@ -112,6 +112,7 @@ int main(int argc, char *argv[]){
 
   vector<TString> abcdcuts, njbcuts_himt;
   TString region_s = "R", method_s, base_all = "mj14>250&&pass&&nonblind&&stitch&&";
+  bool unblind = false;
 
   if(method=="m2l") {
     base_s = base_all+"njets>=5";
@@ -195,6 +196,8 @@ int main(int argc, char *argv[]){
     return 0;
   }
   bcut baseline(base_s);
+  if(really_unblind) unblind = true;
+
 
   ////// Combining cuts
   vector<bcut > bincuts;
@@ -413,18 +416,22 @@ void GetOptions(int argc, char *argv[]){
   while(true){
     static struct option long_options[] = {
       {"method", required_argument, 0, 'm'},
+      {"unblind", no_argument, 0, 'u'},
       {0, 0, 0, 0}
     };
 
     char opt = -1;
     int option_index;
-    opt = getopt_long(argc, argv, "m:", long_options, &option_index);
+    opt = getopt_long(argc, argv, "m:u", long_options, &option_index);
     if(opt == -1) break;
 
     string optname;
     switch(opt){
     case 'm':
       method = optarg;
+      break;
+    case 'u':
+      really_unblind = true;
       break;
     case 0:
       break;
