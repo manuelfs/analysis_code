@@ -73,32 +73,28 @@ int main(){
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////  MET/MHT Njets, electron  /////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////////////////////////
-  minx = 1.5; maxx = 9.5; nbins = static_cast<int>((maxx-minx)/1);
-    // MET100, MET110, MET120: MHT
-  PlotTurnOn(&c_el, "njets", nbins,minx,maxx, "N_{jets}",
-	     "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&mht>300&&mht/met<5&&nvmus==0", 
-	     "((trig[13]||trig[33]))", "Ele25_WPTight, N_{e,25} #geq 1, MHT>300", "MHT100 || MHTNoMu100", -3);
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////  MET/MHT, electron  /////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   baseline = "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0";
   cout<<endl<<"=========  MHT100 fake MHT =========="<<endl;
   Efficiency(&c_ht900, baseline+"&&mht>250&&mht<=300", "(trig[13]||trig[33])");
   Efficiency(&c_ht900, baseline+"&&mht>300",           "(trig[13]||trig[33])");
+  Efficiency(&c_ht900, baseline+"&&mht>300&&mht<=500", "(trig[13]||trig[33])");
+  Efficiency(&c_ht900, baseline+"&&mht>500",           "(trig[13]||trig[33])");
 
   baseline = "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0&&ntks==0";
   cout<<endl<<"=========  MHT100 fake MHT =========="<<endl;
   Efficiency(&c_ht900, baseline+"&&mht>250&&mht<=300", "(trig[13]||trig[33])");
   Efficiency(&c_ht900, baseline+"&&mht>300",           "(trig[13]||trig[33])");
+  Efficiency(&c_ht900, baseline+"&&mht>300&&mht<=500", "(trig[13]||trig[33])");
+  Efficiency(&c_ht900, baseline+"&&mht>500",           "(trig[13]||trig[33])");
 
   baseline = "trig[23]&&njets>=3&&mht/met<5&&nels>=1&&nvmus==0&&ht>900";
   cout<<endl<<"=========  MHT100 Real MHT =========="<<endl;
   Efficiency(&c_el, baseline+"&&mht>250&&mht<=300", "(trig[13]||trig[33])");
   Efficiency(&c_el, baseline+"&&mht>300",           "(trig[13]||trig[33])");
+  Efficiency(&c_ht900, baseline+"&&mht>300&&mht<=500", "(trig[13]||trig[33])");
+  Efficiency(&c_ht900, baseline+"&&mht>500",           "(trig[13]||trig[33])");
 
   minx = 0; maxx = 800; nbins = static_cast<int>((maxx-minx)/20);
   // MET100, MET110, MET120: Fake MHT
@@ -161,6 +157,16 @@ int main(){
   Efficiency(&c_el, baseline+"&&mht>300",           "(trig[30]||trig[31])");
 
   cout<<endl<<endl;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////  MET/MHT Njets, electron  /////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  minx = 1.5; maxx = 9.5; nbins = static_cast<int>((maxx-minx)/1);
+    // MET100, MET110, MET120: MHT
+  PlotTurnOn(&c_el, "njets", nbins,minx,maxx, "N_{jets}",
+	     "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&mht>300&&mht/met<5&&nvmus==0", 
+	     "((trig[13]||trig[33]))", "Ele25_WPTight, N_{e,25} #geq 1, MHT>300", "MHT100 || MHTNoMu100", -3);
+
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////

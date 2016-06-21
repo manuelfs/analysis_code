@@ -76,7 +76,7 @@ int main(int argc, char *argv[]){
   ////// Defining cuts
   TString base_s = "mj14>250&&njets>=5&&stitch&&pass&&nonblind";
 
-  vector<TString> njbcuts_std = {"njets>=6&&njets<=8", "njets>=9", "njets>=6&&njets<=8", "njets>=9"}; 
+  vector<TString> njbcuts_stdnob = {"njets>=6&&njets<=8", "njets>=9", "njets>=6&&njets<=8", "njets>=9"}; 
   vector<TString> njbcuts_2l = {"njets>=5&&njets<=7", "njets>=8", "njets>=5&&njets<=7", "njets>=8"}; 
   vector<TString> njbcuts_5j = {"nbm==1&&njets==5", "nbm>=2&&njets==5", "nbm==1&&njets==5", "nbm>=2&&njets==5"}; 
   vector<TString> njbcuts_m1lmet150nb12 = {"nbm==1&&njets>=6&&njets<=8", "nbm>=2&&njets>=6&&njets<=8", 
@@ -110,8 +110,8 @@ int main(int argc, char *argv[]){
 				 "mj14>400&&nbm<=2&&nleps==2"};
 
 
-  vector<TString> abcdcuts, njbcuts_himt = njbcuts_std;
-  vector<TString> njbcuts = njbcuts_std;
+  vector<TString> abcdcuts, njbcuts_himt = njbcuts_stdnob;
+  vector<TString> njbcuts = njbcuts_stdnob;
   TString region_s = "R", method_s, base_all = "mj14>250&&pass&&nonblind&&stitch&&";
   TString lumi_s = "815 pb$^{-1}$";
   bool unblind = false;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]){
     method_s = "$2\\ell$";
   } else if(method=="mveto") {
     base_s = base_all+"njets>=6&&nbm>=1&&nleps==1";
-    njbcuts_himt = njbcuts_std;
+    njbcuts_himt = njbcuts_stdnob;
     abcdcuts = abcdcuts_veto;
     region_s = "D";
     method_s = "$N_{\\rm veto}=1$";

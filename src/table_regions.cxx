@@ -24,7 +24,7 @@
 using namespace std;
 namespace {
   TString luminosity = "0.815";
-  bool do_lowmet = false;
+  bool do_lowmet = true;
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
@@ -478,7 +478,7 @@ void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yi
       ebkg += pow(errval, 2);
       out <<" & "<< RoundNumber(val,digits);
     } // Loop over background samples
-    out<<" & "<<RoundNumber(bkg, digits)<<" $\\pm$ "<<RoundNumber(ebkg, digits);
+    out<<" & "<<RoundNumber(bkg, digits)<<" $\\pm$ "<<RoundNumber(sqrt(ebkg), digits);
     for(unsigned sam(Samples.size()-nsig); sam < Samples.size(); sam++)
       out <<" & "<< RoundNumber(yields[sam][ini+icut],digits)<<" $\\pm$ "<<RoundNumber(sqrt(w2[sam][ini+icut]), digits); 
     out<<" \\\\ ";
