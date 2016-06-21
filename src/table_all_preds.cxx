@@ -128,14 +128,12 @@ int main(int argc, char *argv[]){
     abcdcuts = abcdcuts_2l;
     region_s = "D";
     method_s = "$2\\ell$";
-    if(!full_lumi) unblind = true;
   } else if(method=="mveto") {
     base_s = base_all+"njets>=6&&nbm>=1&&nleps==1";
     njbcuts_himt = njbcuts_veto;
     abcdcuts = abcdcuts_veto;
     region_s = "D";
     method_s = "$N_{\\rm veto}=1$";
-    if(!full_lumi) unblind = true;
   } else if(method=="m5j") {
     base_s = base_all+"njets==5&&nbm>=1&&nleps==1&&nveto==0";
     njbcuts = njbcuts_5j;
@@ -314,6 +312,8 @@ int main(int argc, char *argv[]){
   ///// Printing table
   TString outname = "txt/table_predictions_lumi0p815_"+method+".tex";
   if(full_lumi) outname.ReplaceAll("lumi0p815", "lumi2p07");
+  if(unblind) outname.ReplaceAll("lumi", "unblind_lumi");
+
   if(do_other) outname.ReplaceAll("predictions", "other_sys");
   ofstream out(outname);
 

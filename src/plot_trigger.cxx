@@ -75,23 +75,43 @@ int main(){
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////  MET/MHT, electron  /////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  minx = 0; maxx = 800; nbins = static_cast<int>((maxx-minx)/20);
-  // MET100, MET110, MET120: Fake MHT
-  PlotTurnOn(&c_ht900, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0&&met/met_calo<2", 
-	     "((trig[13]||trig[33]))", "HT800, H_{T}>900, N_{lep}=0, N_{jet}#geq3, PF/calo<2", "MHT100 || MHTNoMu100");
-  PlotTurnOn(&c_ht900, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0", 
-	     "((trig[13]||trig[33]))", "HT800, H_{T} > 900, N_{lep} = 0, N_{jet} #geq 3", "MHT100 || MHTNoMu100");
-  PlotTurnOn(&c_ht900, "mht", nbins,minx,maxx, "H_{T}^{miss}",
-	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0", 
-	     "((trig[13]||trig[33]))", "HT800, H_{T} > 900, N_{lep} = 0, N_{jet} #geq 3", "MHT100 || MHTNoMu100");
-
   baseline = "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0";
   cout<<endl<<"=========  MHT100 fake MHT =========="<<endl;
   Efficiency(&c_ht900, baseline+"&&mht>250&&mht<=300", "(trig[13]||trig[33])");
   Efficiency(&c_ht900, baseline+"&&mht>300",           "(trig[13]||trig[33])");
-  return 0;
+
+  baseline = "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0&&ntks==0";
+  cout<<endl<<"=========  MHT100 fake MHT =========="<<endl;
+  Efficiency(&c_ht900, baseline+"&&mht>250&&mht<=300", "(trig[13]||trig[33])");
+  Efficiency(&c_ht900, baseline+"&&mht>300",           "(trig[13]||trig[33])");
+
+  baseline = "trig[23]&&njets>=3&&mht/met<5&&nels>=1&&nvmus==0&&ht>900";
+  cout<<endl<<"=========  MHT100 Real MHT =========="<<endl;
+  Efficiency(&c_el, baseline+"&&mht>250&&mht<=300", "(trig[13]||trig[33])");
+  Efficiency(&c_el, baseline+"&&mht>300",           "(trig[13]||trig[33])");
+
+  minx = 0; maxx = 800; nbins = static_cast<int>((maxx-minx)/20);
+  // MET100, MET110, MET120: Fake MHT
+  PlotTurnOn(&c_ht900, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0&&met/met_calo<5&&ntks==0", 
+	     "((trig[13]||trig[33]))", "HT800, H_{T}>900,N_{l,tk}=0,N_{j}#geq3,PF/calo<5", "MHT100 || MHTNoMu100");
+  PlotTurnOn(&c_ht900, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0&&met/met_calo<2&&ntks==0", 
+	     "((trig[13]||trig[33]))", "HT800, H_{T}>900,N_{l,tk}=0,N_{j}#geq3,PF/calo<2", "MHT100 || MHTNoMu100");
+  PlotTurnOn(&c_ht900, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0&&ntks==0", 
+	     "((trig[13]||trig[33]))", "HT800, H_{T} > 900, N_{l,tk} = 0, N_{jet} #geq 3", "MHT100 || MHTNoMu100");
+
+
+  PlotTurnOn(&c_ht900, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0&&met/met_calo<2", 
+	     "((trig[13]||trig[33]))", "HT800, H_{T}>900,N_{l}=0,N_{j}#geq3,PF/calo<2", "MHT100 || MHTNoMu100");
+  PlotTurnOn(&c_ht900, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0&&met/met_calo<5", 
+	     "((trig[13]||trig[33]))", "HT800, H_{T}>900,N_{l}=0,N_{j}#geq3,PF/calo<5", "MHT100 || MHTNoMu100");
+  PlotTurnOn(&c_ht900, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+	     "trig[12]&&njets>=3&&mht/met<5&&nvmus==0&&nvels==0", 
+	     "((trig[13]||trig[33]))", "HT800, H_{T} > 900, N_{lep} = 0, N_{jet} #geq 3", "MHT100 || MHTNoMu100");
 
 
   // MET100: MET

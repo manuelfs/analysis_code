@@ -7,18 +7,26 @@ import string
 
 lumi = "2p07"
 lumi = "0p815"
+do_unblind = True
+
+tag = "lumi"+lumi
+options = ""
+if lumi == "2p07": options = options + " -f"
+if do_unblind: 
+    options = options + " -u"
+    tag = "unblind_lumi"+lumi
+
 
 os.system("./compile.sh")
 methods = ['met200', 'met500', 'met200nb1', 'met350nb1', 'met500nb1', 'm2l', 'mveto', 'm5j', 'm1lmet150', 'm2lmet150']
+#methods = ['m5j']
+
 for method in methods:
-    if lumi=="2p07":
-        cmd = "./run/table_all_preds.exe -f -m "+method+" && pdflatex txt/table_predictions_lumi"+lumi+"_"+method+".tex > /dev/null"
-    else:
-        cmd = "./run/table_all_preds.exe -m "+method+" && pdflatex txt/table_predictions_lumi"+lumi+"_"+method+".tex > /dev/null"
+    cmd = "./run/table_all_preds.exe "+options+" -m "+method+" && pdflatex txt/table_predictions_"+tag+"_"+method+".tex > /dev/null"
     os.system(cmd)
     #os.system("mv table_predictions_"+method+".pdf ~/Dropbox/AR-Cuatro/closure_tables/")
 
 for method in methods:
-    print " open table_predictions_lumi"+lumi+"_"+method+".pdf"
+    print " open table_predictions_"+tag+"_"+method+".pdf"
 
 sys.exit(0)
