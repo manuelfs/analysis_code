@@ -122,7 +122,7 @@ long getYieldW(TChain& tree, TString cut, double& yield, double lumi=1.);
 long getYieldErr(TChain& tree, TString cut, double& yield, double& uncertainty);
 
 std::vector<double> getYields(baby_basic &baby, bcut baseline, std::vector<bcut> bincuts, std::vector<double> &yields, 
-			      std::vector<double> &w2, double lumi=1., bool do_trig=false);
+			      std::vector<double> &w2, double lumi=1., bool do_trig=false, TString flag="");
 std::vector<std::vector<double> > getYields(baby_basic &baby, bcut baseline, std::vector<std::vector<bcut> > bincuts, 
 					    std::vector<std::vector<double> > &yields, 
 					    std::vector<std::vector<double> > &w2, double lumi=1., bool do_trig=false);

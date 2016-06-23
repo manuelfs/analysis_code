@@ -6,6 +6,7 @@
 #include "utilities_macros.hpp"
 #endif
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -925,7 +926,8 @@ void calc_chi2_diff(TH1D *histo1, TH1D *histo2, float &chi2, int &ndof, float &p
 }
 
 vector<double> getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts, 
-			 vector<double> &yield, vector<double> &w2, double lumi, bool do_trig){
+			 vector<double> &yield, vector<double> &w2, double lumi, bool do_trig, TString flag){
+
   vector<double> entries = vector<double>(bincuts.size(), 0);
   yield = vector<double>(bincuts.size(), 0);
   w2 = yield;
@@ -941,6 +943,14 @@ vector<double> getYields(baby_basic &baby, bcut baseline, vector<bcut> bincuts,
       if(bincuts[ind].pass(&baby)) {
 	entries[ind]++;
 	float wgt(bincuts[ind].weight(&baby));
+	
+	if(flag=="jer_tail"){
+	  double jet_res_min = *min_element(baby.jets_pt_res().begin(),baby.jets_pt_res().end());
+	  double jet_res_max = *max_element(baby.jets_pt_res().begin(),baby.jets_pt_res().end());
+	  if((jet_res_min>0&&jet_res_min<0.675) || jet_res_max>1.391)
+	    wgt *= 1.5;
+	}
+
         yield[ind] += wgt;
         w2[ind] += wgt*wgt;
       }
