@@ -205,6 +205,38 @@ int main(int argc, char *argv[]){
     metcuts[0] = "met>500&&nbm==1";
     metcuts[1] = "met>500&&nbm>=2";
     ilowmet = 2;
+  }else if(method=="agg_highmet"){
+    base_s = base_all+"met>500&&njets>=6&&nbm>=3";
+    njbcuts = vector<TString>{"nbm>=3&&njets>=6"};
+    njbcuts_himt = njbcuts;
+    abcdcuts = abcdcuts_std;
+    method_s = "Agg. Bin: $1\\ell$, MET500, $N_{j}\\geq6$, $N_{b}\\geq3$";
+    metcuts = vector<TString>{"met>500"};
+    ilowmet = 1;
+  }else if(method=="agg_mixed"){
+    base_s = base_all+"met>350&&njets>=9&&nbm>=2";
+    njbcuts = vector<TString>{"nbm>=2&&njets>=9"};
+    njbcuts_himt = njbcuts;
+    abcdcuts = abcdcuts_std;
+    method_s = "Agg. Bin: $1\\ell$, MET350, $N_{j}\\geq9$, $N_{b}\\geq2$";
+    metcuts = vector<TString>{"met>350"};
+    ilowmet = 1;
+  }else if(method=="agg_highmultiplicity"){
+    base_s = base_all+"met>200&&njets>=9&&nbm>=3";
+    njbcuts = vector<TString>{"nbm>=3&&njets>=9"};
+    njbcuts_himt = njbcuts;
+    abcdcuts = abcdcuts_std;
+    method_s = "Agg. Bin: $1\\ell$, MET200, $N_{j}\\geq9$, $N_{b}\\geq3$";
+    metcuts = vector<TString>{"met>200"};
+    ilowmet = 1;
+  }else if(method=="agg_1b"){
+    base_s = base_all+"met>500&&njets>=9&&nbm>=1";
+    njbcuts = vector<TString>{"nbm>=1&&njets>=9"};
+    njbcuts_himt = njbcuts;
+    abcdcuts = abcdcuts_std;
+    method_s = "Agg. Bin: $1\\ell$, MET500, $N_{j}\\geq9$, $N_{b}\\geq1$";
+    metcuts = vector<TString>{"met>500"};
+    ilowmet = 1;
   }else {
     cout<<"Method "<<method<<" not available. Exiting"<<endl<<endl; 
     return 0;
