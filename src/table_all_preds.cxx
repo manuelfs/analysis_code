@@ -79,17 +79,20 @@ int main(int argc, char *argv[]){
   vector<TString> njbcuts_stdnob = {"njets>=6&&njets<=8", "njets>=9", "njets>=6&&njets<=8", "njets>=9"}; 
   vector<TString> njbcuts_2l = {"njets>=5&&njets<=7", "njets>=8", "njets>=5&&njets<=7", "njets>=8"}; 
   vector<TString> njbcuts_5j = {"nbm==1&&njets==5", "nbm>=2&&njets==5", "nbm==1&&njets==5", "nbm>=2&&njets==5"}; 
-  vector<TString> njbcuts_m1lmet150nb12 = {"nbm==1&&njets>=6&&njets<=8", "nbm>=2&&njets>=6&&njets<=8", 
-				       "nbm==1&&njets>=9", "nbm>=2&&njets>=9"}; 
-  vector<TString> njbcuts_std = {"nbm==1&&njets>=6&&njets<=8", "nbm==2&&njets>=6&&njets<=8", "nbm>=3&&njets>=6&&njets<=8", 
-				 "nbm==1&&njets>=9", "nbm==2&&njets>=9", "nbm>=3&&njets>=9",
-				 "nbm==1&&njets>=6&&njets<=8", "nbm==2&&njets>=6&&njets<=8", "nbm>=3&&njets>=6&&njets<=8", 
-				 "nbm= =1&&njets>=9", "nbm==2&&njets>=9", "nbm>=3&&njets>=9"}; 
+  vector<TString> njbcuts_m1lmet150nb12 = {"nbm==1&&njets>=6&&njets<=8", "nbm==1&&njets>=9", 
+					   "nbm>=2&&njets>=6&&njets<=8", "nbm>=2&&njets>=9"}; 
+  vector<TString> njbcuts_std = {"nbm==1&&njets>=6&&njets<=8", "nbm==1&&njets>=9", 
+				 "nbm==2&&njets>=6&&njets<=8", "nbm==2&&njets>=9", 
+				 "nbm>=3&&njets>=6&&njets<=8", "nbm>=3&&njets>=9",
+				 "nbm==1&&njets>=6&&njets<=8", "nbm==1&&njets>=9", 
+				 "nbm==2&&njets>=6&&njets<=8", "nbm==2&&njets>=9", 
+				 "nbm>=3&&njets>=6&&njets<=8", "nbm>=3&&njets>=9"}; 
   vector<TString> njbcuts_nb1 = {"nbm==1&&njets>=6&&njets<=8", "nbm==1&&njets>=9", 
-				 "nbm==2&&njets>=6&&njets<=8", "nbm>=3&&njets>=6&&njets<=8", 
-				 "nbm==2&&njets>=9", "nbm>=3&&njets>=9"}; 
-  vector<TString> njbcuts_met500 = {"nbm==1&&njets>=6&&njets<=8", "nbm==2&&njets>=6&&njets<=8", "nbm>=3&&njets>=6&&njets<=8", 
-				 "nbm==1&&njets>=9", "nbm==2&&njets>=9", "nbm>=3&&njets>=9"}; 
+				 "nbm==2&&njets>=6&&njets<=8", "nbm==2&&njets>=9", 
+				 "nbm>=3&&njets>=6&&njets<=8", "nbm>=3&&njets>=9"}; 
+  vector<TString> njbcuts_met500 = {"nbm==1&&njets>=6&&njets<=8", "nbm==1&&njets>=9", 
+				    "nbm==2&&njets>=6&&njets<=8", "nbm==2&&njets>=9", 
+				    "nbm>=3&&njets>=6&&njets<=8", "nbm>=3&&njets>=9"}; 
   vector<TString> njbcuts_m1lmet150 = {"njets>=6&&njets<=8", "njets>=9"}; 
   vector<TString> njbcuts_m2lmet150 = {"njets>=5&&njets<=7", "njets>=8"}; 
 
