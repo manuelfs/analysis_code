@@ -31,10 +31,12 @@
 using namespace std;
 
 namespace{
+  TString jec_var = "2"; // 1 for jecup and 2 for jec down
+
   bool verbose(false);
   TString title_style("CMSPaper");
   bool do_data(false);
-  bool only_tt(false);
+  bool only_tt(true);
   bool only_other(false);
   bool do_metbins(true);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
@@ -96,42 +98,42 @@ int main(){
   }
 
   ////// Defining cuts
-  bcut baseline("nleps==1&&nveto==0&&ht>500&&met>200&&njets>="+basenj+"&&nbm>=1&&mj14>"+lowmj+"&&pass&&stitch");
+  bcut baseline("nleps==1&&nveto==0&&sys_ht["+jec_var+"]>500&&sys_met["+jec_var+"]>200&&sys_njets["+jec_var+"]>="+basenj+"&&sys_nbm["+jec_var+"]>=1&&sys_mj14["+jec_var+"]>"+lowmj+"&&pass&&stitch");
   
   map<TString, vector<bcut> > cutmap;
   //RmT and kappa calculation depend on mt cuts ordering, assumed 0 = low, 1 = high
-  cutmap["mt"].push_back(bcut("mt<="+mtcut));
-  cutmap["mt"].push_back(bcut("mt>"+mtcut));
+  cutmap["mt"].push_back(bcut("sys_mt["+jec_var+"]<="+mtcut));
+  cutmap["mt"].push_back(bcut("sys_mt["+jec_var+"]>"+mtcut));
   
   //kappa calculation depends on MJ cut ordering, assumed 0 = low, 1 = high
-  cutmap["mj"].push_back(bcut("mj14<="+highmj));
-  cutmap["mj"].push_back(bcut("mj14>"+highmj));
+  cutmap["mj"].push_back(bcut("sys_mj14["+jec_var+"]<="+highmj));
+  cutmap["mj"].push_back(bcut("sys_mj14["+jec_var+"]>"+highmj));
 
-  cutmap["nb"].push_back(bcut("nbm==1"));
-  cutmap["nb"].push_back(bcut("nbm==2")); 
-  cutmap["nb"].push_back(bcut("nbm>=3"));
+  cutmap["nb"].push_back(bcut("sys_nbm["+jec_var+"]==1"));
+  cutmap["nb"].push_back(bcut("sys_nbm["+jec_var+"]==2")); 
+  cutmap["nb"].push_back(bcut("sys_nbm["+jec_var+"]>=3"));
 
   if (do_metbins){
-    cutmap["met"].push_back(bcut("met<="+medmet));
-    cutmap["met"].push_back(bcut("met>"+medmet+"&&met<="+highmet));
-    cutmap["met"].push_back(bcut("met>"+highmet));
+    cutmap["met"].push_back(bcut("sys_met["+jec_var+"]<="+medmet));
+    cutmap["met"].push_back(bcut("sys_met["+jec_var+"]>"+medmet+"&&sys_met["+jec_var+"]<="+highmet));
+    cutmap["met"].push_back(bcut("sys_met["+jec_var+"]>"+highmet));
   } else {
-    cutmap["met"].push_back(bcut("met>"+lowmet));
+    cutmap["met"].push_back(bcut("sys_met["+jec_var+"]>"+lowmet));
   }
 
   vector<vector<unsigned> > m3_njbin_ind;
   m3_njbin_ind.push_back(vector<unsigned>()); // push indices of yields to be integrated for low nj
   m3_njbin_ind.push_back(vector<unsigned>()); // push indices of yields to be integrated for high nj
-  cutmap["nj"].push_back(bcut("njets==4"));
-  cutmap["nj"].push_back(bcut("njets==5")); 
-  cutmap["nj"].push_back(bcut("njets==6")); 
+  cutmap["nj"].push_back(bcut("sys_njets["+jec_var+"]==4"));
+  cutmap["nj"].push_back(bcut("sys_njets["+jec_var+"]==5")); 
+  cutmap["nj"].push_back(bcut("sys_njets["+jec_var+"]==6")); 
   if (atoi(lownj)==6) m3_njbin_ind[0].push_back(cutmap["nj"].size()-1);
-  cutmap["nj"].push_back(bcut("njets==7")); 
+  cutmap["nj"].push_back(bcut("sys_njets["+jec_var+"]==7")); 
   if (atoi(lownj)<=7) m3_njbin_ind[0].push_back(cutmap["nj"].size()-1);
-  cutmap["nj"].push_back(bcut("njets==8")); 
+  cutmap["nj"].push_back(bcut("sys_njets["+jec_var+"]==8")); 
   if (atoi(highnj)==8) m3_njbin_ind[1].push_back(cutmap["nj"].size()-1);
   else m3_njbin_ind[0].push_back(cutmap["nj"].size()-1);
-  cutmap["nj"].push_back(bcut("njets>=9")); 
+  cutmap["nj"].push_back(bcut("sys_njets["+jec_var+"]>=9")); 
   m3_njbin_ind[1].push_back(cutmap["nj"].size()-1);
 
   ////// Combining cuts
@@ -155,7 +157,7 @@ int main(){
   //cutmap["mj"].resize(1);
   if(do_data){
     cutmap["nb"].resize(1);
-    cutmap["nb"].push_back(bcut("nbm>=2"));
+    cutmap["nb"].push_back(bcut("sys_nbm["+jec_var+"]>=2"));
     getYields(data, baseline, bincuts, yield[1], w2[1], 1., true);
     ini = 1; fin = 1;
   } else {
@@ -356,7 +358,8 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     line.SetLineColor(28); line.SetLineWidth(4); line.SetLineStyle(3);
     line.DrawLine(minh, 1, maxh, 1);
 
-    TString pname = "plots/kappa_mj"+lowmj+"x"+highmj+"_met"+lowmet+"x"+medmet+"x"+highmet+"_nj"+lownj+"x"+highnj;
+    TString pname = "plots/kappa_jecup_mj"+lowmj+"x"+highmj+"_met"+lowmet+"x"+medmet+"x"+highmet+"_nj"+lownj+"x"+highnj;
+    if(jec_var=="2") pname.ReplaceAll("jecup","jecdown");
     if (!fatbins) pname.ReplaceAll("kappa_","kappa_method1_");
     if(is_data) pname += "_data";
     else {

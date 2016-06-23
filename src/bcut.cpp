@@ -335,6 +335,9 @@ void onecut::assignBranch(TString var, TString val){
     }else if(var=="sys_mj"){ 
       cutType_ = kvFloat;
       bvf_ = &baby_base::sys_mj;
+    }else if(var=="sys_mj14"){ 
+      cutType_ = kvFloat;
+      bvf_ = &baby_base::sys_mj14;
     }else if(var=="sys_mt"){ 
       cutType_ = kvFloat;
       bvf_ = &baby_base::sys_mt;
