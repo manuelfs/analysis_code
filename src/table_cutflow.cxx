@@ -24,7 +24,7 @@
 
 using namespace std;
 namespace {
-  TString luminosity = "2.246";
+  TString luminosity = "10";
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
@@ -37,7 +37,9 @@ int main(){
 
 
   //// Defining samples, i.e. columns in the table
-  TString folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
+  // TString folder="/cms2r0/babymaker/babies/2016_06_14/mc/skim_1lht500/";
+  TString folder="/cms2r0/babymaker/babies/2016_06_14/mc/merged_standard/";
+  TString folder_sig="/cms2r0/babymaker/babies/2016_04_29/mc/T1tttt/unskimmed/";
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  folder = "/net/cms2"+folder;
 
@@ -45,9 +47,9 @@ int main(){
   s_tt.push_back(folder+"*_TTJets*Lept*");
   s_tt.push_back(folder+"*_TTJets_HT*");
   vector<TString> s_t1t;
-  s_t1t.push_back(folder+"*T1tttt*1500_*");
+  s_t1t.push_back(folder_sig+"*T1tttt*-1800_*-200_*");
   vector<TString> s_t1tc;
-  s_t1tc.push_back(folder+"*T1tttt*1200_*");
+  s_t1tc.push_back(folder_sig+"*T1tttt*-1400_*-1000_*");
   vector<TString> s_other;
   s_other.push_back(folder+"*DYJetsToLL*");
   s_other.push_back(folder+"*_ZJet*");
@@ -55,10 +57,11 @@ int main(){
   s_other.push_back(folder+"*ttHJetTobb*");
   s_other.push_back(folder+"*_TTTT*");
   s_other.push_back(folder+"*_WZ*.root");
-
+  s_other.push_back(folder+"*_WH_HToBB*.root");
+  s_other.push_back(folder+"*_ZH_HToBB*.root");
+  s_other.push_back(folder+"*_ZZ_*.root");
   vector<TString> s_qcd;
   s_qcd.push_back(folder+"*_QCD_HT*");
-  s_qcd.push_back(folder+"*_TTJets_TuneCUET*");
   vector<TString> s_wjets;
   s_wjets.push_back(folder+"*_WJetsToLNu*");
   vector<TString> s_ttv;
@@ -83,6 +86,7 @@ int main(){
   vector<tfeats> tables;
   TString baseline_s("stitch&&pass"); 
 
+  TString r1check = "&&mt<140&&mj14<=400&&met<=350";
   //////////// Standard cutflow ////////////
   // Pushing first table and adding rows
   tables.push_back(tfeats("1", "an"));
@@ -90,14 +94,17 @@ int main(){
   tables.back().add("$1\\ell$", "nleps==1");
   tables.back().add("$H_T>500$ GeV", "ht>500&&nleps==1");
   tables.back().add("MET$>200$ GeV", "met>200&&ht>500&&nleps==1");
-  tables.back().add("$N_{\\rm jets}\\geq6$", "njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$N_{\\rm b}\\geq1$", "nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$M_J>250$ GeV", "mj>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$m_T>140$ GeV", "mt>140&&mj>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$M_J>400$ GeV", "mt>140&&mj>400&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("$N_{\\rm b}\\geq2$", "mt>140&&mj>400&&mj>250&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1");
-  tables.back().add("MET$>400$ GeV", "mt>140&&mj>400&&nbm>=2&&njets>=6&&met>400&&ht>500&&nleps==1");
-  tables.back().add("$N_{\\rm jets}\\geq9$", "mt>140&&mj>400&&nbm>=2&&njets>=9&&met>400&&ht>500&&nleps==1");
+  tables.back().add("Track veto", "met>200&&ht>500&&nleps==1&&nveto==0");
+  tables.back().add("$N_{\\rm jets}\\geq6$", "njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
+  tables.back().add("$N_{\\rm b}\\geq1$", "nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0","-");
+  tables.back().add("$M_J>250$ GeV", "mj14>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
+  // tables.back().add("R1, low met", "mj14>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0"+r1check);
+  tables.back().add("$m_T>140$ GeV", "mt>140&&mj14>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
+  tables.back().add("$M_J>400$ GeV", "mt>140&&mj14>400&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
+  tables.back().add("$N_{\\rm b}\\geq2$", "mt>140&&mj14>400&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
+  tables.back().add("MET$>350$ GeV", "mt>140&&mj14>400&&nbm>=2&&njets>=6&&met>350&&ht>500&&nleps==1&&nveto==0");
+  tables.back().add("MET$>500$ GeV", "mt>140&&mj14>400&&nbm>=2&&njets>=6&&met>500&&ht>500&&nleps==1&&nveto==0");
+  tables.back().add("$N_{\\rm jets}\\geq9$", "mt>140&&mj14>400&&nbm>=2&&njets>=9&&met>500&&ht>500&&nleps==1&&nveto==0");
 
 
   /////////////////////////////  No more changes needed down here to add tables ///////////////////////
@@ -186,7 +193,7 @@ void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yi
   out<<"}\\hline\\hline\n";
   out << " \\multicolumn{1}{c|}{${\\cal L} = "<<luminosity<<"$ fb$^{-1}$} ";
   for(unsigned sam(0); sam < Samples.size()-nsig; sam++)
-    out << " & "<<Samples[sam].label;
+    out<< " & "<<Samples[sam].label;
   out<< " & SM bkg. ";
   for(unsigned sam(Samples.size()-nsig); sam < Samples.size(); sam++)
     out << " & "<<Samples[sam].label;
@@ -195,7 +202,7 @@ void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yi
     if(table.options[icut]=="=") do_uncert = true;
     if(icut==table.tcuts.size()-3) digits = 2;
     for(int ind(0); ind < table.options[icut].CountChar('='); ind++) out << " \\hline ";
-    out<<table.texnames[icut];
+    out<<setw(20)<<table.texnames[icut];
     double bkg(0), ebkg(0);
     for(unsigned sam(0); sam < Samples.size()-nsig; sam++) {
       double val(yields[sam][ini+icut]), errval(sqrt(w2[sam][ini+icut]));
@@ -203,15 +210,15 @@ void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yi
       else errval = sqrt(av_w2[sam]);
       bkg += val;
       ebkg += pow(errval, 2);
-      if(!do_uncert) out <<" & "<< RoundNumber(val,digits);
-      else out <<" & $"<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$";
+      if(!do_uncert) out <<" & "<<setw(8)<< RoundNumber(val,digits);
+      else out <<" & $"<<setw(8)<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$";
     } // Loop over background samples
-    if(!do_uncert) out <<" & "<< RoundNumber(bkg,digits);
-    else out <<" & $"<< RoundNumber(bkg,digits)<<"\\pm"<<RoundNumber(sqrt(ebkg),digits)<<"$";
+    if(!do_uncert) out <<" & "<<setw(8)<< RoundNumber(bkg,digits);
+    else out <<" & $"<<setw(8)<< RoundNumber(bkg,digits)<<"\\pm"<<RoundNumber(sqrt(ebkg),digits)<<"$";
     for(unsigned sam(Samples.size()-nsig); sam < Samples.size(); sam++){
       double val(yields[sam][ini+icut]), errval(sqrt(w2[sam][ini+icut]));
-      if(!do_uncert) out <<" & "<< RoundNumber(val,digits);
-      else out <<" & $"<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$";
+      if(!do_uncert) out <<" & "<<setw(8)<< RoundNumber(val,digits);
+      else out <<" & $"<<setw(8)<< RoundNumber(val,digits)<<"\\pm"<<RoundNumber(errval,digits)<<"$";
     }
     out<<" \\\\ ";
     for(int ind(0); ind < table.options[icut].CountChar('-'); ind++) out << " \\hline";
