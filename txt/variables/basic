@@ -5,6 +5,7 @@ Long64_t event
 bool nonblind
 ## stitch is used to stitch an MC sample with its corresponding HT-bin sample
 bool stitch
+bool json2p6
 
 ####################   Global   ###################
 int npv
@@ -232,6 +233,7 @@ bool pass_nohf;
 int nfjets
 float mj
 float mj14
+float mj14_original
 float mj16
 std::vector<float> fjets_pt
 std::vector<float> fjets_eta
