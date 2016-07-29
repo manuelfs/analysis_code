@@ -59,7 +59,7 @@ int main(){
 
   time_t begtime, endtime;
   time(&begtime);
-  TString folder="/cms2r0/babymaker/babies/2016_06_14/mc/skim_standard/";
+  TString folder="/cms2r0/babymaker/babies/2016_06_14/mc/merged_standard/";
   TString folderdata="/cms2r0/babymaker/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-")) {
@@ -254,7 +254,7 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
    
           double kappa(0), ksys(0.38);
 	  if(inj==1) ksys = 0.89;
-          kappa = calcKappa(entries, weights, powersk, mSigma, pSigma, (idata%2)==1, false); 
+          kappa = calcKappa(entries, weights, powersk, mSigma, pSigma, (idata%2)==1, verbose); 
 	  double kstat = (mSigma+pSigma)/2.;
           cout<<"k = $"<<RoundNumber(kappa,2)<<" \\pm "<<RoundNumber(kstat, 2)<<" \\pm "<<RoundNumber(kappa*ksys, 2)<<"$"
 	      <<"  -> kstat = "<<RoundNumber(kstat/kappa*100,0)<<endl;
@@ -416,7 +416,7 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
               weights[imt].push_back(sumw2/totyield);
             } // Loop over mt and k observables
             double kappa(0);
-            kappa = calcKappa(entries, weights, powersk, mSigma, pSigma, idata==1, false);  
+            kappa = calcKappa(entries, weights, powersk, mSigma, pSigma, idata==1, verbose);  
             if(imj>=1 && idata==1) { // Blinding data at high MJ
               kappa = 1;
               pSigma = 0; mSigma = 0;

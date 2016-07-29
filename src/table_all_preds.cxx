@@ -42,7 +42,8 @@ int main(int argc, char *argv[]){
     bfolder = "/net/cms2"; // In laptops, you can't create a /net folder
 
   TString foldermc(bfolder+"/cms2r0/babymaker/babies/2016_06_14/mc/merged_standard/");
-  TString folderdata(bfolder+"/cms2r0/babymaker/babies/2016_06_14/data/skim_standard/");
+  //TString folderdata(bfolder+"/cms2r0/babymaker/babies/2016_06_14/data/skim_standard/");
+  TString folderdata(bfolder+"/cms2r0/babymaker/babies/2016_06_21/data/skim_standard/");
   if(method.Contains("met150")){
     foldermc = bfolder+"/cms2r0/babymaker/babies/2016_06_14/mc/merged_1lht500met150nj5/";
     folderdata = bfolder+"/cms2r0/babymaker/babies/2016_06_14/data/merged_1lht500met150nj5/";
@@ -121,8 +122,8 @@ int main(int argc, char *argv[]){
 
   if(full_lumi){
     base_all = "mj14>250&&pass&&stitch&&";
-    lumi = 2.07;
-    lumi_s = "2.07 fb$^{-1}$";
+    lumi = 2.6;
+    lumi_s = "2.6 fb$^{-1}$";
   }
 
   if(method=="m2l") {
@@ -208,7 +209,7 @@ int main(int argc, char *argv[]){
     metcuts[0] = "met>500&&nbm==1";
     metcuts[1] = "met>500&&nbm>=2";
     ilowmet = 2;
-  }else if(method=="agg_highmet"){
+  }else if(method=="agg_himet"){
     base_s = base_all+"met>500&&njets>=6&&nbm>=3";
     njbcuts = vector<TString>{"nbm>=3&&njets>=6"};
     njbcuts_himt = njbcuts;
@@ -224,7 +225,7 @@ int main(int argc, char *argv[]){
     method_s = "Agg. Bin: $1\\ell$, MET350, $N_{j}\\geq9$, $N_{b}\\geq2$";
     metcuts = vector<TString>{"met>350"};
     ilowmet = 1;
-  }else if(method=="agg_highmultiplicity"){
+  }else if(method=="agg_himult"){
     base_s = base_all+"met>200&&njets>=9&&nbm>=3";
     njbcuts = vector<TString>{"nbm>=3&&njets>=9"};
     njbcuts_himt = njbcuts;
@@ -251,10 +252,12 @@ int main(int argc, char *argv[]){
   ////// Combining cuts
   vector<bcut > bincuts;
   for(size_t ind(0); ind<njbcuts.size(); ind++){
+    cout<<endl<<"New njbcut"<<endl;
     for(size_t obs(0); obs < abcdcuts.size(); obs++){
       TString totcut(abcdcuts[obs]+"&&"+metcuts[ind>=ilowmet]);
       if(obs == 1) totcut += ("&&"+njbcuts[ind]);
       if(obs == 3) totcut += ("&&"+njbcuts_himt[ind]);
+      cout<<base_s+"&&"+totcut<<endl;
       bincuts.push_back(bcut(totcut));
     } // Loop over observables going into kappa
   } // Loop over signal bins
@@ -354,7 +357,7 @@ int main(int argc, char *argv[]){
 
   ///// Printing table
   TString outname = "txt/table_predictions_lumi0p815_"+method+".tex";
-  if(full_lumi) outname.ReplaceAll("lumi0p815", "lumi2p07");
+  if(full_lumi) outname.ReplaceAll("lumi0p815", "lumi2p6");
   if(unblind) outname.ReplaceAll("lumi", "unblind_lumi");
 
   if(do_other) outname.ReplaceAll("predictions", "other_sys");
