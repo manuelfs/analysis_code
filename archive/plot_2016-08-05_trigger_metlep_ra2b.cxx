@@ -1,5 +1,3 @@
-// plot_trigger: Plots for the trigger section of the RA4 note
-
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -25,9 +23,10 @@
 #include "styles.hpp"
 #include "utilities.hpp"
 #include "utilities_macros.hpp"
+#include "alias_ra2b.hpp"
 
 namespace  {
-  bool do_dps = true;
+  bool do_dps = false;
   TString plot_type = ".pdf";
 }
 
@@ -38,9 +37,9 @@ Double_t errorFun(Double_t *x, Double_t *par) {
   return value;
 }
 
-void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, TString xtitle, 
-		TString den, TString num, TString title="", TString ytitle="", 
-		float minfit=-1., float scale = 1., bool isData=true, bool addOverflow=true);
+TString PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, TString xtitle, 
+		   TString den, TString num, TString title="", TString ytitle="", 
+		   float minfit=-1., float scale = 1., bool isData=true, bool addOverflow=true);
 TString Efficiency(TChain *data, TString den, TString num);
 TString Efficiency(TChain *data, TString den, TString num, float &effic, float &errup, float &errdown);
 
@@ -55,83 +54,100 @@ int main(){
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  
     bfolder = "/net/cms2"; // In laptops, you can't create a /net folder
 
-  TString folder(bfolder+"/cms2r0/babymaker/babies/2016_06_26/data/");
+  TString run="2016";
+  TString folder(bfolder+"/cms2r0/treemaker/2016_07_27/");
 
-  TChain c_met("tree"); c_met.Add(folder+"/skim_nj2met150/*.root");
-  TChain c_mu("tree");  c_mu.Add(folder+"/skim_nm1nj3/*root");
-  TChain c_el("tree");  c_el.Add(folder+"/skim_ne1nj3/*root");
+  // All skims have "globalTightHalo2016Filter==1&&HBHENoiseFilter==1&&HBHEIsoNoiseFilter==1&&eeBadScFilter==1
+  //                 &&EcalDeadCellTriggerPrimitiveFilter==1&&BadChargedCandidateFilter&&BadPFMuonFilter&&NVtx>0&&JetID"
+  // Additionally
+  //   JetHT: HT > 900 (skim_ra2_qcd has NJets >= 3, NLeps = 0)
 
+  TChain c_ht("tree"); c_ht.Add(folder+"/dirty/skim_ra2_nl1ht900nj3/*JetHT*"+run+"*.root"); setAliasRa2b(&c_ht);
 
   float minx(0), maxx(460);
   int nbins(static_cast<int>((maxx-minx)/10));
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////      MET  mu    ////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////////////////////////
-  minx = 0; maxx = 520; nbins = static_cast<int>((maxx-minx)/10);
-  // MET100 or METNoMu100
-  PlotTurnOn(&c_mu, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     "trig[32]&&Max$(mus_pt*(mus_miniso<0.2&&mus_sigid))>25&&njets>=4&&ht>500", "(trig[13]||trig[33])",  
-	     "IsoMu22, N_{#mu,25} #geq 1, N_{jet} #geq 4", "MET100 || METNoMu100",100);
-
+  TString ump(" & ");
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////      MET  el      ////////////////////////////////////////////////
+  ///////////////////////////////////////////    Real MET e   //////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  minx = 0; maxx = 520; nbins = static_cast<int>((maxx-minx)/10);
-  // MET100 or METNoMu100
-  PlotTurnOn(&c_el, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     "trig[23]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>25&&njets>=4&&ht>500&&nvmus==0", "(trig[13]||trig[33])",      
-	     "Ele25_WPTight, N_{e,25} #geq 1, N_{jet} #geq 4", "MET100 || METNoMu100");
+  // MET100: Muon
+  vector<TString> baseline({"(trig[38]==1)&&Sum$(Muons.Pt()>20)==1", "(trig[38]==1)&&Sum$(Electrons.Pt()>20)==1"});
+  vector<TString>trigs({"(trig[40]==1||trig[44]==1||trig[17]==1||trig[20]==1||trig[21]==1||trig[26]==1||trig[27]==1)",
+	"(trig[40]==1||trig[44]==1||trig[3]==1||trig[5]==1||trig[6]==1||trig[9]==1||trig[13]==1)"});
+  vector<TString> title({"HT800, N_{#mu}=1, N_{j}#geq3, H_{T}>900", "HT800, N_{e}=1, H_{T}>900"});
+  vector<TString> ytitle({"MET100 || Mu[15,24,50]", "MET100 || Ele[15,25,50,105]"});
+  vector<TString> variable({"Max$(Muons.Pt())", "Max$(Electrons.Pt())"});
+  vector<TString> lepton({"Muon", "Electron"});
+
+  vector<vector<TString> > effs;
+  vector<TString> metcuts({"met>0&&met<=50", "met>50&&met<=100", "met>100&&met<=150", "met>150&&met<=200", 
+	"met>200&&met<=250", "met>250&&met<=300", "met>300", "met>200"});
+
+  for(size_t ilep=0; ilep<baseline.size(); ilep++){
+    
+    cout<<endl<<" ==== MET100 efficiency for "<<ytitle[ilep]<<endl<<endl;
+    minx = 0; maxx = 420; nbins = static_cast<int>((maxx-minx)/10);
+    PlotTurnOn(&c_ht,"met",nbins,minx,maxx, "E_{T}^{miss}", baseline[ilep], trigs[ilep], title[ilep], ytitle[ilep], -200);
+
+    //// Finding efficiencies in bins of MET
+    effs.push_back(vector<TString>());
+    for(size_t icut=0; icut<metcuts.size(); icut++)
+      effs[ilep].push_back(Efficiency(&c_ht, baseline[ilep]+"&&"+metcuts[icut], trigs[ilep]));
+
+    //// Plotting lepton pT
+    baseline[ilep].ReplaceAll(">20)", ">10)");
+    minx = 10; maxx = 70; nbins = static_cast<int>((maxx-minx)/2.5);
+    PlotTurnOn(&c_ht,variable[ilep],nbins,minx,maxx, lepton[ilep]+" p_{T}", baseline[ilep]+"&&met>200", 
+	       trigs[ilep], title[ilep]+", MET>200", ytitle[ilep], -20);
+    PlotTurnOn(&c_ht,variable[ilep],nbins,minx,maxx, lepton[ilep]+" p_{T}", baseline[ilep]+"&&met<200", 
+	       trigs[ilep], title[ilep]+", MET<200", ytitle[ilep], -20);
+    minx = 0; maxx = 450; nbins = static_cast<int>((maxx-minx)/25);
+    PlotTurnOn(&c_ht,variable[ilep],nbins,minx,maxx, lepton[ilep]+" p_{T}", baseline[ilep]+"&&met>200", 
+	       trigs[ilep], title[ilep]+", MET>200", ytitle[ilep], -20);
+    PlotTurnOn(&c_ht,variable[ilep],nbins,minx,maxx, lepton[ilep]+" p_{T}", baseline[ilep]+"&&met<200", 
+	       trigs[ilep], title[ilep]+", MET<200", ytitle[ilep], -20);
+
+
+  } // Loop over muon, electron
+
+
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////      HT         ////////////////////////////////////////////////
+  ////////////////////////////////////////  Printing table  ///////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////
+  TString outname("out_trigeff_metlep.txt");
+  ofstream out(outname);
+  out<<"\n\n\\begin{table}\n  \\centering\n  \\caption{Efficiency for MET100+Mu[15,24,50] triggers, RA2/b ntuples.}\n"
+     <<"\\label{tab:trig_eff} \\vspace{0.5cm}\n"
+     <<"\\renewcommand{\\arraystretch}{1.3}\n"
+     <<"  \\begin{tabular}{l |cc}\n \\hline\\hline"<<endl
+     <<"  MET bin  & Muon & Electron  \\\\\n"
+     <<"  \\hline"<<endl;
+  for(size_t icut=0; icut<metcuts.size(); icut++)
+    out << cuts2tex(metcuts[icut]) << ump << effs[0][icut] << ump << effs[1][icut] <<" \\\\"<<endl;
+  out<<"  \\hline\\hline\n  \\end{tabular}\n\\end{table}\n\n"<<endl;
 
-  // VVVL: HT400
-  minx = 240; maxx = 830; nbins = static_cast<int>((maxx-minx)/10);
-  PlotTurnOn(&c_met, "ht", nbins,minx,maxx, "H_{T}",
-	     "trig[13]&&met>200&&njets>=4&&Max$(els_vvvl)&&nvels>=1&&run>=274960", "trig[7]",
-	     "MET100, N_{e}#geq1, N_{jet}#geq4, MET>200", "Ele15_HT400", 300,1,true,false);
-  PlotTurnOn(&c_met, "ht", nbins,minx,maxx, "H_{T}",
-	     "trig[13]&&Max$(mus_vvvl)&&met>200&&njets>=4&&nvmus>=1&&run>=274960", "trig[3]",
-	     "MET100, N_{#mu}#geq1, N_{jet}#geq4, MET>200", "Mu15_HT400", 300,1,true,false);
+  out.close();
+  cout<<endl<<"Written efficiencies to "<<outname<<endl<<endl;
 
-  // HT800: HT
-  minx = 500; maxx = 1450; nbins = static_cast<int>((maxx-minx)/25);
-  PlotTurnOn(&c_met, "ht", nbins,minx,maxx, "H_{T}",
-	     "trig[13]&&met>200&&njets>=4&&nvleps==0", "trig[12]",
-	     "MET100, N_{e,10}=0, N_{jet}#geq2, MET>200", "HT800", 750,1,true,false);
+
 
 
 }
 
-// mv plots/turnon_ht_1450_trig12_trig13_metg200_njetsge4_nvleps0_min750_data.pdf                                     tsg/trig-ht-HT800.pdf
-// mv plots/turnon_ht_830_trig3_trig13_Maxmus_vvvl_metg200_njetsge4_nvmusge1_runge274960_min300_data.pdf	      tsg/trig-ht-Mu15_IsoVVVL_PFHT400.pdf
-// mv plots/turnon_ht_830_trig7_trig13_metg200_njetsge4_Maxels_vvvl_nvelsge1_runge274960_min300_data.pdf	      tsg/trig-ht-Ele15_IsoVVVL_PFHT400.pdf
-// mv plots/turnon_met_520_trig13_trig33_trig23_Maxels_ptels_minisos01_els_sigidg25_njetsge4_htg500_nvmus0_data.pdf   tsg/trig-met_PFMET100_PFMHT100-electron.pdf
-// mv plots/turnon_met_520_trig13_trig33_trig32_Maxmus_ptmus_minisos02_mus_sigidg25_njetsge4_htg500_min100_data.pdf   tsg/trig-met_PFMET100_PFMHT100-muon.pdf
-
-// convert -trim -density 150  tsg/trig-ht-HT800.pdf                        tsg/trig-ht-HT800.png			
-// convert -trim -density 150  tsg/trig-ht-Mu15_IsoVVVL_PFHT400.pdf	 tsg/trig-ht-Mu15_IsoVVVL_PFHT400.png	
-// convert -trim -density 150  tsg/trig-ht-Ele15_IsoVVVL_PFHT400.pdf	 tsg/trig-ht-Ele15_IsoVVVL_PFHT400.png	
-// convert -trim -density 150  tsg/trig-met_PFMET100_PFMHT100-electron.pdf	 tsg/trig-met_PFMET100_PFMHT100-electron.png	
-// convert -trim -density 150  tsg/trig-met_PFMET100_PFMHT100-muon.pdf      tsg/trig-met_PFMET100_PFMHT100-muon.png     
-
-
-void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, TString xtitle, 
-		TString den, TString num, TString title, TString ytitle, float minfit, float scale, 
-		bool isData, bool addOverflow){
+TString PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, TString xtitle, 
+		   TString den, TString num, TString title, TString ytitle, float minfit, float scale, 
+		   bool isData, bool addOverflow){
   styles style("HLTStyle"); gStyle->SetPadTickY(0);
   bool dofit(minfit>=-1);
-  //if(var.Contains("phi") || var.Contains("nbm")) dofit = false;
+  if(var.Contains("phi") || var.Contains("nbm")) dofit = false;
 
   TCanvas can;
   can.SetGrid();
   TH1D* histo[2];
   TString hname, totCut, pname;
-  //  den = "("+den+")&&json&&pass&&pass_jets_ra2"; 
-  den = "("+den+")&&pass";
   hname = "den"; totCut = den;
   histo[0] = new TH1D(hname, "", nbins, minx, maxx);
   data->Project(hname, var, totCut);
@@ -156,7 +172,7 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   //epsi = "Efficiency";
   // Ploting denominator
   float hscaled(0.3*scale), maxeff(1.42);
-  if(do_dps) maxeff = 1.32;
+  if(do_dps) maxeff = 1.3;
   float hfactor(hscaled/histo[1]->GetMaximum()), hmax(histo[1]->GetMaximum());
   float axismax(hmax*maxeff/hscaled);
   histo[1]->Scale(hfactor);
@@ -189,8 +205,6 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   if(isData) pname += "_data";
   else pname += "_mc";
   pname += plot_type;
-  pname.ReplaceAll("_pass","");
-
   
   // Fitting turn on curve
   if(minfit<0 && dofit) minfit = minx;
@@ -234,7 +248,7 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
     var_plateau =RoundNumber(var_plateau_f, 1);
   }
   den_plateau += ("&&"+var+">="+var_plateau);
-  Efficiency(data, den_plateau, num, effic, errup, errdown);
+  TString eff_plateau = Efficiency(data, den_plateau, num, effic, errup, errdown);
 
   // 98th percentile of Gaussian from Wolfram Alpha
   float p98(fitCurve->GetParameter(1)+2.05*fitCurve->GetParameter(2));
@@ -253,7 +267,7 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   label.SetTextAlign(33); //label.SetNDC(); 
   float range(maxx-minx);
   float x2(maxx-0.04*range), y2(maxeff-0.07), ysingle(0.1);
-  TString lumi = "4.3 fb^{-1}";
+  TString lumi = "12.9 fb^{-1}";
   if(title.Contains("fb")){
     lumi = title; lumi.Remove(lumi.First("fb"), lumi.Length()); lumi = lumi + " fb^{-1}";
     title.Remove(0, title.First("fb")+2);
@@ -282,18 +296,19 @@ void PlotTurnOn(TChain *data, TString var, int nbins, double minx, double maxx, 
   label.SetTextAlign(31); 
   if(isData) {
     if(!do_dps) label.DrawLatex(0.85, 0.93, lumi+" (13 TeV)");
-    else label.DrawLatex(0.85, 0.93, "2016, 13 TeV");
+    else label.DrawLatex(0.85, 0.93, "2015, 13 TeV");
   } else label.DrawLatex(0.85, 0.93, "Spring15 t#bar{t}");
 
   can.SaveAs(pname);
   if(do_dps) {
     pname.ReplaceAll(plot_type, ".png");
-    //can.SaveAs(pname);
+    can.SaveAs(pname);
   }
 
   for(unsigned his(0); his<2; his++)
     histo[his]->Delete();
   fitCurve->Delete();
+  return eff_plateau;
 }
 
 TString Efficiency(TChain *data, TString den, TString num){
@@ -304,8 +319,6 @@ TString Efficiency(TChain *data, TString den, TString num){
 TString Efficiency(TChain *data, TString den, TString num, float &effic, float &errup, float &errdown){
   TH1D* histo[2];
   TString hname, totCut;
-  //  den = "("+den+")&&json&&pass&&pass_jets_ra2";
-  den = "("+den+")&&pass";
 
   hname = "eden"; totCut = den;
   histo[0] = new TH1D(hname, "", 1, 0, 1);
@@ -347,3 +360,57 @@ TString Efficiency(TChain *data, TString den, TString num, float &effic, float &
 
 }
 
+//  //// Trigger indices in RA2/b ntuples
+
+//  0: HLT_CaloJet500_NoJetID_v
+//  1: HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v
+//  2: HLT_DoubleMu8_Mass8_PFHT300_v
+//  3: HLT_Ele105_CaloIdVT_GsfTrkIdT_v
+//  4: HLT_Ele15_IsoVVVL_PFHT350_PFMET50_v
+//  5: HLT_Ele15_IsoVVVL_PFHT350_v
+//  6: HLT_Ele15_IsoVVVL_PFHT400_v
+//  7: HLT_Ele15_IsoVVVL_PFHT600_v
+//  8: HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
+//  9: HLT_Ele25_eta2p1_WPTight_v 
+//  10: HLT_Ele27_WPTight_v
+//  11: HLT_Ele27_eta2p1_WPLoose_v 
+//  12: HLT_Ele45_WPLoose_v
+//  13: HLT_Ele50_IsoVVVL_PFHT400_v
+//  14: HLT_IsoMu16_eta2p1_MET30_v
+//  15: HLT_IsoMu22_eta2p1_v
+//  16: HLT_IsoMu22_v
+//  17: HLT_IsoMu24_v 
+//  18: HLT_IsoTkMu22_v
+//  19: HLT_Mu15_IsoVVVL_PFHT350_PFMET50_v
+//  20: HLT_Mu15_IsoVVVL_PFHT350_v
+//  21: HLT_Mu15_IsoVVVL_PFHT400_v
+//  22: HLT_Mu15_IsoVVVL_PFHT600_v
+//  23: HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v
+//  24: HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v
+//  25: HLT_Mu45_eta2p1_v
+//  26: HLT_Mu50_IsoVVVL_PFHT400_v
+//  27: HLT_Mu50_v
+//  28: HLT_PFHT200_v
+//  29: HLT_PFHT250_v
+//  30: HLT_PFHT300_PFMET100_v
+//  31: HLT_PFHT300_PFMET110_v
+//  32: HLT_PFHT300_v
+//  33: HLT_PFHT350_v
+//  34: HLT_PFHT400_v
+//  35: HLT_PFHT475_v
+//  36: HLT_PFHT600_v
+//  37: HLT_PFHT650_v
+//  38: HLT_PFHT800_v
+//  39: HLT_PFHT900_v
+//  40: HLT_PFMET100_PFMHT100_IDTight_v
+//  41: HLT_PFMET110_PFMHT110_IDTight_v
+//  42: HLT_PFMET120_PFMHT120_IDTight_v
+//  43: HLT_PFMET90_PFMHT90_IDTight_v
+//  44: HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_v
+//  45: HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v
+//  46: HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v
+//  47: HLT_PFMETNoMu90_PFMHTNoMu90_IDTight_v
+//  48: HLT_Photon165_HE10_v
+//  49: HLT_Photon175_v
+//  50: HLT_Photon90_CaloIdL_PFHT500_v
+//  51: HLT_TkMu50_v
