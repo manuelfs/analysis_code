@@ -56,15 +56,17 @@ int main(int argc, char *argv[]){
   styles style("2Dnobar");
   style.setDefaultStyle();
   
-  string folder="/cms2r0/babymaker/babies/2016_08_10/mc/merged_mcbase_standard/";
+  string folder_bkg="/cms2r0/babymaker/babies/2016_08_10/mc/merged_mcbase_standard/";
+  string folder_sig="/cms2r0/babymaker/babies/2016_08_10/T1tttt/merged_mcbase_standard";
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  {
-    folder = "/net/cms2"+folder;
+    folder_bkg = "/net/cms2"+folder_bkg;
+    folder_sig = "/net/cms2"+folder_sig;
   }
 
-  string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
-  baby_basic st_sig(folder+sig_name);
-  baby_basic st_bkg(folder+"*TTJets_Tune*");
+  string sig_name = compressed ? "*T1tttt*1600*1100*":"*T1tttt*1700*100*";
+  baby_basic st_sig(folder_sig+sig_name);
+  baby_basic st_bkg(folder_bkg+"*TTJets_Tune*");
 
   double mj_max = 1000.;
   double mt_max = 400.;
@@ -124,8 +126,8 @@ int main(int argc, char *argv[]){
  
   if(!no_signal){
     l.AddEntry(&g_sig, compressed?"#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}\
- (1200,800)":"#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}\
- (1500,100)", "p");
+ (1600,1100)":"#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}\
+ (1700,100)", "p");
   }
  
   double height = 0.125;
@@ -201,7 +203,7 @@ int main(int argc, char *argv[]){
 	  << "_njets_" << njets_min << '_' << njets_max
 	  << "_seed" << seed
 	  << (merge_ttbar?"_merged":"_split")
-	  << (no_signal ? "_no_signal" : (compressed ? "_T1tttt_1200_800" : "_T1tttt_1500_100"))
+	  << (no_signal ? "_no_signal" : (compressed ? "_T1tttt_1600_1100" : "_T1tttt_1700_100"))
 	  << (full_stats ? "_shapes" : "_lumi") << luminosity
 	  << ".pdf";
   c.Print(outname.str().c_str());

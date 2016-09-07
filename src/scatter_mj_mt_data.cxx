@@ -60,35 +60,38 @@ int main(int argc, char *argv[]){
   style.setDefaultStyle();
 
   string folder_data="/cms2r0/babymaker/babies/2016_08_10/data/merged_database_standard/";
-  string folder="/cms2r0/babymaker/babies/2016_08_10/mc/merged_mcbase_standard/";
+  string folder_bkg="/cms2r0/babymaker/babies/2016_08_10/mc/merged_mcbase_standard/";
+  string folder_sig="/cms2r0/babymaker/babies/2016_08_10/T1tttt/merged_mcbase_standard/";
 
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  {
-    folder = "/net/cms2"+folder;
+    folder_bkg = "/net/cms2"+folder_bkg;
     folder_data = "/net/cms2"+folder_data;
+    folder_sig = "/net/cms2"+folder_sig;
   }
   if(Contains(hostname, "lxplus")){
-    folder="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/skim_1lht500met200/";
+    folder_bkg="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_28/mc/skim_1lht500met200/";
     folder_data="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
+    folder_sig=folder_bkg;
   }
 
-  string sig_name = compressed ? "*T1tttt*1200*800*":"*T1tttt*1500*100*";
-  baby_basic st_sig(folder+sig_name);
+  string sig_name = compressed ? "*T1tttt_mGluino-1600_mLSP-1100*" : "*T1tttt_mGluino-1700_mLSP-100*";
+  baby_basic st_sig(folder_sig+sig_name);
   // baby_basic st_bkg(folder+"*_WJetsToLNu*");
-  baby_basic st_bkg(folder+"*TTJets*Lept*");
-  st_bkg.Add(folder+"*TTJets_HT*"); 
-  st_bkg.Add(folder+"*_WJetsToLNu*"); 
-  st_bkg.Add(folder+"*_TTWJets*");
-  st_bkg.Add(folder+"*_TTZTo*");
-  st_bkg.Add(folder+"*_TTG*");
-  st_bkg.Add(folder+"*_TTTT*");
-  st_bkg.Add(folder+"*_ST_*"); 
-  st_bkg.Add(folder+"*DYJetsToLL*"); 
-  st_bkg.Add(folder+"*_QCD_HT*"); 
-  st_bkg.Add(folder+"*_ZJet*"); 
-  st_bkg.Add(folder+"*_WWTo*"); 
-  st_bkg.Add(folder+"*ggZH_HToBB*");
-  st_bkg.Add(folder+"*ttHJetTobb*");
+  baby_basic st_bkg(folder_bkg+"*TTJets*Lept*");
+  st_bkg.Add(folder_bkg+"*TTJets_HT*"); 
+  st_bkg.Add(folder_bkg+"*_WJetsToLNu*"); 
+  st_bkg.Add(folder_bkg+"*_TTWJets*");
+  st_bkg.Add(folder_bkg+"*_TTZTo*");
+  st_bkg.Add(folder_bkg+"*_TTG*");
+  st_bkg.Add(folder_bkg+"*_TTTT*");
+  st_bkg.Add(folder_bkg+"*_ST_*"); 
+  st_bkg.Add(folder_bkg+"*DYJetsToLL*"); 
+  st_bkg.Add(folder_bkg+"*_QCD_HT*"); 
+  st_bkg.Add(folder_bkg+"*_ZJet*"); 
+  st_bkg.Add(folder_bkg+"*_WWTo*"); 
+  st_bkg.Add(folder_bkg+"*ggZH_HToBB*");
+  st_bkg.Add(folder_bkg+"*ttHJetTobb*");
   baby_basic st_data(folder_data+"*Single*");
 
   double mj_max = 1200.;
@@ -245,8 +248,9 @@ int main(int argc, char *argv[]){
   l.SetBorderSize(0);
   //  l.AddEntry(&g_sig, GetLabel((compressed?"T1tttt(1200,800)":"T1tttt(1500,100)"),rho_sig).c_str(), "p");
   l.AddEntry(&h_data, "Data", "p"); 
-  TLegendEntry *le = l.AddEntry(&g_sig, "#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}\
- (1500,100)", "p");                                                                                              
+  TLegendEntry *le = compressed
+    ? l.AddEntry(&g_sig, "#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}(1600,1100)", "p")
+    : l.AddEntry(&g_sig, "#tilde{g}#tilde{g}, #tilde{g} #rightarrow t#bar{t}#tilde{#chi}_{1}^{0}(1700,100)", "p");
   le->SetTextColor(kRed);
   l.SetTextSize(0.045);
 
@@ -286,11 +290,11 @@ int main(int argc, char *argv[]){
   ostringstream outname;
   outname << "plots/scat_mj_mt_"
           << "nbm" << nb_bin
-          // << "met_" << met_min << '_' << met_max
+	  << "met_" << met_min << '_' << met_max
           // << "_njets_" << njets_min << '_' << njets_max
           << "_seed" << seed
           // << (merge_ttbar?"_merged":"_split")
-          << (no_signal ? "_no_signal" : (compressed ? "_T1tttt_1200_800" : "_T1tttt_1500_100"))
+          << (no_signal ? "_no_signal" : (compressed ? "_T1tttt_1600_1100" : "_T1tttt_1700_100"))
           // << (full_stats ? "_shapes" : "_lumi") << luminosity
           << ".pdf";
           //<< ".root";
