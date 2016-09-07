@@ -6,6 +6,7 @@ bool nonblind
 ## stitch is used to stitch an MC sample with its corresponding HT-bin sample
 bool stitch
 bool json2p6
+bool json12p9
 
 ####################   Global   ###################
 int npv

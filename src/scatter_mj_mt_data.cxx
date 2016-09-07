@@ -329,6 +329,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
     if (!isData && !st.stitch()) continue;
 
     if(false
+       || (isData  && !st.json12p9())
        || nleps
        || (nb_bin==1 && st.nbm()!=1) //nb==1
        || (nb_bin==2 && st.nbm()<2) //nb>=2
