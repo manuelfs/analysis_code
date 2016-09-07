@@ -194,6 +194,7 @@ std::vector<float> tks_mt
 ###################   Trigger   ##################
 std::vector<bool> trig;
 std::vector<float> trig_prescale;
+bool trig_ra4
 float onht
 float onmet
 float onmu_vvvl

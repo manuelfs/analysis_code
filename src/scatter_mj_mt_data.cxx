@@ -339,10 +339,11 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
        || (met_max > 0. && st.met()>met_max)
        || st.st()<=500.
        || (st.nleps())!=1
+       || st.nveto() != 0
        || !(st.pass() || color==2)
        ) continue;
 
-    if(isData && !((st.trig()[4] ||st.trig()[8]) && st.pass())) continue; 
+    if(isData && !st.trig_ra4()) continue; 
 
     double mj = std::min(1199.9f, st.mj14());
     double mt = std::min(599.9f, st.mt());

@@ -244,8 +244,9 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full,
        || (njets_max > 0 && st.njets()>njets_max)
        || st.met()<=met_min
        || (met_max > 0. && st.met()>met_max)
-       || st.ht()<=500.
-       || (st.nmus()+st.nels())!=1
+       || st.st()<=500.
+       || st.nleps()!=1
+       || st.nveto() != 0
        || ((nleps == 1 && st.ntruleps()>1) || (nleps == 2 && st.ntruleps()<2))
        ) continue;
 
