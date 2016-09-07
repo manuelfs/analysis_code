@@ -19,12 +19,11 @@
 
 using namespace std;
 namespace {
-  TString luminosity = "2.246";
+  TString luminosity = "12.9";
   TString nom_wgt = "weight"; // nominal weight to use, (no division in bcut yet...)
   enum SysType {kConst, kWeight, kSmear, kCorr};
   TString syst = "all";
   bool altBinning = true;
-  TString mjvar="mj12";
 }
 
 class bindef {
@@ -122,81 +121,81 @@ int main(int argc, char *argv[]){
   v_sys.back().v_wgts.push_back("0.046");
 
   //// tables has a vector of the tables you want to print
-  TString baseline("ht>500 && met>200 && mj>250 && njets>=6 && nbm>=1 && nleps==1");
-  vector<bindef> v_bins;  
+  TString baseline("st>500 && met>200 && mj14>250 && njets>=6 && nbm>=1 && nleps==1");
+  vector<bindef> v_bins;
 
   if(!altBinning){
-    v_bins.push_back(bindef("r1_lowmet_allnb",      "met<=400 && mt<=140 && mj<=400"));
-    v_bins.push_back(bindef("r2_lowmet_lownj_1b",   "met<=400 && mt<=140 && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r2_lowmet_highnj_1b",  "met<=400 && mt<=140 && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r2_lowmet_lownj_2b",   "met<=400 && mt<=140 && mj>400 && nbm==2 && njets<=8"));
-    v_bins.push_back(bindef("r2_lowmet_highnj_2b",  "met<=400 && mt<=140 && mj>400 && nbm==2 && njets>=9"));
-    v_bins.push_back(bindef("r2_lowmet_lownj_3b",   "met<=400 && mt<=140 && mj>400 && nbm>=3 && njets<=8"));
-    v_bins.push_back(bindef("r2_lowmet_highnj_3b",  "met<=400 && mt<=140 && mj>400 && nbm>=3 && njets>=9"));
-    v_bins.push_back(bindef("r3_lowmet_allnb",      "met<=400 && mt>140  && mj<=400"));
-    v_bins.push_back(bindef("r4_lowmet_lownj_1b",   "met<=400 && mt>140  && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r4_lowmet_highnj_1b",  "met<=400 && mt>140  && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r4_lowmet_lownj_2b",   "met<=400 && mt>140  && mj>400 && nbm==2 && njets<=8"));
-    v_bins.push_back(bindef("r4_lowmet_highnj_2b",  "met<=400 && mt>140  && mj>400 && nbm==2 && njets>=9"));
-    v_bins.push_back(bindef("r4_lowmet_lownj_3b",   "met<=400 && mt>140  && mj>400 && nbm>=3 && njets<=8"));
-    v_bins.push_back(bindef("r4_lowmet_highnj_3b",  "met<=400 && mt>140  && mj>400 && nbm>=3 && njets>=9"));
-    v_bins.push_back(bindef("r1_highmet_allnb",      "met>400 && mt<=140 && mj<=400"));
-    v_bins.push_back(bindef("r2_highmet_lownj_1b",   "met>400 && mt<=140 && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r2_highmet_highnj_1b",  "met>400 && mt<=140 && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r2_highmet_lownj_2b",   "met>400 && mt<=140 && mj>400 && nbm>=2 && njets<=8"));
-    v_bins.push_back(bindef("r2_highmet_highnj_2b",  "met>400 && mt<=140 && mj>400 && nbm>=2 && njets>=9"));
-    v_bins.push_back(bindef("r3_highmet_allnb",      "met>400 && mt>140  && mj<=400"));
-    v_bins.push_back(bindef("r4_highmet_lownj_1b",   "met>400 && mt>140  && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r4_highmet_highnj_1b",  "met>400 && mt>140  && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r4_highmet_lownj_2b",   "met>400 && mt>140  && mj>400 && nbm>=2 && njets<=8"));
-    v_bins.push_back(bindef("r4_highmet_highnj_2b",  "met>400 && mt>140  && mj>400 && nbm>=2 && njets>=9"));
+    v_bins.push_back(bindef("r1_lowmet_allnb",      "met<=400 && mt<=140 && mj14<=400"));
+    v_bins.push_back(bindef("r2_lowmet_lownj_1b",   "met<=400 && mt<=140 && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r2_lowmet_highnj_1b",  "met<=400 && mt<=140 && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r2_lowmet_lownj_2b",   "met<=400 && mt<=140 && mj14>400 && nbm==2 && njets<=8"));
+    v_bins.push_back(bindef("r2_lowmet_highnj_2b",  "met<=400 && mt<=140 && mj14>400 && nbm==2 && njets>=9"));
+    v_bins.push_back(bindef("r2_lowmet_lownj_3b",   "met<=400 && mt<=140 && mj14>400 && nbm>=3 && njets<=8"));
+    v_bins.push_back(bindef("r2_lowmet_highnj_3b",  "met<=400 && mt<=140 && mj14>400 && nbm>=3 && njets>=9"));
+    v_bins.push_back(bindef("r3_lowmet_allnb",      "met<=400 && mt>140  && mj14<=400"));
+    v_bins.push_back(bindef("r4_lowmet_lownj_1b",   "met<=400 && mt>140  && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r4_lowmet_highnj_1b",  "met<=400 && mt>140  && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r4_lowmet_lownj_2b",   "met<=400 && mt>140  && mj14>400 && nbm==2 && njets<=8"));
+    v_bins.push_back(bindef("r4_lowmet_highnj_2b",  "met<=400 && mt>140  && mj14>400 && nbm==2 && njets>=9"));
+    v_bins.push_back(bindef("r4_lowmet_lownj_3b",   "met<=400 && mt>140  && mj14>400 && nbm>=3 && njets<=8"));
+    v_bins.push_back(bindef("r4_lowmet_highnj_3b",  "met<=400 && mt>140  && mj14>400 && nbm>=3 && njets>=9"));
+    v_bins.push_back(bindef("r1_highmet_allnb",      "met>400 && mt<=140 && mj14<=400"));
+    v_bins.push_back(bindef("r2_highmet_lownj_1b",   "met>400 && mt<=140 && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r2_highmet_highnj_1b",  "met>400 && mt<=140 && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r2_highmet_lownj_2b",   "met>400 && mt<=140 && mj14>400 && nbm>=2 && njets<=8"));
+    v_bins.push_back(bindef("r2_highmet_highnj_2b",  "met>400 && mt<=140 && mj14>400 && nbm>=2 && njets>=9"));
+    v_bins.push_back(bindef("r3_highmet_allnb",      "met>400 && mt>140  && mj14<=400"));
+    v_bins.push_back(bindef("r4_highmet_lownj_1b",   "met>400 && mt>140  && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r4_highmet_highnj_1b",  "met>400 && mt>140  && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r4_highmet_lownj_2b",   "met>400 && mt>140  && mj14>400 && nbm>=2 && njets<=8"));
+    v_bins.push_back(bindef("r4_highmet_highnj_2b",  "met>400 && mt>140  && mj14>400 && nbm>=2 && njets>=9"));
   }
   
   else{
-    v_bins.push_back(bindef("r1_lowmet_allnb",      "met<=350 && mt<=140 && mj<=400"));
-    v_bins.push_back(bindef("r2_lowmet_lownj_1b",   "met<=350 && mt<=140 && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r2_lowmet_highnj_1b",  "met<=350 && mt<=140 && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r2_lowmet_lownj_2b",   "met<=350 && mt<=140 && mj>400 && nbm==2 && njets<=8"));
-    v_bins.push_back(bindef("r2_lowmet_highnj_2b",  "met<=350 && mt<=140 && mj>400 && nbm==2 && njets>=9"));
-    v_bins.push_back(bindef("r2_lowmet_lownj_3b",   "met<=350 && mt<=140 && mj>400 && nbm>=3 && njets<=8"));
-    v_bins.push_back(bindef("r2_lowmet_highnj_3b",  "met<=350 && mt<=140 && mj>400 && nbm>=3 && njets>=9"));
-    v_bins.push_back(bindef("r3_lowmet_allnb",      "met<=350 && mt>140  && mj<=400"));
-    v_bins.push_back(bindef("r4_lowmet_lownj_1b",   "met<=350 && mt>140  && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r4_lowmet_highnj_1b",  "met<=350 && mt>140  && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r4_lowmet_lownj_2b",   "met<=350 && mt>140  && mj>400 && nbm==2 && njets<=8"));
-    v_bins.push_back(bindef("r4_lowmet_highnj_2b",  "met<=350 && mt>140  && mj>400 && nbm==2 && njets>=9"));
-    v_bins.push_back(bindef("r4_lowmet_lownj_3b",   "met<=350 && mt>140  && mj>400 && nbm>=3 && njets<=8"));
-    v_bins.push_back(bindef("r4_lowmet_highnj_3b",  "met<=350 && mt>140  && mj>400 && nbm>=3 && njets>=9"));
+    v_bins.push_back(bindef("r1_lowmet_allnb",      "met<=350 && mt<=140 && mj14<=400"));
+    v_bins.push_back(bindef("r2_lowmet_lownj_1b",   "met<=350 && mt<=140 && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r2_lowmet_highnj_1b",  "met<=350 && mt<=140 && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r2_lowmet_lownj_2b",   "met<=350 && mt<=140 && mj14>400 && nbm==2 && njets<=8"));
+    v_bins.push_back(bindef("r2_lowmet_highnj_2b",  "met<=350 && mt<=140 && mj14>400 && nbm==2 && njets>=9"));
+    v_bins.push_back(bindef("r2_lowmet_lownj_3b",   "met<=350 && mt<=140 && mj14>400 && nbm>=3 && njets<=8"));
+    v_bins.push_back(bindef("r2_lowmet_highnj_3b",  "met<=350 && mt<=140 && mj14>400 && nbm>=3 && njets>=9"));
+    v_bins.push_back(bindef("r3_lowmet_allnb",      "met<=350 && mt>140  && mj14<=400"));
+    v_bins.push_back(bindef("r4_lowmet_lownj_1b",   "met<=350 && mt>140  && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r4_lowmet_highnj_1b",  "met<=350 && mt>140  && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r4_lowmet_lownj_2b",   "met<=350 && mt>140  && mj14>400 && nbm==2 && njets<=8"));
+    v_bins.push_back(bindef("r4_lowmet_highnj_2b",  "met<=350 && mt>140  && mj14>400 && nbm==2 && njets>=9"));
+    v_bins.push_back(bindef("r4_lowmet_lownj_3b",   "met<=350 && mt>140  && mj14>400 && nbm>=3 && njets<=8"));
+    v_bins.push_back(bindef("r4_lowmet_highnj_3b",  "met<=350 && mt>140  && mj14>400 && nbm>=3 && njets>=9"));
 
-    v_bins.push_back(bindef("r1_medmet_allnb",      "met>350&&met<=500 && mt<=140 && mj<=400"));
-    v_bins.push_back(bindef("r2_medmet_lownj_1b",   "met>350&&met<=500 && mt<=140 && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r2_medmet_highnj_1b",  "met>350&&met<=500 && mt<=140 && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r2_medmet_lownj_2b",   "met>350&&met<=500 && mt<=140 && mj>400 && nbm==2 && njets<=8"));
-    v_bins.push_back(bindef("r2_medmet_highnj_2b",  "met>350&&met<=500 && mt<=140 && mj>400 && nbm==2 && njets>=9"));
-    v_bins.push_back(bindef("r2_medmet_lownj_3b",   "met>350&&met<=500 && mt<=140 && mj>400 && nbm>=3 && njets<=8"));
-    v_bins.push_back(bindef("r2_medmet_highnj_3b",  "met>350&&met<=500 && mt<=140 && mj>400 && nbm>=3 && njets>=9"));
-    v_bins.push_back(bindef("r3_medmet_allnb",      "met>350&&met<=500 && mt>140  && mj<=400"));
-    v_bins.push_back(bindef("r4_medmet_lownj_1b",   "met>350&&met<=500 && mt>140  && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r4_medmet_highnj_1b",  "met>350&&met<=500 && mt>140  && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r4_medmet_lownj_2b",   "met>350&&met<=500 && mt>140  && mj>400 && nbm==2 && njets<=8"));
-    v_bins.push_back(bindef("r4_medmet_highnj_2b",  "met>350&&met<=500 && mt>140  && mj>400 && nbm==2 && njets>=9"));
-    v_bins.push_back(bindef("r4_medmet_lownj_3b",   "met>350&&met<=500 && mt>140  && mj>400 && nbm>=3 && njets<=8"));
-    v_bins.push_back(bindef("r4_medmet_highnj_3b",  "met>350&&met<=500 && mt>140  && mj>400 && nbm>=3 && njets>=9"));
+    v_bins.push_back(bindef("r1_medmet_allnb",      "met>350&&met<=500 && mt<=140 && mj14<=400"));
+    v_bins.push_back(bindef("r2_medmet_lownj_1b",   "met>350&&met<=500 && mt<=140 && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r2_medmet_highnj_1b",  "met>350&&met<=500 && mt<=140 && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r2_medmet_lownj_2b",   "met>350&&met<=500 && mt<=140 && mj14>400 && nbm==2 && njets<=8"));
+    v_bins.push_back(bindef("r2_medmet_highnj_2b",  "met>350&&met<=500 && mt<=140 && mj14>400 && nbm==2 && njets>=9"));
+    v_bins.push_back(bindef("r2_medmet_lownj_3b",   "met>350&&met<=500 && mt<=140 && mj14>400 && nbm>=3 && njets<=8"));
+    v_bins.push_back(bindef("r2_medmet_highnj_3b",  "met>350&&met<=500 && mt<=140 && mj14>400 && nbm>=3 && njets>=9"));
+    v_bins.push_back(bindef("r3_medmet_allnb",      "met>350&&met<=500 && mt>140  && mj14<=400"));
+    v_bins.push_back(bindef("r4_medmet_lownj_1b",   "met>350&&met<=500 && mt>140  && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r4_medmet_highnj_1b",  "met>350&&met<=500 && mt>140  && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r4_medmet_lownj_2b",   "met>350&&met<=500 && mt>140  && mj14>400 && nbm==2 && njets<=8"));
+    v_bins.push_back(bindef("r4_medmet_highnj_2b",  "met>350&&met<=500 && mt>140  && mj14>400 && nbm==2 && njets>=9"));
+    v_bins.push_back(bindef("r4_medmet_lownj_3b",   "met>350&&met<=500 && mt>140  && mj14>400 && nbm>=3 && njets<=8"));
+    v_bins.push_back(bindef("r4_medmet_highnj_3b",  "met>350&&met<=500 && mt>140  && mj14>400 && nbm>=3 && njets>=9"));
   
-    v_bins.push_back(bindef("r1_highmet_allnb",      "met>500 && mt<=140 && mj<=400"));
-    v_bins.push_back(bindef("r2_highmet_lownj_1b",   "met>500 && mt<=140 && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r2_highmet_highnj_1b",  "met>500 && mt<=140 && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r2_highmet_lownj_2b",   "met>500 && mt<=140 && mj>400 && nbm==2 && njets<=8"));
-    v_bins.push_back(bindef("r2_highmet_highnj_2b",  "met>500 && mt<=140 && mj>400 && nbm==2 && njets>=9"));
-    v_bins.push_back(bindef("r2_highmet_lownj_3b",   "met>500 && mt<=140 && mj>400 && nbm>=3 && njets<=8"));
-    v_bins.push_back(bindef("r2_highmet_highnj_3b",  "met>500 && mt<=140 && mj>400 && nbm>=3 && njets>=9"));
-    v_bins.push_back(bindef("r3_highmet_allnb",      "met>500 && mt>140  && mj<=400"));
-    v_bins.push_back(bindef("r4_highmet_lownj_1b",   "met>500 && mt>140  && mj>400 && nbm==1 && njets<=8"));
-    v_bins.push_back(bindef("r4_highmet_highnj_1b",  "met>500 && mt>140  && mj>400 && nbm==1 && njets>=9"));
-    v_bins.push_back(bindef("r4_highmet_lownj_2b",   "met>500 && mt>140  && mj>400 && nbm==2 && njets<=8"));
-    v_bins.push_back(bindef("r4_highmet_highnj_2b",  "met>500 && mt>140  && mj>400 && nbm==2 && njets>=9"));
-    v_bins.push_back(bindef("r4_highmet_lownj_3b",   "met>500 && mt>140  && mj>400 && nbm>=3 && njets<=8"));
-    v_bins.push_back(bindef("r4_highmet_highnj_3b",  "met>500 && mt>140  && mj>400 && nbm>=3 && njets>=9"));
+    v_bins.push_back(bindef("r1_highmet_allnb",      "met>500 && mt<=140 && mj14<=400"));
+    v_bins.push_back(bindef("r2_highmet_lownj_1b",   "met>500 && mt<=140 && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r2_highmet_highnj_1b",  "met>500 && mt<=140 && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r2_highmet_lownj_2b",   "met>500 && mt<=140 && mj14>400 && nbm==2 && njets<=8"));
+    v_bins.push_back(bindef("r2_highmet_highnj_2b",  "met>500 && mt<=140 && mj14>400 && nbm==2 && njets>=9"));
+    v_bins.push_back(bindef("r2_highmet_lownj_3b",   "met>500 && mt<=140 && mj14>400 && nbm>=3 && njets<=8"));
+    v_bins.push_back(bindef("r2_highmet_highnj_3b",  "met>500 && mt<=140 && mj14>400 && nbm>=3 && njets>=9"));
+    v_bins.push_back(bindef("r3_highmet_allnb",      "met>500 && mt>140  && mj14<=400"));
+    v_bins.push_back(bindef("r4_highmet_lownj_1b",   "met>500 && mt>140  && mj14>400 && nbm==1 && njets<=8"));
+    v_bins.push_back(bindef("r4_highmet_highnj_1b",  "met>500 && mt>140  && mj14>400 && nbm==1 && njets>=9"));
+    v_bins.push_back(bindef("r4_highmet_lownj_2b",   "met>500 && mt>140  && mj14>400 && nbm==2 && njets<=8"));
+    v_bins.push_back(bindef("r4_highmet_highnj_2b",  "met>500 && mt>140  && mj14>400 && nbm==2 && njets>=9"));
+    v_bins.push_back(bindef("r4_highmet_lownj_3b",   "met>500 && mt>140  && mj14>400 && nbm>=3 && njets<=8"));
+    v_bins.push_back(bindef("r4_highmet_highnj_3b",  "met>500 && mt>140  && mj14>400 && nbm>=3 && njets>=9"));
   }
   /////////////////////////////  No more changes needed down here to add systematics ///////////////////////
   // prepare the vector of bincuts used to get the yields
@@ -233,7 +232,7 @@ int main(int argc, char *argv[]){
 
 
   //calculate uncertainties and write results to three files
-  TString outpath = outfolder+"/sys_SMS-"+TString(model)+"_"+glu_lsp+"_"+mjvar+"_"+luminosity+"ifb";
+  TString outpath = outfolder+"/sys_SMS-"+TString(model)+"_"+glu_lsp+"_"+luminosity+"ifb";
   if(altBinning) outpath+="_altbins.txt";
   else outpath+="_nominal.txt";
   cout<<"Writing to "<<outpath<<endl;
@@ -311,8 +310,8 @@ int main(int argc, char *argv[]){
 TString nom2sys_bin(TString ibin, size_t shift_index){
   ibin.ReplaceAll("met", "sys_met["+to_string(shift_index)+"]");
   ibin.ReplaceAll("mt", "sys_mt["+to_string(shift_index)+"]");
-  ibin.ReplaceAll("ht", "sys_ht["+to_string(shift_index)+"]");
-  ibin.ReplaceAll("mj", "sys_mj["+to_string(shift_index)+"]");
+  ibin.ReplaceAll("st", "sys_st["+to_string(shift_index)+"]");
+  ibin.ReplaceAll("mj", "sys_mj14["+to_string(shift_index)+"]");
   ibin.ReplaceAll("njets", "sys_njets["+to_string(shift_index)+"]");
   ibin.ReplaceAll("nbm", "sys_nbm["+to_string(shift_index)+"]");
   return ibin;
@@ -328,13 +327,12 @@ void GetOptions(int argc, char *argv[], TString &infolder, TString &outfolder, T
       {"outfolder", required_argument, 0, 'o'},
       {"lumi", required_argument, 0, 'l'},
       {"alt_bin", no_argument, 0, 'b'},
-      {"mjvar", required_argument, 0, 'm'},
       {0, 0, 0, 0}
     };
 
     char opt = -1;
     int option_index;
-    opt = getopt_long(argc, argv, "s:i:f:o:l:bm:", long_options, &option_index);
+    opt = getopt_long(argc, argv, "s:i:f:o:l:b", long_options, &option_index);
     if( opt == -1) break;
 
     string optname;
@@ -345,7 +343,6 @@ void GetOptions(int argc, char *argv[], TString &infolder, TString &outfolder, T
     case 'o': outfolder = optarg; break;
     case 'l': luminosity = optarg; break;
     case 'b': altBinning = true; break;
-    case 'm': mjvar = optarg; break;
     default: printf("Bad option! getopt_long returned character code 0%o\n", opt); break;
     }
   }
@@ -353,22 +350,198 @@ void GetOptions(int argc, char *argv[], TString &infolder, TString &outfolder, T
 
 void fillTtbarSys(ofstream &fsys){
 
+  if(!altBinning){
 
-  if(altBinning){
     fsys<<"SYSTEMATIC isr_pt"<<endl;
     fsys<<" PROCESSES ttbar"<<endl;
     fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
     fsys<<"  r2_highmet_lownj_1b   0.03"<<endl;
     fsys<<"  r2_lowmet_highnj_1b   0.01"<<endl;
     fsys<<"  r2_highmet_highnj_1b  0.05"<<endl;
+    fsys<<"  r2_lowmet_lownj_2b    -0.01"<<endl;
+    fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
+    fsys<<"  r2_highmet_lownj_2b   0.01"<<endl;
+    fsys<<"  r2_lowmet_highnj_2b   0.01"<<endl;
+    fsys<<"  r2_lowmet_highnj_3b   0.01"<<endl;
+    fsys<<"  r2_highmet_highnj_2b  0.02"<<endl<<endl;
+
+    fsys<<"SYSTEMATIC jec"<<endl;
+    fsys<<" PROCESSES ttbar"<<endl;
+    fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
+    fsys<<"  r2_highmet_lownj_1b   0.04"<<endl;
+    fsys<<"  r2_lowmet_highnj_1b   0.04"<<endl;
+    fsys<<"  r2_highmet_highnj_1b  0.03"<<endl;
+    fsys<<"  r2_lowmet_lownj_2b    0.02"<<endl;
+    fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
+    fsys<<"  r2_highmet_lownj_2b   0.02"<<endl;
+    fsys<<"  r2_lowmet_highnj_2b   0.02"<<endl;
+    fsys<<"  r2_lowmet_highnj_3b   0.05"<<endl;
+    fsys<<"  r2_highmet_highnj_2b  0.04"<<endl<<endl;
+
+    fsys<<"SYSTEMATIC top_pt"<<endl;
+    fsys<<" PROCESSES ttbar"<<endl;
+    fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
+    fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
+    fsys<<"  r2_lowmet_highnj_1b   0.01"<<endl;
+    fsys<<"  r2_highmet_highnj_1b  0.04"<<endl;
+    fsys<<"  r2_lowmet_lownj_2b    0.01"<<endl;
+    fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
+    fsys<<"  r2_highmet_lownj_2b   0.03"<<endl;
+    fsys<<"  r2_lowmet_highnj_2b   0.01"<<endl;
+    fsys<<"  r2_lowmet_highnj_3b   0.01"<<endl;
+    fsys<<"  r2_highmet_highnj_2b  0.01"<<endl<<endl;
+
+    fsys<<"SYSTEMATIC jet_mismeas"<<endl;
+    fsys<<" PROCESSES ttbar"<<endl;
+    fsys<<"  r2_lowmet_lownj_1b    0.05"<<endl;
+    fsys<<"  r2_highmet_lownj_1b   0.05"<<endl;
+    fsys<<"  r2_lowmet_highnj_1b   0.10"<<endl;
+    fsys<<"  r2_highmet_highnj_1b  0.02"<<endl;
+    fsys<<"  r2_lowmet_lownj_2b    0.04"<<endl;
+    fsys<<"  r2_lowmet_lownj_3b    0.07"<<endl;
+    fsys<<"  r2_highmet_lownj_2b   0.04"<<endl;
+    fsys<<"  r2_lowmet_highnj_2b   0.07"<<endl;
+    fsys<<"  r2_lowmet_highnj_3b   0.10"<<endl;
+    fsys<<"  r2_highmet_highnj_2b  0.06"<<endl<<endl;
+
+    fsys<<"SYSTEMATIC non_ttbar"<<endl;
+    fsys<<" PROCESSES other"<<endl;
+    fsys<<"  r2_lowmet_lownj_1b    1.00"<<endl;
+    fsys<<"  r2_highmet_lownj_1b   1.00"<<endl;
+    fsys<<"  r2_lowmet_highnj_1b   1.00"<<endl;
+    fsys<<"  r2_highmet_highnj_1b  1.00"<<endl;
+    fsys<<"  r2_lowmet_lownj_2b    1.00"<<endl;
+    fsys<<"  r2_lowmet_lownj_3b    1.00"<<endl;
+    fsys<<"  r2_highmet_lownj_2b   1.00"<<endl;
+    fsys<<"  r2_lowmet_highnj_2b   1.00"<<endl;
+    fsys<<"  r2_lowmet_highnj_3b   1.00"<<endl;
+    fsys<<"  r2_highmet_highnj_2b  1.00"<<endl<<endl;
+
+  
+    if (luminosity == "5"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.23"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.23"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.57"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.57"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.23"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.23"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.23"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.57"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.57"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.57"<<endl;
+
+
+    }
+
+    else if (luminosity == "7"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.20"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.48"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.20"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.20"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.48"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.48"<<endl;
+
+
+    }
+
+    else if (luminosity == "10"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.16"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.16"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.40"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.40"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.16"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.16"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.16"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.40"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.40"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.40"<<endl;
+
+
+    }
     
+      else if (luminosity == "15"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.33"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.13"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.33"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.33"<<endl;
+
+
+    }
+
+
+    else if (luminosity == "20"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.12"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.12"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.29"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.29"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.12"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.12"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.12"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.29"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.29"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.29"<<endl;
+
+
+    }
+
+  
+    else{
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
+      fsys<<"  r2_lowmet_lownj_1b    0.37"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.37"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.88"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.88"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.37"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.37"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.37"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.88"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.88"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.88"<<endl;
+    }
+
+  
+  }
+  else{
+    fsys<<"SYSTEMATIC isr_pt"<<endl;
+    fsys<<" PROCESSES ttbar"<<endl;
+    fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
+    fsys<<"  r2_highmet_lownj_1b   0.03"<<endl;
+    fsys<<"  r2_lowmet_highnj_1b   0.01"<<endl;
+    fsys<<"  r2_highmet_highnj_1b  0.05"<<endl;
+
     fsys<<"  r2_medmet_lownj_1b   0.03"<<endl;
     fsys<<"  r2_medmet_highnj_1b  0.05"<<endl;
     fsys<<"  r2_medmet_lownj_2b   0.01"<<endl;
     fsys<<"  r2_medmet_lownj_3b   0.01"<<endl;
     fsys<<"  r2_medmet_highnj_2b  0.02"<<endl;
     fsys<<"  r2_medmet_highnj_3b  0.02"<<endl;
-    
+  
     fsys<<"  r2_lowmet_lownj_2b    -0.01"<<endl;
     fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
     fsys<<"  r2_highmet_lownj_2b   0.01"<<endl;
@@ -377,7 +550,7 @@ void fillTtbarSys(ofstream &fsys){
     fsys<<"  r2_lowmet_highnj_3b   0.01"<<endl;
     fsys<<"  r2_highmet_highnj_2b  0.02"<<endl;
     fsys<<"  r2_highmet_highnj_3b  0.02"<<endl<<endl;
-    
+
     fsys<<"SYSTEMATIC jec"<<endl;
     fsys<<" PROCESSES ttbar"<<endl;
     fsys<<"  r2_medmet_lownj_1b   0.04"<<endl;
@@ -398,18 +571,16 @@ void fillTtbarSys(ofstream &fsys){
     fsys<<"  r2_lowmet_highnj_3b   0.05"<<endl;
     fsys<<"  r2_highmet_highnj_2b  0.04"<<endl;
     fsys<<"  r2_highmet_highnj_3b  0.04"<<endl<<endl;
-    
+
     fsys<<"SYSTEMATIC top_pt"<<endl;
     fsys<<" PROCESSES ttbar"<<endl;
-    
-    
     fsys<<"  r2_medmet_lownj_1b   0.01"<<endl;
     fsys<<"  r2_medmet_highnj_1b  0.04"<<endl;
     fsys<<"  r2_medmet_lownj_2b   0.03"<<endl;
     fsys<<"  r2_medmet_lownj_3b   0.03"<<endl;
     fsys<<"  r2_medmet_highnj_2b  0.01"<<endl;
     fsys<<"  r2_medmet_highnj_3b  0.01"<<endl;
-    
+  
     fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
     fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
     fsys<<"  r2_lowmet_highnj_1b   0.01"<<endl;
@@ -422,17 +593,17 @@ void fillTtbarSys(ofstream &fsys){
     fsys<<"  r2_lowmet_highnj_3b   0.01"<<endl;
     fsys<<"  r2_highmet_highnj_2b  0.01"<<endl;
     fsys<<"  r2_highmet_highnj_3b  0.01"<<endl<<endl;
-    
+
     fsys<<"SYSTEMATIC jet_mismeas"<<endl;
     fsys<<" PROCESSES ttbar"<<endl;
-    
+  
     fsys<<"  r2_medmet_lownj_1b   0.05"<<endl;
     fsys<<"  r2_medmet_highnj_1b  0.02"<<endl;
     fsys<<"  r2_medmet_lownj_2b   0.04"<<endl;
     fsys<<"  r2_medmet_lownj_3b   0.04"<<endl;
     fsys<<"  r2_medmet_highnj_2b  0.06"<<endl;
     fsys<<"  r2_medmet_highnj_3b  0.06"<<endl;
-    
+  
     fsys<<"  r2_lowmet_lownj_1b    0.05"<<endl;
     fsys<<"  r2_highmet_lownj_1b   0.05"<<endl;
     fsys<<"  r2_lowmet_highnj_1b   0.10"<<endl;
@@ -445,18 +616,18 @@ void fillTtbarSys(ofstream &fsys){
     fsys<<"  r2_lowmet_highnj_3b   0.10"<<endl;
     fsys<<"  r2_highmet_highnj_2b  0.06"<<endl;
     fsys<<"  r2_highmet_highnj_3b  0.06"<<endl<<endl;
-    
+
     fsys<<"SYSTEMATIC non_ttbar"<<endl;
     fsys<<" PROCESSES other"<<endl;
-    
-    
+
+ 
     fsys<<"  r2_medmet_lownj_1b   1.00"<<endl;
     fsys<<"  r2_medmet_highnj_1b  1.00"<<endl;
     fsys<<"  r2_medmet_lownj_2b   1.00"<<endl;
     fsys<<"  r2_medmet_lownj_3b   1.00"<<endl;
     fsys<<"  r2_medmet_highnj_2b  1.00"<<endl;
     fsys<<"  r2_medmet_highnj_3b  1.00"<<endl;
-    
+  
     fsys<<"  r2_lowmet_lownj_1b    1.00"<<endl;
     fsys<<"  r2_highmet_lownj_1b   1.00"<<endl;
     fsys<<"  r2_lowmet_highnj_1b   1.00"<<endl;
@@ -471,516 +642,209 @@ void fillTtbarSys(ofstream &fsys){
     fsys<<"  r2_highmet_highnj_3b  1.00"<<endl<<endl;
 
 
-    if(mjvar=="mj"){
-      
-      if (luminosity == "20"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
 
 
-	fsys<<"  r2_medmet_lownj_1b   0.11"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.25"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.11"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.11"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.25"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.25"<<endl;
-	
-	
-	fsys<<"  r2_lowmet_lownj_1b    0.11"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.11"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.25"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.25"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.11"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.11"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.11"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.11"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.25"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.25"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.25"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.25"<<endl;
-	
-      }
-
-      else if (luminosity == "15"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-
-	fsys<<"  r2_medmet_lownj_1b   0.13"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.29"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.13"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.13"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.29"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.29"<<endl;
-	
-   
-	fsys<<"  r2_lowmet_lownj_1b    0.13"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.13"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.29"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.29"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.13"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.13"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.13"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.13"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.29"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.29"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.29"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.29"<<endl;
-	
-      }
-
-      else if (luminosity == "10"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
+    if (luminosity == "20"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
 
 
-	fsys<<"  r2_medmet_lownj_1b   0.16"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.35"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.16"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.16"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.35"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.35"<<endl;
-	
-	
-	fsys<<"  r2_lowmet_lownj_1b    0.16"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.16"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.35"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.35"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.16"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.16"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.16"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.16"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.35"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.35"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.35"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.35"<<endl;
-	
-      }
-
-      else if (luminosity == "7"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-	
-	fsys<<"  r2_medmet_lownj_1b   0.19"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.42"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.19"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.19"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.42"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.42"<<endl;
-	
-   
-	fsys<<"  r2_lowmet_lownj_1b    0.19"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.19"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.42"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.42"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.19"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.19"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.19"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.19"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.42"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.42"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.42"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.42"<<endl;
-	
-      }
-    
-      else if (luminosity == "5"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-	
-	fsys<<"  r2_medmet_lownj_1b   0.23"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.50"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.23"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.23"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.50"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.50"<<endl;
+      fsys<<"  r2_medmet_lownj_1b   0.12"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.29"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.12"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.12"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.29"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.29"<<endl;
     
    
-	fsys<<"  r2_lowmet_lownj_1b    0.23"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.23"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.50"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.50"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.23"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.23"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.23"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.23"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.50"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.50"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.50"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.50"<<endl;
+      fsys<<"  r2_lowmet_lownj_1b    0.12"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.12"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.29"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.29"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.12"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.12"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.12"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.12"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.29"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.29"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.29"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.29"<<endl;
 
-      }
-      
-      else{
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-
-	fsys<<"  r2_medmet_lownj_1b   0.33"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.73"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.33"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.33"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.73"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.73"<<endl;
-	
-    
-	fsys<<"  r2_lowmet_lownj_1b    0.33"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.33"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.73"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.73"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.33"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.33"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.33"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.33"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.73"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.73"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.73"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.73"<<endl;
-      }
     }
 
-
-    if(mjvar=="mj14"){
-      
-      if (luminosity == "20"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-
-
-	fsys<<"  r2_medmet_lownj_1b   0.10"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.20"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.10"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.10"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.20"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.20"<<endl;
-	
-	
-	fsys<<"  r2_lowmet_lownj_1b    0.10"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.10"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.20"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.20"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.10"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.10"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.10"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.10"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.20"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.20"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.20"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.20"<<endl;
-	
-      }
-
-      else if (luminosity == "15"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-
-	fsys<<"  r2_medmet_lownj_1b   0.11"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.23"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.11"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.11"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.23"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.23"<<endl;
-	
    
-	fsys<<"  r2_lowmet_lownj_1b    0.11"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.11"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.23"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.23"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.11"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.11"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.11"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.11"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.23"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.23"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.23"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.23"<<endl;
-	
-      }
 
-      else if (luminosity == "10"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
+    else if (luminosity == "10"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
 
 
-	fsys<<"  r2_medmet_lownj_1b   0.14"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.28"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.14"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.14"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.28"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.28"<<endl;
-	
-	
-	fsys<<"  r2_lowmet_lownj_1b    0.14"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.14"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.28"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.28"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.14"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.14"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.14"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.14"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.28"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.28"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.28"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.28"<<endl;
-	
-      }
-
-      else if (luminosity == "7"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-	
-	fsys<<"  r2_medmet_lownj_1b   0.16"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.33"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.16"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.16"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.33"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.33"<<endl;
-	
-   
-	fsys<<"  r2_lowmet_lownj_1b    0.16"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.16"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.33"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.33"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.16"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.16"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.16"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.16"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.33"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.33"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.33"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.33"<<endl;
-	
-      }
-    
-      else if (luminosity == "5"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-	
-	fsys<<"  r2_medmet_lownj_1b   0.19"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.39"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.19"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.19"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.39"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.39"<<endl;
+      fsys<<"  r2_medmet_lownj_1b   0.16"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.40"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.16"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.16"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.40"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.40"<<endl;
     
    
-	fsys<<"  r2_lowmet_lownj_1b    0.19"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.19"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.39"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.39"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.19"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.19"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.19"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.19"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.39"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.39"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.39"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.39"<<endl;
+      fsys<<"  r2_lowmet_lownj_1b    0.16"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.16"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.40"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.40"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.16"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.16"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.16"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.16"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.40"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.40"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.40"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.40"<<endl;
 
-      }
-      
-      else{
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-
-	fsys<<"  r2_medmet_lownj_1b   0.28"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.57"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.28"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.28"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.57"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.57"<<endl;
-	
-    
-	fsys<<"  r2_lowmet_lownj_1b    0.28"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.28"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.57"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.57"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.28"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.28"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.28"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.28"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.57"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.57"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.57"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.57"<<endl;
-      }
     }
 
-    if(mjvar=="mj16"){
-      
-      if (luminosity == "20"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
+    else if (luminosity == "15"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
 
 
-	fsys<<"  r2_medmet_lownj_1b   0.8"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.18"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.8"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.8"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.18"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.18"<<endl;
-	
-	
-	fsys<<"  r2_lowmet_lownj_1b    0.8"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.8"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.18"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.18"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.8"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.8"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.8"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.8"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.18"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.18"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.18"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.18"<<endl;
-	
-      }
-
-      else if (luminosity == "15"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-
-	fsys<<"  r2_medmet_lownj_1b   0.09"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.21"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.09"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.09"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.21"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.21"<<endl;
-	
-   
-	fsys<<"  r2_lowmet_lownj_1b    0.09"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.09"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.21"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.21"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.09"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.09"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.09"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.09"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.21"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.21"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.21"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.21"<<endl;
-	
-      }
-
-      else if (luminosity == "10"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-
-
-	fsys<<"  r2_medmet_lownj_1b   0.12"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.26"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.12"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.12"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.26"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.26"<<endl;
-	
-	
-	fsys<<"  r2_lowmet_lownj_1b    0.12"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.12"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.26"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.26"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.12"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.12"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.12"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.12"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.26"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.26"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.26"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.26"<<endl;
-	
-      }
-
-      else if (luminosity == "7"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-	
-	fsys<<"  r2_medmet_lownj_1b   0.14"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.31"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.14"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.14"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.31"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.31"<<endl;
-	
-   
-	fsys<<"  r2_lowmet_lownj_1b    0.14"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.14"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.31"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.31"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.14"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.14"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.14"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.14"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.31"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.31"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.31"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.31"<<endl;
-	
-      }
-    
-      else if (luminosity == "5"){
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-	
-	fsys<<"  r2_medmet_lownj_1b   0.16"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.36"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.16"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.16"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.36"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.36"<<endl;
+      fsys<<"  r2_medmet_lownj_1b   0.13"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.33"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.13"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.13"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.33"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.33"<<endl;
     
    
-	fsys<<"  r2_lowmet_lownj_1b    0.16"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.16"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.36"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.36"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.16"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.16"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.16"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.16"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.36"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.36"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.36"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.36"<<endl;
+      fsys<<"  r2_lowmet_lownj_1b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.33"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.13"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.33"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.33"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.33"<<endl;
 
-      }
-      
-      else{
-	fsys<<"SYSTEMATIC dilep_closure"<<endl;
-	fsys<<" PROCESSES ttbar"<<endl;
-	
-
-	fsys<<"  r2_medmet_lownj_1b   0.24"<<endl;
-	fsys<<"  r2_medmet_highnj_1b  0.53"<<endl;
-	fsys<<"  r2_medmet_lownj_2b   0.24"<<endl;
-	fsys<<"  r2_medmet_lownj_3b   0.24"<<endl;
-	fsys<<"  r2_medmet_highnj_2b  0.53"<<endl;
-	fsys<<"  r2_medmet_highnj_3b  0.53"<<endl;
-	
-    
-	fsys<<"  r2_lowmet_lownj_1b    0.24"<<endl;
-	fsys<<"  r2_highmet_lownj_1b   0.24"<<endl;
-	fsys<<"  r2_lowmet_highnj_1b   0.53"<<endl;
-	fsys<<"  r2_highmet_highnj_1b  0.53"<<endl;
-	fsys<<"  r2_lowmet_lownj_2b    0.24"<<endl;
-	fsys<<"  r2_lowmet_lownj_3b    0.24"<<endl;
-	fsys<<"  r2_highmet_lownj_2b   0.24"<<endl;
-	fsys<<"  r2_highmet_lownj_3b   0.24"<<endl;
-	fsys<<"  r2_lowmet_highnj_2b   0.53"<<endl;
-	fsys<<"  r2_lowmet_highnj_3b   0.53"<<endl;
-	fsys<<"  r2_highmet_highnj_2b  0.53"<<endl;
-	fsys<<"  r2_highmet_highnj_3b  0.53"<<endl;
-      }
     }
 
+    else if (luminosity == "5"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
+
+
+      fsys<<"  r2_medmet_lownj_1b   0.23"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.57"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.23"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.23"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.57"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.57"<<endl;
+    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.23"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.23"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.57"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.57"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.23"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.23"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.23"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.23"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.57"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.57"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.57"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.57"<<endl;
+
+    }
+
+     else if (luminosity == "12.9"){ 
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
+
+     // took numbers from 
+     // http://cms2.physics.ucsb.edu/susy/slides/archive/unblind/2016_09_03/unblind_12p9/fulltable_pred_lumi12p9_unblind_m2lvetoonemet.pdf
+     // MET bins integrated
+     // Low Njets:  Npred=307.25+15.44-15.34 , Nobs=343 
+     //           => uncert = sqrt((343-307.25)/307.25*(343-307.25)/307.25+1/343) = .128
+     // High Njets: Npred=33.10+2.74-2.72    , Nobs=38
+     //           => uncert = sqrt((38-33.1)/33.1*(38-33.1)/33.1+1/38) = 0.220 
+      fsys<<"  r2_medmet_lownj_1b   0.13"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.22"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.13"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.13"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.22"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.22"<<endl;
+    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.22"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.22"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.13"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.13"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.13"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.22"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.22"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.22"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.22"<<endl;
+
+    }
+  
+     else if (luminosity == "7"){
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
+
+
+      fsys<<"  r2_medmet_lownj_1b   0.20"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.48"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.20"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.20"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.48"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.48"<<endl;
+    
+   
+      fsys<<"  r2_lowmet_lownj_1b    0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.20"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.48"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.20"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.20"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.20"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.48"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.48"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.48"<<endl;
+
+    }
+  
+    else{
+      fsys<<"SYSTEMATIC dilep_closure"<<endl;
+      fsys<<" PROCESSES ttbar"<<endl;
+
+
+      fsys<<"  r2_medmet_lownj_1b   0.37"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.88"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.37"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.37"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.88"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.88"<<endl;
+    
+    
+      fsys<<"  r2_lowmet_lownj_1b    0.37"<<endl;
+      fsys<<"  r2_highmet_lownj_1b   0.37"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.88"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.88"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.37"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.37"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.37"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.37"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.88"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.88"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.88"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.88"<<endl;
+    }
   }
 }

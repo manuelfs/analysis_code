@@ -293,6 +293,7 @@ std::vector<float> w_pdf
 ################  Systematic variations   ##################
 # variations have index 0 (JER smearing), 1 (JEC up) and 2 (JEC down)
 std::vector<float> sys_ht
+std::vector<float> sys_st
 std::vector<int>   sys_njets
 std::vector<int>   sys_nbm
 std::vector<bool>  sys_pass

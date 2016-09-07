@@ -200,7 +200,7 @@ void onecut::assignBranch(TString var, TString val){
   if(var == "ht"){
     cutType_ = kFloat;
     bf_ = &baby_base::ht;
-  }else if(var == "st"){
+  } else if(var == "st"){
     cutType_ = kFloat;
     bf_ = &baby_base::st;
   }else if(var=="met"){
@@ -296,9 +296,6 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="pass"){
     cutType_ = kBool;
     bb_ = &baby_base::pass;
-  }else if(var=="ntrupv"){
-    cutType_ = kInt;
-    bi_ = &baby_base::ntrupv;
   }else if(var=="stitch"){
     cutType_ = kBool;
     bb_ = &baby_base::stitch;
@@ -326,6 +323,9 @@ void onecut::assignBranch(TString var, TString val){
     }else if(var=="sys_ht"){ 
       cutType_ = kvFloat;
       bvf_ = &baby_base::sys_ht;
+    }else if(var=="sys_st"){ 
+      cutType_ = kvFloat;
+      bvf_ = &baby_base::sys_st;
     }else if(var=="sys_met"){ 
       cutType_ = kvFloat;
       bvf_ = &baby_base::sys_met;
