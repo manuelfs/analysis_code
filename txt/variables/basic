@@ -16,6 +16,7 @@ float ht_ra2
 float ht_clean
 float ht_hlt
 float ht_tru
+float st
 float mht
 float mht_phi
 float mht_clean

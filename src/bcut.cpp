@@ -200,6 +200,9 @@ void onecut::assignBranch(TString var, TString val){
   if(var == "ht"){
     cutType_ = kFloat;
     bf_ = &baby_base::ht;
+  }else if(var == "st"){
+    cutType_ = kFloat;
+    bf_ = &baby_base::st;
   }else if(var=="met"){
     cutType_ = kFloat;
     bf_ = &baby_base::met;

@@ -41,7 +41,7 @@ namespace{
   bool compressed = false;
   bool no_signal = false;
   bool full_stats = false;
-  TString luminosity = "2.1";
+  TString luminosity = "12.9";
 }
 
 //Not sure why I can't get the colors from utilities_macros...
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]){
   styles style("2Dnobar");
   style.setDefaultStyle();
   
-  string folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
+  string folder="/cms2r0/babymaker/babies/2016_08_10/mc/merged_mcbase_standard/";
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  {
     folder = "/net/cms2"+folder;
@@ -103,9 +103,6 @@ int main(int argc, char *argv[]){
   double rho_bkg = g_bkg_full.GetCorrelationFactor();
   double rho_bkg1 = g_bkg1_full.GetCorrelationFactor();
   double rho_bkg2 = g_bkg2_full.GetCorrelationFactor();
-
-
- 
 
   TLegend l(style.PadLeftMargin, 1.-style.PadTopMargin, 1.-style.PadRightMargin, 1.0);
   if(merge_ttbar){
@@ -252,7 +249,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full,
        || ((nleps == 1 && st.ntruleps()>1) || (nleps == 2 && st.ntruleps()<2))
        ) continue;
 
-    double mj = std::min(999.9f, st.mj());
+    double mj = std::min(999.9f, st.mj14());
     double mt = std::min(399.9f, st.mt());
 
     AddPoint(g_full, mj, mt);

@@ -44,7 +44,7 @@ namespace{
   bool compressed = false;
   bool no_signal = false; 
   bool full_stats = false;
-  float luminosity = 2.3; //2.15 for previous random seed
+  float luminosity = 12.9; //2.15 for previous random seed
 }
 
 //Not sure why I can't get the colors from utilities_macros...
@@ -59,8 +59,8 @@ int main(int argc, char *argv[]){
   styles style("2Dtitle");
   style.setDefaultStyle();
 
-  string folder_data="/cms2r0/babymaker/babies/2016_02_04/data/singlelep/combined/skim_1lht500met200/";
-  string folder="/cms2r0/babymaker/babies/2015_11_28/mc/skim_1lht500met200/";
+  string folder_data="/cms2r0/babymaker/babies/2016_08_10/data/merged_database_standard/";
+  string folder="/cms2r0/babymaker/babies/2016_08_10/mc/merged_mcbase_standard/";
 
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  {
@@ -336,14 +336,14 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
        || (njets_max > 0 && st.njets()>njets_max)
        || st.met()<=met_min
        || (met_max > 0. && st.met()>met_max)
-       || st.ht()<=500.
+       || st.st()<=500.
        || (st.nleps())!=1
        || !(st.pass() || color==2)
        ) continue;
-    
+
     if(isData && !((st.trig()[4] ||st.trig()[8]) && st.pass())) continue; 
 
-    double mj = std::min(1199.9f, st.mj());
+    double mj = std::min(1199.9f, st.mj14());
     double mt = std::min(599.9f, st.mt());
 
     if(isData) { 
@@ -353,8 +353,7 @@ void Process(baby_basic &st, TGraph &g, TGraph &g_full, TH2D &h,
         AddPoint(g_full, mj, mt); 
         h.Fill(mj, mt, st.weight()*luminosity);
     }
-    if(color!=2&& indices.size() >0 && indices.find(entry) == indices.end()) continue;
-    if(color==2 && (entry!=3198 && entry!=9581 && entry!=22320 && entry!=32212 && entry!=33132 && entry != 35314 && entry != 36889)) continue;
+    if(indices.size() >0 && indices.find(entry) == indices.end()) continue;
 
     AddPoint(g, mj, mt);
     if(color==2) {
