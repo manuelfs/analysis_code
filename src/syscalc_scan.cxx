@@ -9,6 +9,7 @@
 #include <unistd.h> // getopt in Macs
 #include <getopt.h>
 
+#include "TSystem.h"
 #include "TString.h"
 #include "TError.h" // Controls error level reporting
 
@@ -20,7 +21,7 @@
 using namespace std;
 namespace {
   TString luminosity = "12.9";
-  TString nom_wgt = "weight"; // nominal weight to use, (no division in bcut yet...)
+  TString nom_wgt = "weight*eff_trig"; // nominal weight to use, (no division in bcut yet...)
   enum SysType {kConst, kWeight, kSmear, kCorr};
   TString syst = "all";
   bool altBinning = true;
@@ -64,6 +65,7 @@ int main(int argc, char *argv[]){
   time(&begtime);
   TString infolder(""), outfolder(""), infile("");
   GetOptions(argc, argv, infolder, outfolder, infile);
+  gSystem->mkdir(outfolder, kTRUE);
 
   // TString infile = "/cms2r0/babymaker/babies/2015_11_27/sms/split_sms/renorm/baby_SMS-T1tttt_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15FSPremix-MCRUN2_74_V9_renorm.root";
   string prs = infile.Data();
@@ -88,7 +90,7 @@ int main(int argc, char *argv[]){
   v_sys.push_back(sysdef("Lepton efficiency FS", "fs_lepeff", kWeight));
   for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_fs_lep["+to_string(i)+"]/w_fs_lep");
   v_sys.push_back(sysdef("Trigger efficiency", "trig", kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_trig["+to_string(i)+"]/w_trig");
+  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_trig["+to_string(i)+"]/eff_trig"); 
   v_sys.push_back(sysdef("B-tag efficiency", "bctag", kWeight));
   for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_bctag["+to_string(i)+"]/w_bctag");
   v_sys.push_back(sysdef("B-tag efficiency FS", "fs_bctag", kWeight));
@@ -293,8 +295,12 @@ int main(int argc, char *argv[]){
       // convert to ra4_stats input and write to file
       double ln = (up>0 ? 1:-1)*max(up>0 ? up : (1/(1+up)-1), dn>0 ? dn : (1/(1+dn)-1));
       if (sys.sys_type == kConst) ln = up;
-      if (sys.tag !="rms_pdf") fsys<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
-      // if (sys.tag !="pdf") fsysrms<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
+      if (sys.tag !="rms_pdf") {
+	if(sys.tag.Contains("trig")) fsys<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.3f",ln) <<endl;
+	else fsys<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
+      }
+      // if (sys.tag !="pdf") 
+      //   fsysrms<<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<std::right<<setw(10)<<Form("%.2f",ln) <<endl;
       fsysdbg <<"    " <<std::left<<setw(25)<<v_bins[ibin].tag <<" "<<"mg="<<setw(5)<<mglu <<" "<<"mlsp="<<setw(10)<<mlsp <<" "<<std::right<<setw(10)<<Form("%.2f",up) <<" "<<setw(10)<<Form("%.2f",dn) <<endl;
     } // loop over bins
   } // loop over systematics
