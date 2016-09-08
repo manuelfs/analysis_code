@@ -84,19 +84,19 @@ int main(int argc, char *argv[]){
   v_sys.push_back(sysdef("Nominal", "nominal", kWeight)); 
   v_sys.back().v_wgts.push_back("1.");
   v_sys.push_back(sysdef("Lepton efficiency", "lepeff", kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_lep["+to_string(i)+"]");
+  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_lep["+to_string(i)+"]/w_lep");
   v_sys.push_back(sysdef("Lepton efficiency FS", "fs_lepeff", kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_fs_lep["+to_string(i)+"]");
+  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_fs_lep["+to_string(i)+"]/w_fs_lep");
   v_sys.push_back(sysdef("Trigger efficiency", "trig", kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_trig["+to_string(i)+"]");
+  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_trig["+to_string(i)+"]/w_trig");
   v_sys.push_back(sysdef("B-tag efficiency", "bctag", kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_bctag["+to_string(i)+"]");
+  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_bctag["+to_string(i)+"]/w_bctag");
   v_sys.push_back(sysdef("B-tag efficiency FS", "fs_bctag", kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_fs_bctag["+to_string(i)+"]");
+  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_fs_bctag["+to_string(i)+"]/w_fs_bctag");
   v_sys.push_back(sysdef("Mistag efficiency", "udsgtag", kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_udsgtag["+to_string(i)+"]");
+  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_udsgtag["+to_string(i)+"]/w_udsgtag");
   v_sys.push_back(sysdef("Mistag efficiency FS", "fs_udsgtag",kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_fs_udsgtag["+to_string(i)+"]");
+  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_fs_udsgtag["+to_string(i)+"]/w_fs_udsgtag");
   v_sys.push_back(sysdef("Jet energy corrections", "jec", kCorr));
   v_sys.back().shift_index = 1; // JEC Up index in sys_met, etc.
   // v_sys.push_back(sysdef("Jet energy resolution", "jer", kSmear));
@@ -107,12 +107,12 @@ int main(int argc, char *argv[]){
   // for (size_t i(0); i<100; i++) v_sys.back().v_wgts.push_back("w_pdf["+to_string(i)+"]");
   v_sys.push_back(sysdef("QCD scales", "murf",kWeight));
   for (size_t i(0); i<2; i++) {
-    v_sys.back().v_wgts.push_back("sys_mur["+to_string(i)+"]");
-    v_sys.back().v_wgts.push_back("sys_muf["+to_string(i)+"]");
-    v_sys.back().v_wgts.push_back("sys_murf["+to_string(i)+"]");
+    v_sys.back().v_wgts.push_back("sys_mur["+to_string(i)+"]/w_mur");
+    v_sys.back().v_wgts.push_back("sys_muf["+to_string(i)+"]/w_muf");
+    v_sys.back().v_wgts.push_back("sys_murf["+to_string(i)+"]/w_murf");
   }
   v_sys.push_back(sysdef("ISR", "isr", kWeight));
-  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_isr["+to_string(i)+"]");
+  for (size_t i(0); i<2; i++) v_sys.back().v_wgts.push_back("sys_isr["+to_string(i)+"]/w_isr");
   v_sys.push_back(sysdef("Jet ID FS", "jetid", kConst));
   v_sys.back().v_wgts.push_back("0.01");
   v_sys.push_back(sysdef("Pile up", "pu", kConst));
@@ -531,91 +531,102 @@ void fillTtbarSys(ofstream &fsys){
     fsys<<"SYSTEMATIC isr_pt"<<endl;
     fsys<<" PROCESSES ttbar"<<endl;
     fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
-    fsys<<"  r2_highmet_lownj_1b   0.03"<<endl;
-    fsys<<"  r2_lowmet_highnj_1b   0.01"<<endl;
-    fsys<<"  r2_highmet_highnj_1b  0.05"<<endl;
+    fsys<<"  r2_lowmet_lownj_2b    0.01"<<endl;
+    fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
+    fsys<<"  r2_lowmet_highnj_1b   0.02"<<endl;
+    fsys<<"  r2_lowmet_highnj_2b   0.02"<<endl;
+    fsys<<"  r2_lowmet_highnj_3b   0.01"<<endl;
 
-    fsys<<"  r2_medmet_lownj_1b   0.03"<<endl;
-    fsys<<"  r2_medmet_highnj_1b  0.05"<<endl;
+    fsys<<"  r2_medmet_lownj_1b   0.01"<<endl;
     fsys<<"  r2_medmet_lownj_2b   0.01"<<endl;
     fsys<<"  r2_medmet_lownj_3b   0.01"<<endl;
-    fsys<<"  r2_medmet_highnj_2b  0.02"<<endl;
+    fsys<<"  r2_medmet_highnj_1b  0.04"<<endl;
+    fsys<<"  r2_medmet_highnj_2b  0.01"<<endl;
     fsys<<"  r2_medmet_highnj_3b  0.02"<<endl;
   
-    fsys<<"  r2_lowmet_lownj_2b    -0.01"<<endl;
-    fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
+    
+    fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
     fsys<<"  r2_highmet_lownj_2b   0.01"<<endl;
     fsys<<"  r2_highmet_lownj_3b   0.01"<<endl;
-    fsys<<"  r2_lowmet_highnj_2b   0.01"<<endl;
-    fsys<<"  r2_lowmet_highnj_3b   0.01"<<endl;
-    fsys<<"  r2_highmet_highnj_2b  0.02"<<endl;
+    fsys<<"  r2_highmet_highnj_1b  0.04"<<endl;
+    fsys<<"  r2_highmet_highnj_2b  0.01"<<endl;
     fsys<<"  r2_highmet_highnj_3b  0.02"<<endl<<endl;
 
     fsys<<"SYSTEMATIC jec"<<endl;
     fsys<<" PROCESSES ttbar"<<endl;
-    fsys<<"  r2_medmet_lownj_1b   0.04"<<endl;
-    fsys<<"  r2_medmet_highnj_1b  0.03"<<endl;
-    fsys<<"  r2_medmet_lownj_2b   0.02"<<endl;
-    fsys<<"  r2_medmet_lownj_3b   0.02"<<endl;
-    fsys<<"  r2_medmet_highnj_2b  0.04"<<endl;
-    fsys<<"  r2_medmet_highnj_3b  0.04"<<endl;
-    fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
-    fsys<<"  r2_highmet_lownj_1b   0.04"<<endl;
-    fsys<<"  r2_lowmet_highnj_1b   0.04"<<endl;
-    fsys<<"  r2_highmet_highnj_1b  0.03"<<endl;
-    fsys<<"  r2_lowmet_lownj_2b    0.02"<<endl;
-    fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
-    fsys<<"  r2_highmet_lownj_2b   0.02"<<endl;
-    fsys<<"  r2_highmet_lownj_3b   0.02"<<endl;
-    fsys<<"  r2_lowmet_highnj_2b   0.02"<<endl;
-    fsys<<"  r2_lowmet_highnj_3b   0.05"<<endl;
-    fsys<<"  r2_highmet_highnj_2b  0.04"<<endl;
-    fsys<<"  r2_highmet_highnj_3b  0.04"<<endl<<endl;
+    fsys<<"  r2_lowmet_lownj_1b    0.02"<<endl;
+    fsys<<"  r2_lowmet_lownj_2b    0.01"<<endl;
+    fsys<<"  r2_lowmet_lownj_3b    0.02"<<endl;
+    fsys<<"  r2_lowmet_highnj_1b   0.12"<<endl;
+    fsys<<"  r2_lowmet_highnj_2b   0.08"<<endl;
+    fsys<<"  r2_lowmet_highnj_3b   0.03"<<endl;
+    
+    fsys<<"  r2_medmet_lownj_1b   0.07"<<endl;
+    fsys<<"  r2_medmet_lownj_2b   0.03"<<endl;
+    fsys<<"  r2_medmet_lownj_3b   0.05"<<endl;
+    fsys<<"  r2_medmet_highnj_1b  0.11"<<endl;
+    fsys<<"  r2_medmet_highnj_2b  0.08"<<endl;
+    fsys<<"  r2_medmet_highnj_3b  0.12"<<endl;
+    
+    fsys<<"  r2_highmet_lownj_1b   0.07"<<endl;
+    fsys<<"  r2_highmet_lownj_2b   0.03"<<endl;
+    fsys<<"  r2_highmet_lownj_3b   0.05"<<endl;
+    fsys<<"  r2_highmet_highnj_1b  0.11"<<endl;
+    fsys<<"  r2_highmet_highnj_2b  0.08"<<endl;
+    fsys<<"  r2_highmet_highnj_3b  0.12"<<endl<<endl;
 
+    
     fsys<<"SYSTEMATIC top_pt"<<endl;
     fsys<<" PROCESSES ttbar"<<endl;
-    fsys<<"  r2_medmet_lownj_1b   0.01"<<endl;
-    fsys<<"  r2_medmet_highnj_1b  0.04"<<endl;
-    fsys<<"  r2_medmet_lownj_2b   0.03"<<endl;
-    fsys<<"  r2_medmet_lownj_3b   0.03"<<endl;
-    fsys<<"  r2_medmet_highnj_2b  0.01"<<endl;
-    fsys<<"  r2_medmet_highnj_3b  0.01"<<endl;
-  
+
     fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
-    fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
-    fsys<<"  r2_lowmet_highnj_1b   0.01"<<endl;
-    fsys<<"  r2_highmet_highnj_1b  0.04"<<endl;
     fsys<<"  r2_lowmet_lownj_2b    0.01"<<endl;
     fsys<<"  r2_lowmet_lownj_3b    0.01"<<endl;
-    fsys<<"  r2_highmet_lownj_2b   0.03"<<endl;
-    fsys<<"  r2_highmet_lownj_3b   0.03"<<endl;
+    fsys<<"  r2_lowmet_highnj_1b   0.02"<<endl;
     fsys<<"  r2_lowmet_highnj_2b   0.01"<<endl;
-    fsys<<"  r2_lowmet_highnj_3b   0.01"<<endl;
-    fsys<<"  r2_highmet_highnj_2b  0.01"<<endl;
+    fsys<<"  r2_lowmet_highnj_3b   0.02"<<endl;
+
+    fsys<<"  r2_medmet_lownj_1b   0.05"<<endl;
+    fsys<<"  r2_medmet_lownj_2b   0.02"<<endl;
+    fsys<<"  r2_medmet_lownj_3b   0.01"<<endl;
+    fsys<<"  r2_medmet_highnj_1b  0.01"<<endl;
+    fsys<<"  r2_medmet_highnj_2b  0.04"<<endl;
+    fsys<<"  r2_medmet_highnj_3b  0.01"<<endl;
+  
+    
+    fsys<<"  r2_highmet_lownj_1b   0.05"<<endl;
+    fsys<<"  r2_highmet_lownj_2b   0.02"<<endl;
+    fsys<<"  r2_highmet_lownj_3b   0.01"<<endl;
+    fsys<<"  r2_highmet_highnj_1b  0.01"<<endl;
+    fsys<<"  r2_highmet_highnj_2b  0.04"<<endl;
     fsys<<"  r2_highmet_highnj_3b  0.01"<<endl<<endl;
+    
 
     fsys<<"SYSTEMATIC jet_mismeas"<<endl;
     fsys<<" PROCESSES ttbar"<<endl;
-  
-    fsys<<"  r2_medmet_lownj_1b   0.05"<<endl;
-    fsys<<"  r2_medmet_highnj_1b  0.02"<<endl;
+
+    fsys<<"  r2_lowmet_lownj_1b    0.01"<<endl;
+    fsys<<"  r2_lowmet_lownj_2b    0.01"<<endl;
+    fsys<<"  r2_lowmet_lownj_3b    0.04"<<endl;
+    fsys<<"  r2_lowmet_highnj_1b   0.02"<<endl;
+    fsys<<"  r2_lowmet_highnj_2b   0.04"<<endl;
+    fsys<<"  r2_lowmet_highnj_3b   0.03"<<endl;
+
+    fsys<<"  r2_medmet_lownj_1b   0.01"<<endl;
     fsys<<"  r2_medmet_lownj_2b   0.04"<<endl;
-    fsys<<"  r2_medmet_lownj_3b   0.04"<<endl;
-    fsys<<"  r2_medmet_highnj_2b  0.06"<<endl;
-    fsys<<"  r2_medmet_highnj_3b  0.06"<<endl;
+    fsys<<"  r2_medmet_lownj_3b   0.08"<<endl;
+    fsys<<"  r2_medmet_highnj_1b  0.13"<<endl;
+    fsys<<"  r2_medmet_highnj_2b  0.12"<<endl;
+    fsys<<"  r2_medmet_highnj_3b  0.01"<<endl;
   
-    fsys<<"  r2_lowmet_lownj_1b    0.05"<<endl;
-    fsys<<"  r2_highmet_lownj_1b   0.05"<<endl;
-    fsys<<"  r2_lowmet_highnj_1b   0.10"<<endl;
-    fsys<<"  r2_highmet_highnj_1b  0.02"<<endl;
-    fsys<<"  r2_lowmet_lownj_2b    0.04"<<endl;
-    fsys<<"  r2_lowmet_lownj_3b    0.07"<<endl;
+    
+    fsys<<"  r2_highmet_lownj_1b   0.01"<<endl;
     fsys<<"  r2_highmet_lownj_2b   0.04"<<endl;
-    fsys<<"  r2_highmet_lownj_3b   0.04"<<endl;
-    fsys<<"  r2_lowmet_highnj_2b   0.07"<<endl;
-    fsys<<"  r2_lowmet_highnj_3b   0.10"<<endl;
-    fsys<<"  r2_highmet_highnj_2b  0.06"<<endl;
-    fsys<<"  r2_highmet_highnj_3b  0.06"<<endl<<endl;
+    fsys<<"  r2_highmet_lownj_3b   0.08"<<endl;
+    fsys<<"  r2_highmet_highnj_1b  0.13"<<endl;
+    fsys<<"  r2_highmet_highnj_2b  0.12"<<endl;
+    fsys<<"  r2_highmet_highnj_3b  0.01"<<endl<<endl;
+
 
     fsys<<"SYSTEMATIC non_ttbar"<<endl;
     fsys<<" PROCESSES other"<<endl;
@@ -769,26 +780,58 @@ void fillTtbarSys(ofstream &fsys){
      //           => uncert = sqrt((343-307.25)/307.25*(343-307.25)/307.25+1/343) = .128
      // High Njets: Npred=33.10+2.74-2.72    , Nobs=38
      //           => uncert = sqrt((38-33.1)/33.1*(38-33.1)/33.1+1/38) = 0.220 
-      fsys<<"  r2_medmet_lownj_1b   0.13"<<endl;
-      fsys<<"  r2_medmet_highnj_1b  0.22"<<endl;
-      fsys<<"  r2_medmet_lownj_2b   0.13"<<endl;
-      fsys<<"  r2_medmet_lownj_3b   0.13"<<endl;
-      fsys<<"  r2_medmet_highnj_2b  0.22"<<endl;
-      fsys<<"  r2_medmet_highnj_3b  0.22"<<endl;
+      // fsys<<"  r2_medmet_lownj_1b   0.13"<<endl;
+      // fsys<<"  r2_medmet_highnj_1b  0.22"<<endl;
+      // fsys<<"  r2_medmet_lownj_2b   0.13"<<endl;
+      // fsys<<"  r2_medmet_lownj_3b   0.13"<<endl;
+      // fsys<<"  r2_medmet_highnj_2b  0.22"<<endl;
+      // fsys<<"  r2_medmet_highnj_3b  0.22"<<endl;
     
    
-      fsys<<"  r2_lowmet_lownj_1b    0.13"<<endl;
-      fsys<<"  r2_highmet_lownj_1b   0.13"<<endl;
-      fsys<<"  r2_lowmet_highnj_1b   0.22"<<endl;
-      fsys<<"  r2_highmet_highnj_1b  0.22"<<endl;
-      fsys<<"  r2_lowmet_lownj_2b    0.13"<<endl;
-      fsys<<"  r2_lowmet_lownj_3b    0.13"<<endl;
-      fsys<<"  r2_highmet_lownj_2b   0.13"<<endl;
-      fsys<<"  r2_highmet_lownj_3b   0.13"<<endl;
-      fsys<<"  r2_lowmet_highnj_2b   0.22"<<endl;
-      fsys<<"  r2_lowmet_highnj_3b   0.22"<<endl;
-      fsys<<"  r2_highmet_highnj_2b  0.22"<<endl;
-      fsys<<"  r2_highmet_highnj_3b  0.22"<<endl;
+      // fsys<<"  r2_lowmet_lownj_1b    0.13"<<endl;
+      // fsys<<"  r2_highmet_lownj_1b   0.13"<<endl;
+      // fsys<<"  r2_lowmet_highnj_1b   0.22"<<endl;
+      // fsys<<"  r2_highmet_highnj_1b  0.22"<<endl;
+      // fsys<<"  r2_lowmet_lownj_2b    0.13"<<endl;
+      // fsys<<"  r2_lowmet_lownj_3b    0.13"<<endl;
+      // fsys<<"  r2_highmet_lownj_2b   0.13"<<endl;
+      // fsys<<"  r2_highmet_lownj_3b   0.13"<<endl;
+      // fsys<<"  r2_lowmet_highnj_2b   0.22"<<endl;
+      // fsys<<"  r2_lowmet_highnj_3b   0.22"<<endl;
+      // fsys<<"  r2_highmet_highnj_2b  0.22"<<endl;
+      // fsys<<"  r2_highmet_highnj_3b  0.22"<<endl;
+
+      //updating to use http://cms2.physics.ucsb.edu/susy/slides/archive/unblind/2016_09_03/unblind_12p9/fulltable_pred_lumi12p9_unblind_m2lveto.pdf
+      //Relative precision of test = sqrt(prediction + pred_unc^2)/prediction
+      //Low Njets, low MET: 0.11 (pred = 149.2+/-11)
+      //High Njets, low MET: 0.28 (pred = 16.4+/-2)
+      //Low Njets, medium MET: 0.29 (pred = 29.4+/-6.7)
+      //high Njets, medium MET: 0.63 (pred = 3.34+/-1.06)
+
+
+      fsys<<"  r2_lowmet_lownj_1b    0.11"<<endl;
+      fsys<<"  r2_lowmet_lownj_2b    0.11"<<endl;
+      fsys<<"  r2_lowmet_lownj_3b    0.11"<<endl;
+      fsys<<"  r2_lowmet_highnj_1b   0.28"<<endl;
+      fsys<<"  r2_lowmet_highnj_2b   0.28"<<endl;
+      fsys<<"  r2_lowmet_highnj_3b   0.28"<<endl;
+
+      fsys<<"  r2_medmet_lownj_1b   0.29"<<endl;
+      fsys<<"  r2_medmet_lownj_2b   0.29"<<endl;
+      fsys<<"  r2_medmet_lownj_3b   0.29"<<endl;
+      fsys<<"  r2_medmet_highnj_1b  0.63"<<endl;
+      fsys<<"  r2_medmet_highnj_2b  0.63"<<endl;
+      fsys<<"  r2_medmet_highnj_3b  0.63"<<endl;
+  
+    
+      fsys<<"  r2_highmet_lownj_1b   0.29"<<endl;
+      fsys<<"  r2_highmet_lownj_2b   0.29"<<endl;
+      fsys<<"  r2_highmet_lownj_3b   0.29"<<endl;
+      fsys<<"  r2_highmet_highnj_1b  0.63"<<endl;
+      fsys<<"  r2_highmet_highnj_2b  0.63"<<endl;
+      fsys<<"  r2_highmet_highnj_3b  0.63"<<endl<<endl;
+
+ 
 
     }
   
