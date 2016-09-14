@@ -12,7 +12,7 @@ import time
 model = "T1tttt"
 ntu_date = "2016_08_10"
 
-infolder  = "/net/cms2/cms2r0/babymaker/babies/"+ntu_date+"/"+model+"/skim_sys_abcd/"
+infolder  = "/net/cms2/cms2r0/babymaker/babies/"+ntu_date+"/"+model+"/unskimmed/"
 outfolder = "/net/cms2/cms2r0/babymaker/sys/"+ntu_date+"/"+model+"/" 
 runfolder = outfolder+"run/" 
 if not os.path.exists(runfolder):
@@ -39,8 +39,8 @@ for file in inputfiles:
   if ifile % files_job == 0 or ifile == len(inputfiles): 
     fexe.close()
     cmd = "JobSubmit.csh ./run/wrapper.sh "+exename
-    print cmd
-    #os.system(cmd)
+   # print cmd
+    os.system(cmd)
     # sys.exit(0)
 
 print "\nSubmitted "+str(ifile)+" files in "+str(ijob)+" jobs. Output goes to "+outfolder+"\n"
