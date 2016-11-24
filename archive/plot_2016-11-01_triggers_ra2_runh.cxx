@@ -54,115 +54,92 @@ int main(){
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  
     bfolder = "/net/cms2"; // In laptops, you can't create a /net folder
 
-  TString folder(bfolder+"/cms2r0/babymaker/babies/2016_11_08/data/");
+  TString folder17(bfolder+"/cms2r0/babymaker/babies/2016_08_10/data/");
+  TString folder14(bfolder+"/cms2r0/babymaker/babies/2016_10_26/data/");
 
-  //TChain c_met("tree"); c_met.Add(folder+"/merged_ra2data_metG200__pass/*.root"); 
+  TChain c_met("tree"); 
+  c_met.Add(folder17+"/merged_ra2data_metG200__pass/*.root"); 
+  c_met.Add(folder14+"/merged_ra2data_met200/*.root"); 
 
-  TChain c_el("tree"); c_el.Add(folder+"/merged_database_ne1nj3/*.root"); 
-  TChain c_ht("tree"); c_ht.Add(folder+"/merged_database_httrig/*.root"); 
+  TChain c_el("tree"); 
+  c_el.Add(folder17+"/merged_ra2data_nelsGE1__njetsGE3__pass/*.root"); 
+  c_el.Add(folder14+"/merged_ra2data_ne1nj3/*.root"); 
 
 
-  TString title, cuts;
-  //TString met_trig = "(trig[30]||trig[31])";
-  TString met_trig = "(trig[13]||trig[33]||trig[14]||trig[15]||trig[30]||trig[31])";
-  TString trig_title = "MET[NoMu]100||110||120";
+  TString title, cuts, baseline, trigger, trigtitle;
 
   float minx(0), maxx(460);
   int nbins(static_cast<int>((maxx-minx)/10));
 
+  trigger = "(trig[13]||trig[33]||trig[14]||trig[15]||trig[30]||trig[31])";
+  trigtitle = "MET120_MHT120";
 
-  //// Real MET turn-on
-  cuts = "trig[40]&&nels>=1&&njets>=3";
-  title = "Ele27_WPTight, N_{j} #geq 3, N_{e} #geq 1";
+  baseline = "trig[40]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>27&&nvmus==0&&mht/met<5&&met/met_calo<5&&ht>300";
+  TString e_rmht250to300 = Efficiency(&c_el, baseline+"&&mht>250&&mht<=300", trigger);
+  TString e_rmht300to350 = Efficiency(&c_el, baseline+"&&mht>300", trigger);
+  //// MHT and HT
+  baseline = "trig[40]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>27&&nvmus==0&&mht/met<5&&met/met_calo<5";
+  title = "Ele27Tight, N_{e}#geq1, N_{jet}#geq3";
+
 
   minx = 0; maxx = 480; nbins = static_cast<int>((maxx-minx)/10);
-  PlotTurnOn(&c_el, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     cuts, met_trig,  title, trig_title,150);
-
-
-
-  //// Fake MET turn-on
-  cuts = "ht>250&&low_dphi";
-  title = "HT[200,900], H_{T} > 250, N_{l} = 0, low #Delta#phi";
-
-  minx = 0; maxx = 520; nbins = static_cast<int>((maxx-minx)/10);
-  PlotTurnOn(&c_ht, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     cuts, met_trig,  title, trig_title,150);
-
-
-  float effic, errup, errdown;
-  vector<vector<float> > effs;
-  vector<TString> metbins;
-  int metplateau = 300;
-  for(int met=100; met<=metplateau; met+=5) metbins.push_back(to_string(met));
-  metbins.push_back("9999");
-  for(unsigned imet=0; imet<metbins.size()-1; imet++){
-    Efficiency(&c_el, cuts+"&&met>"+metbins[imet]+"&&met<="+metbins[imet+1], met_trig, effic, errup, errdown);
-    effs.push_back(vector<float>{effic,errup,errdown});
-  }
-
-  //// Printing the trigger efficiencies in bins of MET
-  cout<<endl<<endl;
-  for(unsigned imet=0; imet<metbins.size()-1; imet++)
-    cout<<"if(met>"<<setw(4)<<metbins[imet]<<" && met<="<<setw(4)<<metbins[imet+1]<<") {eff = "<<RoundNumber(effs[imet][0],3)
-	<<"; errup = "<<RoundNumber(effs[imet][1],3)<<"; errdown = "<<RoundNumber(effs[imet][2],3)<<";}"<<endl;
-  cout<<endl<<endl;
-
-
-  return 0;
-
-
-  ///////////////////////// For Laurent
-  /////////// RunH 
-  cuts = "trig[40]&&nels>=1&&njets>=3&&run>=280919";
-  title = "RunHtagEle27_WPTight, N_{j} #geq 3, n_{e} #geq 1";
-
-  minx = 0; maxx = 480; nbins = static_cast<int>((maxx-minx)/10);
-  PlotTurnOn(&c_el, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     cuts, "(trig[30]||trig[31])",  title, "MET120_MHT120",170);
+  PlotTurnOn(&c_el, "mht", nbins,minx,maxx, "H_{T}^{miss}", baseline, trigger,  title, trigtitle,170);
 
   minx = 425; maxx = 1550; nbins = static_cast<int>((maxx-minx)/25);
-  PlotTurnOn(&c_el, "ht", nbins,minx,maxx, "H_{T}",
-	     cuts, "(trig[54]||trig[56])", title, "HT900 || Jet450", 825);
-  PlotTurnOn(&c_el, "ht", nbins,minx,maxx, "H_{T}",
-	     cuts, "(trig[54])", title, "HT900", 825);
+  PlotTurnOn(&c_el, "ht_ra2", nbins,minx,maxx, "H_{T}", baseline, "(trig[54])", title, "HT900", 825);
 
 
-  cuts = "trig[40]&&nels>=1&&njets>=6&&run>=280919";
-  title = "RunHtagEle27_WPTight, N_{j} #geq 6, n_{e} #geq 1";
-  PlotTurnOn(&c_el, "ht", nbins,minx,maxx, "H_{T}",
-	     cuts, "(trig[54]||trig[56])", title, "HT900 || Jet450", 825);
-  PlotTurnOn(&c_el, "ht", nbins,minx,maxx, "H_{T}",
-	     cuts, "(trig[54])", title, "HT900", 825);
+
+  //// Variables
+  baseline = "trig[40]&&Max$(els_pt*(els_miniso<0.1&&els_sigid))>27&&nvmus==0&&mht/met<5&&met/met_calo<5&&mht>250";
+  title = "Ele27Tight, N_{e}#geq1, N_{jet}#geq3, H_{T}^{miss}>250";
+
+  trigger = "(trig[30]||trig[31])";
+  trigtitle = "MET120_MHT120";
+
+  minx = 0; maxx = 1850; nbins = static_cast<int>((maxx-minx)/50);
+  PlotTurnOn(&c_el,"ht_ra2",nbins,minx,maxx, "H_{T}", baseline, trigger, title, trigtitle, -300);
 
 
-  /////////// All 2016
-  cuts = "trig[40]&&nels>=1&&njets>=3";
-  title = "Ele27_WPTight, N_{j} #geq 3, n_{e} #geq 1";
+  minx = 2.5; maxx = 9.5; nbins = static_cast<int>((maxx-minx)/1);
+  PlotTurnOn(&c_el,"njets",nbins,minx,maxx, "N_{jets}", baseline, trigger, title, trigtitle, -3);
 
-  minx = 0; maxx = 480; nbins = static_cast<int>((maxx-minx)/10);
-  PlotTurnOn(&c_el, "met", nbins,minx,maxx, "E_{T}^{miss}",
-	     cuts, "(trig[30]||trig[31])",  title, "MET120_MHT120",170);
-
-  minx = 425; maxx = 1550; nbins = static_cast<int>((maxx-minx)/25);
-  PlotTurnOn(&c_el, "ht", nbins,minx,maxx, "H_{T}",
-	     cuts, "(trig[54]||trig[56])", title, "HT900 || Jet450", 825);
-  PlotTurnOn(&c_el, "ht", nbins,minx,maxx, "H_{T}",
-	     cuts, "(trig[54])", title, "HT900", 825);
-
-
-  cuts = "trig[40]&&nels>=1&&njets>=6";
-  title = "Ele27_WPTight, N_{j} #geq 6, n_{e} #geq 1";
-  PlotTurnOn(&c_el, "ht", nbins,minx,maxx, "H_{T}",
-	     cuts, "(trig[54]||trig[56])", title, "HT900 || Jet450", 825);
-  PlotTurnOn(&c_el, "ht", nbins,minx,maxx, "H_{T}",
-	     cuts, "(trig[54])", title, "HT900", 825);
+  minx = -0.5; maxx = 4.5; nbins = static_cast<int>((maxx-minx)/1);
+  PlotTurnOn(&c_el,"nbm",nbins,minx,maxx, "N_{b}", baseline, trigger, title, trigtitle, 0);
 
 
   vector<TString> runs({"run>=272007&&run<=275376", "run>=275657&&run<=276283", "run>=276315&&run<=276811", 
-	"run>=276831&&run<=277420 ", "run>=277772&&run<=278808 ", "run>=278820&&run<=280385",   
-	"run>=280919&&run<=2830590"});
+  	"run>=276831&&run<=277420 ", "run>=277772&&run<=278808 ", "run>=278820&&run<=280385",   
+  	"run>=280919&&run<=2830590"});
   vector<TString> runNames({"RunB", "RunC", "RunD", "RunE", "RunF", "RunG", "RunH"});
+
+  for(size_t ind=0; ind<runs.size(); ind++){
+    cuts = "trig[30]&&onmet>110&&njets>=3&&nvleps==0&&"+runs[ind];
+    title = runNames[ind]+"tagMET120, N_{j} #geq 3, N_{l} = 0, MET > 200";
+
+    minx = 180; maxx = 750; nbins = static_cast<int>((maxx-minx)/10);
+    PlotTurnOn(&c_met, "ht_ra2", nbins,minx,maxx, "H_{T}",
+    	       cuts, "(trig[43])", title, "HT300_MET110", 300, 1, true, false);
+
+    cuts = "trig[40]&&nels>=1&&"+runs[ind];
+    title = runNames[ind]+"tagEle27_WPTight, N_{j} #geq 3, n_{e} #geq 1";
+
+    minx = 425; maxx = 1550; nbins = static_cast<int>((maxx-minx)/25);
+    PlotTurnOn(&c_el, "ht_ra2", nbins,minx,maxx, "H_{T}",
+    	       cuts, "(trig[54])", title, "HT900", 825);
+
+
+
+    minx = 0; maxx = 480; nbins = static_cast<int>((maxx-minx)/10);
+    PlotTurnOn(&c_el, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+    	       cuts, "(trig[30]||trig[31])",  title, "MET120_MHT120",170);
+
+    cuts = "trig[40]&&nels>=1&&ht>400&&"+runs[ind];
+    title = runNames[ind]+"tagEle27_WPTight, N_{j} #geq 3, H_{T} > 400, n_{e} #geq 1";
+    PlotTurnOn(&c_el, "mht", nbins,minx,maxx, "H_{T}^{miss}",
+    	       cuts, "(trig[43])",  title, "HT300_MET110",160);
+  }
+
 
 
 
@@ -235,6 +212,7 @@ TString PlotTurnOn(TChain *data, TString var, int nbins, double minx, double max
   if(minfit>0) {pname += "_min"; pname += minfit; }
   if(isData) pname += "_data";
   else pname += "_mc";
+  pname.ReplaceAll(".","p");
   pname += plot_type;
   
   // Fitting turn on curve
@@ -298,7 +276,7 @@ TString PlotTurnOn(TChain *data, TString var, int nbins, double minx, double max
   label.SetTextAlign(33); //label.SetNDC(); 
   float range(maxx-minx);
   float x2(maxx-0.04*range), y2(maxeff-0.07), ysingle(0.1);
-  TString lumi = "36.2 fb^{-1}";
+  TString lumi = "31.2 fb^{-1}";
   if(title.Contains("fb")){
     lumi = title; lumi.Remove(lumi.First("fb"), lumi.Length()); lumi = lumi + " fb^{-1}";
     title.Remove(0, title.First("fb")+2);
