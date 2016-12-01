@@ -24,7 +24,7 @@
 
 using namespace std;
 namespace {
-  TString luminosity = "10";
+  TString luminosity = "36.2";
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
@@ -37,9 +37,8 @@ int main(){
 
 
   //// Defining samples, i.e. columns in the table
-  // TString folder="/cms2r0/babymaker/babies/2016_06_14/mc/skim_1lht500/";
-  TString folder="/cms2r0/babymaker/babies/2016_06_14/mc/merged_standard/";
-  TString folder_sig="/cms2r0/babymaker/babies/2016_04_29/mc/T1tttt/unskimmed/";
+  TString folder="/cms2r0/babymaker/babies/2016_08_10/mc/merged_mcbase_standard/";
+  TString folder_sig="/cms2r0/babymaker/babies/2016_08_10/T1tttt/skim_standard/";
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  folder = "/net/cms2"+folder;
 
@@ -47,16 +46,17 @@ int main(){
   s_tt.push_back(folder+"*_TTJets*Lept*");
   s_tt.push_back(folder+"*_TTJets_HT*");
   vector<TString> s_t1t;
-  s_t1t.push_back(folder_sig+"*T1tttt*-1800_*-200_*");
+  s_t1t.push_back(folder_sig+"*T1tttt_mGluino-1700_mLSP-100_*");
   vector<TString> s_t1tc;
-  s_t1tc.push_back(folder_sig+"*T1tttt*-1400_*-1000_*");
+  s_t1tc.push_back(folder_sig+"*T1tttt_mGluino-1400_mLSP-1000_*");
   vector<TString> s_other;
   s_other.push_back(folder+"*DYJetsToLL*");
   s_other.push_back(folder+"*_ZJet*");
   s_other.push_back(folder+"*_WWTo*");
   s_other.push_back(folder+"*ttHJetTobb*");
-  s_other.push_back(folder+"*_TTTT*");
-  s_other.push_back(folder+"*_WZ*.root");
+  s_other.push_back(folder+"*ggZH_HToBB*");
+  s_other.push_back(folder+"*_TTTT_*");
+  s_other.push_back(folder+"*_WZTo*.root");
   s_other.push_back(folder+"*_WH_HToBB*.root");
   s_other.push_back(folder+"*_ZH_HToBB*.root");
   s_other.push_back(folder+"*_ZZ_*.root");
@@ -67,12 +67,12 @@ int main(){
   vector<TString> s_ttv;
   s_ttv.push_back(folder+"*_TTWJets*");
   s_ttv.push_back(folder+"*_TTZTo*");
-  s_ttv.push_back(folder+"*_TTG*");
+  s_ttv.push_back(folder+"*_TTGJets*");
   vector<TString> s_single;
   s_single.push_back(folder+"*_ST_*");
  
   vector<sfeats> Samples; 
-  Samples.push_back(sfeats(s_other, "Other", 1001,1,"stitch"));
+  Samples.push_back(sfeats(s_other, "Other", 1001,1));
   Samples.push_back(sfeats(s_qcd, "QCD", 1002, 1,"ntruleps==0"));
   Samples.push_back(sfeats(s_ttv, "$t\\bar{t}V$", 1002));
   Samples.push_back(sfeats(s_single, "Single $t$", 1005));
@@ -90,21 +90,22 @@ int main(){
   //////////// Standard cutflow ////////////
   // Pushing first table and adding rows
   tables.push_back(tfeats("1", "an"));
-  tables.back().add("No selection", "1");
-  tables.back().add("$1\\ell$", "nleps==1");
-  tables.back().add("$H_T>500$ GeV", "ht>500&&nleps==1");
-  tables.back().add("MET$>200$ GeV", "met>200&&ht>500&&nleps==1");
-  tables.back().add("Track veto", "met>200&&ht>500&&nleps==1&&nveto==0");
-  tables.back().add("$N_{\\rm jets}\\geq6$", "njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
-  tables.back().add("$N_{\\rm b}\\geq1$", "nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0","-");
-  tables.back().add("$M_J>250$ GeV", "mj14>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
-  // tables.back().add("R1, low met", "mj14>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0"+r1check);
-  tables.back().add("$m_T>140$ GeV", "mt>140&&mj14>250&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
-  tables.back().add("$M_J>400$ GeV", "mt>140&&mj14>400&&nbm>=1&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
-  tables.back().add("$N_{\\rm b}\\geq2$", "mt>140&&mj14>400&&nbm>=2&&njets>=6&&met>200&&ht>500&&nleps==1&&nveto==0");
-  tables.back().add("MET$>350$ GeV", "mt>140&&mj14>400&&nbm>=2&&njets>=6&&met>350&&ht>500&&nleps==1&&nveto==0");
-  tables.back().add("MET$>500$ GeV", "mt>140&&mj14>400&&nbm>=2&&njets>=6&&met>500&&ht>500&&nleps==1&&nveto==0");
-  tables.back().add("$N_{\\rm jets}\\geq9$", "mt>140&&mj14>400&&nbm>=2&&njets>=9&&met>500&&ht>500&&nleps==1&&nveto==0");
+  //  tables.back().add("No selection", "1");
+  //  tables.back().add("$1\\ell$", "nleps==1");
+  //  tables.back().add("$S_T>500$ GeV", "st>500&&nleps==1");
+  //  tables.back().add("MET$>200$ GeV", "met>200&&st>500&&nleps==1");
+  tables.back().add("$1\\ell$, $S_T>500$ GeV, MET$>200$ GeV", "nleps==1&&st>500&&met>200");
+  tables.back().add("Track veto", "met>200&&st>500&&nleps==1&&nveto==0");
+  tables.back().add("$N_{\\rm jets}\\geq6$", "njets>=6&&met>200&&st>500&&nleps==1&&nveto==0");
+  tables.back().add("$N_{\\rm b}\\geq1$", "nbm>=1&&njets>=6&&met>200&&st>500&&nleps==1&&nveto==0","-");
+  tables.back().add("$M_J>250$ GeV", "mj14>250&&nbm>=1&&njets>=6&&met>200&&st>500&&nleps==1&&nveto==0");
+  // tables.back().add("R1, low met", "mj14>250&&nbm>=1&&njets>=6&&met>200&&st>500&&nleps==1&&nveto==0"+r1check);
+  tables.back().add("$m_T>140$ GeV", "mt>140&&mj14>250&&nbm>=1&&njets>=6&&met>200&&st>500&&nleps==1&&nveto==0");
+  tables.back().add("$M_J>400$ GeV", "mt>140&&mj14>400&&nbm>=1&&njets>=6&&met>200&&st>500&&nleps==1&&nveto==0");
+  tables.back().add("$N_{\\rm b}\\geq2$", "mt>140&&mj14>400&&nbm>=2&&njets>=6&&met>200&&st>500&&nleps==1&&nveto==0");
+  tables.back().add("MET$>350$ GeV", "mt>140&&mj14>400&&nbm>=2&&njets>=6&&met>350&&st>500&&nleps==1&&nveto==0");
+  tables.back().add("MET$>500$ GeV", "mt>140&&mj14>400&&nbm>=2&&njets>=6&&met>500&&st>500&&nleps==1&&nveto==0");
+  tables.back().add("$N_{\\rm jets}\\geq9$", "mt>140&&mj14>400&&nbm>=2&&njets>=9&&met>500&&st>500&&nleps==1&&nveto==0");
 
 
   /////////////////////////////  No more changes needed down here to add tables ///////////////////////
@@ -116,7 +117,7 @@ int main(){
     for(size_t icut(0); icut < tables[itab].tcuts.size(); icut++){
       bincuts.push_back(bcut(tables[itab].cuts+"&&"+tables[itab].tcuts[icut]));
     }
-    tables[itab].cuts = "ht>500&&met>200&&"+baseline_s + "&&" + tables[itab].cuts;
+    tables[itab].cuts = "st>500&&met>200&&"+baseline_s + "&&" + tables[itab].cuts;
   }
   //// Calculating yields per sample, all bins from all tables at a time
   vector<vector<double> > yields, w2, entries;
