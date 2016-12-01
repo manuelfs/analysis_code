@@ -152,13 +152,13 @@ int main(){
 	// 	   "MET triggers", v_minfit[ivar]);
 
 
-	PlotTurnOn(&c_ht,variable[ivar],nbins,minx,maxx, varname[ivar], baseline[ilep]+runrange[irun], "trig_lep&&trig_vvvl", title[ilep], 
+	PlotTurnOn(&c_ht,variable[ivar],nbins,minx,maxx, varname[ivar], baseline[ilep]+runrange[irun], "(trig_lep||trig_vvvl)", title[ilep], 
 		  "Lepton triggers", v_minfit[ivar]);
 	 
-	// PlotTurnOn(&c_ht,variable[ivar],nbins,minx,maxx, varname[ivar], baseline[ilep]+runrange[irun]+"&&met>200", "trig_lep&&trig_vvvl", title[ilep], 
+	// PlotTurnOn(&c_ht,variable[ivar],nbins,minx,maxx, varname[ivar], baseline[ilep]+runrange[irun]+"&&met>200", "(trig_lep||trig_vvvl)", title[ilep], 
 	// 	   "Lepton triggers", v_minfit[ivar]);
 
-	// PlotTurnOn(&c_ht,variable[ivar],nbins,minx,maxx, varname[ivar], baseline[ilep]+runrange[irun]+"&&met<=200","trig_lep&&trig_vvvl", title[ilep], 
+	// PlotTurnOn(&c_ht,variable[ivar],nbins,minx,maxx, varname[ivar], baseline[ilep]+runrange[irun]+"&&met<=200","(trig_lep||trig_vvvl)", title[ilep], 
 	// 	  "Lepton triggers", v_minfit[ivar]);
 
 
