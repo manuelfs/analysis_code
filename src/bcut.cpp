@@ -1,4 +1,3 @@
-
 #include "bcut.hpp"
 
 using namespace std;
@@ -302,6 +301,9 @@ void onecut::assignBranch(TString var, TString val){
   }else if(var=="stitch"){
     cutType_ = kBool;
     bb_ = &baby_base::stitch;
+  }else if(var=="stitch_met"){
+    cutType_ = kBool;
+    bb_ = &baby_base::stitch_met;
   }else if(var=="nonblind"){
     cutType_ = kBool;
     bb_ = &baby_base::nonblind;

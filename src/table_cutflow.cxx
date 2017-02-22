@@ -24,7 +24,7 @@
 
 using namespace std;
 namespace {
-  TString luminosity = "36.2";
+  TString luminosity = "35.9";
 }
 
 void printTable(vector<sfeats> Samples, tfeats table, vector<vector<double> > yields, vector<vector<double> > w2, 
@@ -37,16 +37,17 @@ int main(){
 
 
   //// Defining samples, i.e. columns in the table
-  TString folder="/cms2r0/babymaker/babies/2016_08_10/mc/merged_mcbase_standard/";
-  TString folder_sig="/cms2r0/babymaker/babies/2016_08_10/T1tttt/skim_standard/";
+  TString folder="/cms29r0/babymaker/babies/2017_01_27/mc/merged_mcbase_standard/";
+  TString folder_sig="/cms29r0/babymaker/babies/2017_02_13_grooming/T1tttt/renormed/";
+
   string hostname = execute("echo $HOSTNAME");
-  if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  folder = "/net/cms2"+folder;
+  if(Contains(hostname, "cms") || Contains(hostname, "compute-"))  folder = "/net/cms29"+folder;
 
   vector<TString> s_tt;
   s_tt.push_back(folder+"*_TTJets*Lept*");
-  s_tt.push_back(folder+"*_TTJets_HT*");
+  //  s_tt.push_back(folder+"*_TTJets_HT*");
   vector<TString> s_t1t;
-  s_t1t.push_back(folder_sig+"*T1tttt_mGluino-1700_mLSP-100_*");
+  s_t1t.push_back(folder_sig+"*T1tttt_mGluino-1800_mLSP-100_*");
   vector<TString> s_t1tc;
   s_t1tc.push_back(folder_sig+"*T1tttt_mGluino-1400_mLSP-1000_*");
   vector<TString> s_other;
@@ -54,7 +55,7 @@ int main(){
   s_other.push_back(folder+"*_ZJet*");
   s_other.push_back(folder+"*_WWTo*");
   s_other.push_back(folder+"*ttHJetTobb*");
-  s_other.push_back(folder+"*ggZH_HToBB*");
+  s_other.push_back(folder+"*_ZH_HToBB*");
   s_other.push_back(folder+"*_TTTT_*");
   s_other.push_back(folder+"*_WZTo*.root");
   s_other.push_back(folder+"*_WH_HToBB*.root");
@@ -72,19 +73,19 @@ int main(){
   s_single.push_back(folder+"*_ST_*");
  
   vector<sfeats> Samples; 
-  Samples.push_back(sfeats(s_other, "Other", 1001,1));
-  Samples.push_back(sfeats(s_qcd, "QCD", 1002, 1,"ntruleps==0"));
+  Samples.push_back(sfeats(s_other, "Other", 1001,1,"stitch"));
+  Samples.push_back(sfeats(s_qcd, "QCD", 1002, 1,"stitch&&ntruleps==0"));
   Samples.push_back(sfeats(s_ttv, "$t\\bar{t}V$", 1002));
   Samples.push_back(sfeats(s_single, "Single $t$", 1005));
-  Samples.push_back(sfeats(s_wjets, "W+jets", 1004));
-  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ (1$\\ell$)", 1000,1, "ntruleps==1"));
-  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ ($2\\ell$)", 1006,1,"ntruleps==2"));
+  Samples.push_back(sfeats(s_wjets, "W+jets", 1004,1,"stitch"));
+  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ (1$\\ell$)", 1000,1, "stitch_met&&ntruleps==1"));
+  Samples.push_back(sfeats(s_tt, "$t\\bar{t}$ ($2\\ell$)", 1006,1,"stitch_met&&ntruleps==2"));
   Samples.push_back(sfeats(s_t1t, "T1tttt NC", 2));
   Samples.push_back(sfeats(s_t1tc, "T1tttt C", 2,2));
 
   //// tables has a vector of the tables you want to print
   vector<tfeats> tables;
-  TString baseline_s("stitch&&pass"); 
+  TString baseline_s("pass"); 
 
   TString r1check = "&&mt<140&&mj14<=400&&met<=350";
   //////////// Standard cutflow ////////////

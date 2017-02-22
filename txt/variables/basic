@@ -5,6 +5,7 @@ Long64_t event
 bool nonblind
 ## stitch is used to stitch an MC sample with its corresponding HT-bin sample
 bool stitch
+bool stitch_met
 bool json2p6
 bool json12p9
 
