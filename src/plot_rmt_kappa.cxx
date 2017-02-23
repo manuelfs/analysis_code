@@ -31,12 +31,12 @@
 using namespace std;
 
 namespace{
-  bool verbose(false);
+  bool verbose(true);
   TString title_style("CMSPaper");
   bool do_data(false);
   bool only_tt(false);
   bool only_other(false);
-  bool do_metbins(true);
+  bool do_metbins(false);
   bool fatbins(true); //fatbins = true is the default; setting it to false does not integrate over bins, aka method1 
   TString baseht("500");   
   TString lowmj("250");    
@@ -48,7 +48,7 @@ namespace{
   TString basenj("4"); //only 4 implemeted so far...
   TString lownj("6"); // 6 or 7 lowest to go into kappa (only 6 yields validated)
   TString highnj("9"); // 8 or 9 (only 9 yields validated)
-  double lumi(5);
+  double lumi(35.9);
 }
 
 void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> const (&yield)[NSAM], vector<double> const (&w2)[NSAM], size_t ini, size_t fin);
@@ -59,11 +59,11 @@ int main(){
 
   time_t begtime, endtime;
   time(&begtime);
-  TString folder="/cms2r0/babymaker/babies/2016_06_14/mc/merged_standard/";
+  TString folder="/cms29r0/babymaker/babies/2017_01_27/mc/merged_mcbase_standard/";
   TString folderdata="/cms2r0/babymaker/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/";
   string hostname = execute("echo $HOSTNAME");
   if(Contains(hostname, "cms") || Contains(hostname, "compute-")) {
-    folder = "/net/cms2"+folder;
+    folder = "/net/cms29"+folder;
     folderdata = "/net/cms2"+folder;
   }
   if(Contains(hostname, "lxplus")) folderdata="/afs/cern.ch/user/m/manuelf/work/babies/2015_11_20/data/singlelep/combined/skim_1lht500met200/"; 
@@ -73,7 +73,7 @@ int main(){
   baby_basic bkg("");
   if(!only_other){
     bkg.Add(folder+"*TTJets*Lept*");
-    bkg.Add(folder+"*TTJets*HT*");
+    // bkg.Add(folder+"*TTJets*HT*");
   }
   if(!only_tt || only_other){
     bkg.Add(folder+"*_WJetsToLNu*.root");
@@ -96,8 +96,8 @@ int main(){
   }
 
   ////// Defining cuts
-  bcut baseline("nleps==1&&nveto==0&&ht>500&&met>200&&njets>="+basenj+"&&nbm>=1&&mj14>"+lowmj+"&&pass&&stitch");
-  
+  bcut baseline("nleps==1&&nveto==0&&ht>500&&met>200&&njets>="+basenj+"&&nbm>=1&&mj14>"+lowmj+"&&pass&&stitch_met");
+
   map<TString, vector<bcut> > cutmap;
   //RmT and kappa calculation depend on mt cuts ordering, assumed 0 = low, 1 = high
   cutmap["mt"].push_back(bcut("mt<="+mtcut));
