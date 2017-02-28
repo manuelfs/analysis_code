@@ -539,6 +539,8 @@ TString cuts2tex(TString cuts){
   cuts.ReplaceAll("trig[4]", "\\text{Mu15\\_VVVL}"); cuts.ReplaceAll("trig[8]", "\\text{Ele15\\_VVVL}"); 
   cuts.ReplaceAll("trig[14]", "\\text{MET170}");  cuts.ReplaceAll("trig[28]", "\\text{MET90}");  
   cuts.ReplaceAll("trig[12]", "\\text{HT800}");  
+  cuts.ReplaceAll("trig[54]", "\\text{HT900}");  
+  cuts.ReplaceAll("trig[40]", "\\text{Ele27}");  
 
   cuts.ReplaceAll("&&&&", "&&");  cuts.ReplaceAll("&&", ", ");  
   cuts.ReplaceAll("elelv_m", "m_{ee}"); cuts.ReplaceAll("elel_m", "m_{ee}"); cuts.ReplaceAll("elelv_pt", "p^{ee}_T"); 
@@ -546,13 +548,18 @@ TString cuts2tex(TString cuts){
   cuts.ReplaceAll("mumuv_pt", "p^{\\mu\\mu}_T"); 
   cuts.ReplaceAll("ht_ra2", "H_T"); cuts.ReplaceAll("ht_clean", "H_T"); cuts.ReplaceAll("ht", "H_T"); 
   cuts.ReplaceAll("mj14", "M_J^{1.4}"); cuts.ReplaceAll("mj", "M_J"); cuts.ReplaceAll("met", "\\mathrm{MET}");  
-  cuts.ReplaceAll("njets_ra2", "n_j");  cuts.ReplaceAll("njets_clean", "n_j");  cuts.ReplaceAll("njets", "N_j");  
+  cuts.ReplaceAll("njets_ra2", "n_j");  cuts.ReplaceAll("njets_clean", "n_j");  
+  cuts.ReplaceAll("njets", "N_{\\rm jets}");  
   cuts.ReplaceAll("nbm", "N_b");  cuts.ReplaceAll("nleps", "n_{\\ell}"); 
   cuts.ReplaceAll("nvels", "n_e"); cuts.ReplaceAll("nels", "n_e");  
   cuts.ReplaceAll("nvmus", "n_\\mu"); cuts.ReplaceAll("nmus", "n_\\mu");  cuts.ReplaceAll("nveto", "N_{\\rm veto}");  
   cuts.ReplaceAll(">=", "\\geq ");  cuts.ReplaceAll("<=", " \\leq "); cuts.ReplaceAll("==", " = ");
   cuts.ReplaceAll("pass_jets","\\text{JetID}"); cuts.ReplaceAll("pass_ra2, ","");cuts.ReplaceAll("pass, ","");
   cuts.ReplaceAll("pass","\\text{all filters}");
+
+  cuts.ReplaceAll("hig_drmax", "\\Delta R_{\\rm max}");
+  cuts.ReplaceAll("hig_am","\\left<m\\right>");
+
 
   cuts = "$"+cuts+"$";
   return cuts;
