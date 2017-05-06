@@ -304,9 +304,10 @@ void kappa(TString basecut, map<TString, vector<bcut> > &cutmap, vector<vector<u
     if (title_style=="CMSPaper"){
       cmslabel.SetNDC(kTRUE);
       cmslabel.SetTextAlign(11);
-      cmslabel.DrawLatex(0.175,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
+      cmslabel.DrawLatex(0.175,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation Supplementary}}");  
       cmslabel.SetTextAlign(31);
-      cmslabel.DrawLatex(0.953,0.94,"13 TeV");  
+      cmslabel.DrawLatex(0.953,0.94,"13 TeV"); 
+      
     }
 
     TString ytitle("#kappa"); 
@@ -457,9 +458,10 @@ void rmt(TString basecut, map<TString, vector<bcut> > &cutmap, vector<double> co
     if (title_style=="CMSPaper"){
       cmslabel.SetNDC(kTRUE);
       cmslabel.SetTextAlign(11);
-      cmslabel.DrawLatex(0.12,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation}}");  
+      cmslabel.DrawLatex(0.12,0.94,"#font[62]{CMS} #scale[0.8]{#font[52]{Simulation Supplementary}}");  
       cmslabel.SetTextAlign(31);
       cmslabel.DrawLatex(0.953,0.94,"13 TeV");  
+      cmslabel.DrawLatex(0.84,0.94,"#scale[0.75]{#font[82]{arXiv:xxxx.xxxxx}}");
     }
 
     TString ytitle("R(m#lower[-.01]{_{T}})"); 
